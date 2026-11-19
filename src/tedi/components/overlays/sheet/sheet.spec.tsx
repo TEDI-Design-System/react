@@ -526,6 +526,28 @@ describe('Sheet', () => {
     expect(screen.getByRole('dialog').style.transform).toBe('');
   });
 
+  it('blocks a native drag while the sheet is dragged, and only then', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Body>Body text</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    const body = screen.getByText('Body text');
+    const pointer = { pointerId: 1, pointerType: 'mouse', buttons: 1 };
+
+    // `fireEvent` returns false when a handler called `preventDefault()`.
+    expect(fireEvent.dragStart(body)).toBe(true);
+
+    fireEvent.pointerDown(handle, { ...pointer, clientY: 100 });
+    expect(fireEvent.dragStart(handle)).toBe(false);
+
+    fireEvent.pointerUp(handle, { ...pointer, clientY: 100 });
+    expect(fireEvent.dragStart(body)).toBe(true);
+  });
+
   it('keeps the active touch drag when another pointer moves or releases', () => {
     render(
       <Sheet defaultOpen>
@@ -735,7 +757,7 @@ describe('Sheet', () => {
     const header = screen.getByRole('heading', { name: 'Layers' }).parentElement as HTMLElement;
     const buttons = within(header)
       .getAllByRole('button')
-      .map((button) => button.getAttribute('aria-label') ?? button.textContent);
+      .map((button) => button.getAttribute('aria-label') ?? button.getAttribute('title') ?? button.textContent);
     expect(buttons).toEqual(['Mocked label: sheet.collapse', 'Fullscreen', 'Close']);
     const end = screen.getByText('End content');
     const collapse = screen.getByRole('button', { name: 'Mocked label: sheet.collapse' });

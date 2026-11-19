@@ -189,10 +189,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                 contentAsRegion={false}
                 open={isCollapsedInternal}
                 onToggle={handleCollapseToggle}
-                toggleLabel={getLabel('sidenav.toggleSubmenuChildren', {
-                  isCollapsedInternal,
-                  children,
-                })}
+                toggleLabel={getLabel('sidenav.toggleSubmenuChildren', { children })}
                 className={styles['tedi-sidenav__collapse']}
                 titleRowProps={{ element: 'span' }}
               >
@@ -211,10 +208,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
             onToggle={handleCollapseToggle}
             className={styles['tedi-sidenav__collapse']}
             titleRowProps={{ element: 'span' }}
-            toggleLabel={getLabel('sidenav.toggleSubmenuChildren', {
-              isCollapsedInternal,
-              children,
-            })}
+            toggleLabel={getLabel('sidenav.toggleSubmenuChildren', { children })}
             title={
               <span
                 className={cn(

@@ -82,14 +82,34 @@ describe('ProgressBar', () => {
     expect(screen.getByText('1 / 5')).toBeInTheDocument();
   });
 
+  it.each(['horizontal', 'bottom'] as const)(
+    'hides the visible value from assistive technology when valuePosition=%s',
+    (valuePosition) => {
+      render(<ProgressBar value={40} label="Upload" valuePosition={valuePosition} />);
+      expect(screen.getByText('40%')).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.getByRole('progressbar', { name: 'Upload' })).toHaveAttribute('aria-valuenow', '40');
+    }
+  );
+
+  it('keeps a custom valueLabel on aria-valuetext while the visible copy is hidden', () => {
+    render(<ProgressBar value={20} valueLabel="1 / 5" />);
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuetext', '1 / 5');
+    expect(screen.getByText('1 / 5')).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it('renders the helper feedback row when `helper` is provided', () => {
     render(<ProgressBar value={50} helper={{ text: 'Almost there', type: 'hint' }} />);
     expect(screen.getByText('Almost there')).toBeInTheDocument();
   });
 
-  it('renders an error feedback row with role=alert', () => {
+  // FeedbackText announces politely, so an error already on screen at load is
+  // not read over everything else.
+  it('renders an error feedback row as a polite live region', () => {
     render(<ProgressBar value={50} helper={{ text: 'Upload failed', type: 'error' }} />);
-    expect(screen.getByRole('alert')).toHaveTextContent('Upload failed');
+    const helper = screen.getByText('Upload failed');
+
+    expect(helper).toHaveAttribute('aria-live', 'polite');
+    expect(helper).toHaveClass('tedi-feedback-text--error');
   });
 
   it('applies the small modifier when small=true', () => {

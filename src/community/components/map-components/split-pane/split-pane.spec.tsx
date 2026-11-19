@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import '@testing-library/jest-dom';
 
@@ -92,6 +93,24 @@ describe('SplitPane', () => {
       render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" />);
 
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('renders the close button outside the separator, whose children are presentational', () => {
+      render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" onClose={jest.fn()} />);
+
+      expect(screen.getByRole('button')).toBeInTheDocument();
+      expect(within(screen.getByRole('separator')).queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('makes the separator and the close button separate tab stops', async () => {
+      const user = userEvent.setup();
+      render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" onClose={jest.fn()} />);
+
+      await user.tab();
+      expect(screen.getByRole('separator')).toHaveFocus();
+
+      await user.tab();
+      expect(screen.getByRole('button')).toHaveFocus();
     });
   });
 

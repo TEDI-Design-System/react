@@ -15,7 +15,7 @@ const PaginationPageButton = ({ item }: PaginationPageButtonProps) => {
   const { table } = React.useContext(TableContext);
   const { getLabel } = useLabels();
   const pageNumber = item.page || 0;
-  const pageLabel = getLabel('pagination.page', pageNumber, item.selected);
+  const pageLabel = getLabel('pagination.page', pageNumber);
 
   const { setPageIndex, toggleAllRowsExpanded } = table as TableType<unknown>;
 

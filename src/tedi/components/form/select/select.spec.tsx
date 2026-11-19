@@ -76,6 +76,79 @@ describe('Select component', () => {
     expect(handleChange).toHaveBeenCalledWith(expect.objectContaining({ value: 'banana', label: 'Banana' }));
   });
 
+  describe('touch inside a shadow root', () => {
+    const renderInShadowRoot = (props: Partial<SelectProps> = {}) => {
+      const host = document.createElement('div');
+      document.body.appendChild(host);
+      const container = document.createElement('div');
+      host.attachShadow({ mode: 'open' }).appendChild(container);
+      const view = render(<Select {...defaultProps} {...props} />, { container });
+
+      return { ...view, host, shadowRoot: host.shadowRoot as ShadowRoot };
+    };
+
+    const touchEnd = (target: Element) =>
+      target.dispatchEvent(new Event('touchend', { bubbles: true, composed: true, cancelable: true }));
+
+    it('keeps the select focused when its control is tapped', async () => {
+      const { host, shadowRoot } = renderInShadowRoot();
+      const input = shadowRoot.querySelector('input') as HTMLInputElement;
+      const control = shadowRoot.querySelector('[class*="control"]') as HTMLElement;
+
+      await act(async () => {
+        input.focus();
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+      });
+      await act(async () => {
+        touchEnd(control);
+      });
+
+      expect(shadowRoot.activeElement).toBe(input);
+      host.remove();
+    });
+
+    it('keeps the select focused when the tap is inside a shadow root within an option', async () => {
+      const { host, shadowRoot } = renderInShadowRoot();
+      const input = shadowRoot.querySelector('input') as HTMLInputElement;
+
+      await act(async () => {
+        input.focus();
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+      });
+
+      const optionHost = document.createElement('span');
+      const inner = document.createElement('span');
+      optionHost.attachShadow({ mode: 'open' }).appendChild(inner);
+      (screen.getByText('Banana').parentElement as HTMLElement).appendChild(optionHost);
+
+      await act(async () => {
+        touchEnd(inner);
+      });
+
+      expect(shadowRoot.activeElement).toBe(input);
+      host.remove();
+    });
+
+    it('still closes the menu when the tap is outside the select', async () => {
+      const { host, shadowRoot } = renderInShadowRoot();
+      const input = shadowRoot.querySelector('input') as HTMLInputElement;
+      const outside = document.createElement('button');
+      document.body.appendChild(outside);
+
+      await act(async () => {
+        input.focus();
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+      });
+      await act(async () => {
+        touchEnd(outside);
+      });
+
+      expect(shadowRoot.activeElement).not.toBe(input);
+      host.remove();
+      outside.remove();
+    });
+  });
+
   it('renders with a placeholder', () => {
     render(<Select {...defaultProps} placeholder="Pick something" />);
     expect(screen.getByText('Pick something')).toBeInTheDocument();
@@ -198,6 +271,32 @@ describe('Select component', () => {
     });
 
     expect(handleChange).toHaveBeenCalledWith(null);
+  });
+
+  it('exposes the clear button to assistive technology with a clear label', () => {
+    render(<Select {...defaultProps} value={basicOptions[0]} isClearIndicatorVisible />);
+
+    expect(screen.getByRole('button', { name: 'clear' })).toBeInTheDocument();
+  });
+
+  it.each([
+    ['Enter', '{Enter}'],
+    ['Space', ' '],
+  ])('clears the selection when %s is pressed on the focused clear button', async (_key, keys) => {
+    const handleChange = jest.fn();
+    render(<Select {...defaultProps} onChange={handleChange} value={basicOptions[0]} isClearIndicatorVisible />);
+
+    const clearButton = screen.getByRole('button', { name: 'clear' });
+    act(() => clearButton.focus());
+
+    await act(async () => {
+      await userEvent.keyboard(keys);
+    });
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenCalledWith(null);
+    await waitFor(() => expect(screen.getByRole('combobox')).toHaveFocus());
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
   it('renders helper text', () => {
@@ -745,6 +844,48 @@ describe('Select component', () => {
       expect(combobox).toHaveAccessibleDescription('Only ripe fruit');
       // react-select's placeholder must not describe the field.
       expect(combobox.getAttribute('aria-describedby') ?? '').not.toMatch(/-placeholder/);
+    });
+
+    it('lists external aria-describedby ids on the combobox', () => {
+      render(
+        <>
+          <p id="external-error">Pick a fruit</p>
+          <Select {...defaultProps} aria-describedby="external-error" />
+        </>
+      );
+
+      const combobox = screen.getByRole('combobox');
+      expect(combobox.getAttribute('aria-describedby')).toBe('external-error');
+      expect(combobox).toHaveAccessibleDescription('Pick a fruit');
+    });
+
+    it('lists external aria-describedby ids before the helper id', () => {
+      render(
+        <Select
+          {...defaultProps}
+          aria-describedby="external-error other"
+          helper={{ id: 'fruit-help', text: 'Only ripe fruit', type: 'error' }}
+        />
+      );
+
+      expect(screen.getByRole('combobox').getAttribute('aria-describedby')).toBe('external-error other fruit-help');
+    });
+
+    it('does not repeat an external id that is also the helper id', () => {
+      render(
+        <Select
+          {...defaultProps}
+          aria-describedby="fruit-help"
+          helper={{ id: 'fruit-help', text: 'Only ripe fruit', type: 'error' }}
+        />
+      );
+
+      expect(screen.getByRole('combobox').getAttribute('aria-describedby')).toBe('fruit-help');
+    });
+
+    it('has no aria-describedby without external ids or helper', () => {
+      render(<Select {...defaultProps} />);
+      expect(screen.getByRole('combobox')).not.toHaveAttribute('aria-describedby');
     });
 
     it('gives each tag remove button an accessible name including the option label', () => {

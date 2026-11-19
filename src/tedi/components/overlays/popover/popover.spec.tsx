@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
@@ -39,6 +39,33 @@ describe('Popover component', () => {
 
     const title = screen.getByText('Heading');
     expect(title).toHaveTextContent('Heading');
+  });
+
+  it('names the popover with ariaLabel when there is no visible title', () => {
+    render(
+      <Popover>
+        <Popover.Trigger>Trigger</Popover.Trigger>
+        <Popover.Content ariaLabel="Filter Name">Content</Popover.Content>
+      </Popover>
+    );
+    fireEvent.click(screen.getByText('Trigger'));
+
+    expect(screen.getByRole('dialog', { name: 'Filter Name' })).toBeInTheDocument();
+  });
+
+  it('prefers the visible title over ariaLabel', () => {
+    render(
+      <Popover>
+        <Popover.Trigger>Trigger</Popover.Trigger>
+        <Popover.Content title="Heading" ariaLabel="Ignored">
+          Content
+        </Popover.Content>
+      </Popover>
+    );
+    fireEvent.click(screen.getByText('Trigger'));
+
+    const dialog = screen.getByRole('dialog', { name: 'Heading' });
+    expect(dialog).not.toHaveAttribute('aria-label');
   });
 
   it('renders a title-only popover without a description wrapper', () => {
@@ -158,6 +185,49 @@ describe('Popover component', () => {
 
       rerender(renderWithOffset(() => 12));
       await waitFor(() => expect(content.style.top).toBe('29px'));
+    });
+  });
+
+  describe('delay prop', () => {
+    beforeEach(() => jest.useFakeTimers());
+    afterEach(() => jest.useRealTimers());
+
+    const renderHover = (delay?: 0 | 100 | 200 | 300) =>
+      render(
+        <Popover openWith="hover" delay={delay}>
+          <Popover.Trigger>Trigger</Popover.Trigger>
+          <Popover.Content>Content</Popover.Content>
+        </Popover>
+      );
+
+    it('opens on hover only after the delay has passed', () => {
+      renderHover(200);
+      fireEvent.mouseEnter(screen.getByText('Trigger'));
+
+      act(() => jest.advanceTimersByTime(199));
+      expect(screen.queryByTestId('overlay-content')).not.toBeInTheDocument();
+
+      act(() => jest.advanceTimersByTime(1));
+      expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
+    });
+
+    it('does not open when the pointer leaves before the delay has passed', () => {
+      renderHover(300);
+      const trigger = screen.getByText('Trigger');
+      fireEvent.mouseEnter(trigger);
+      act(() => jest.advanceTimersByTime(100));
+      fireEvent.mouseLeave(trigger);
+      act(() => jest.advanceTimersByTime(500));
+
+      expect(screen.queryByTestId('overlay-content')).not.toBeInTheDocument();
+    });
+
+    it('opens right away without a delay', () => {
+      renderHover();
+      fireEvent.mouseEnter(screen.getByText('Trigger'));
+      act(() => jest.advanceTimersByTime(0));
+
+      expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
     });
   });
 });

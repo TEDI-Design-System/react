@@ -87,7 +87,7 @@ export interface TableOfContentsProps extends BreakpointSupport<TableOfContentsB
    * divider — the card border closes the list.
    * @default false
    */
-  bordered?: boolean;
+  divided?: boolean;
   /**
    * Whether every item's sub-items are expanded by default. Set `false` to make the list behave like
    * an accordion: only the branch leading to `activeId` keeps its nested children visible.
@@ -187,7 +187,7 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     numbered = false,
     sticky = true,
     variant = 'default',
-    bordered = false,
+    divided = false,
     scrollActiveIntoView = false,
     className,
   } = getCurrentBreakpointProps<TableOfContentsProps>(props);
@@ -220,7 +220,7 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     <div
       className={cn(styles['tedi-table-of-contents'], {
         [styles['tedi-table-of-contents--transparent']]: variant === 'transparent',
-        [styles['tedi-table-of-contents--bordered']]: bordered,
+        [styles['tedi-table-of-contents--divided']]: divided,
       })}
     >
       <TableOfContentsList nodes={nodes} heading={resolvedHeading} />

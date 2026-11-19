@@ -67,11 +67,12 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
     <div className="example-list">
       {array.map((value, key) => {
         const baseId = `${id}-${property}-${value}`;
+        const caption = value ? value.charAt(0).toUpperCase() + value.slice(1) : '';
 
         return (
           <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
             <Col width={12} sm={2}>
-              <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
+              <Text modifiers="bold">{caption}</Text>
             </Col>
             <Col width={12} sm={10}>
               <VerticalSpacing>
@@ -79,20 +80,20 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-plain`}
-                  ariaLabel={`Search – ${value} – plain`}
+                  ariaLabel={`${caption}, lihtne`}
                 />
                 <Search
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-icon`}
-                  ariaLabel={`Search – ${value} – icon button`}
+                  ariaLabel={`${caption}, ikooniga`}
                   button={{ icon: 'search', size: value, 'aria-label': 'Otsi' }}
                 />
                 <Search
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-button`}
-                  ariaLabel={`Search – ${value} – button`}
+                  ariaLabel={`${caption}, tekstiga`}
                   button={{ iconLeft: 'search', children: 'Otsi', size: value }}
                 />
               </VerticalSpacing>
@@ -118,12 +119,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
               <Text modifiers="bold">{state}</Text>
             </Col>
             <Col>
-              <Search
-                {...textFieldProps}
-                id={stateId}
-                disabled={state === 'Disabled'}
-                ariaLabel={`Search – ${state}`}
-              />
+              <Search {...textFieldProps} id={stateId} ariaLabel={state} disabled={state === 'Disabled'} />
             </Col>
           </Row>
         );
@@ -137,7 +133,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Search
             {...textFieldProps}
             id={`${id}-success`}
-            ariaLabel="Search – Success"
+            ariaLabel="Success"
             helper={{ text: 'Tagasiside tekst', type: 'valid' }}
           />
         </Col>
@@ -151,7 +147,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Search
             {...textFieldProps}
             id={`${id}-error`}
-            ariaLabel="Search – Error"
+            ariaLabel="Error"
             helper={{ text: 'Tagasiside tekst', type: 'error' }}
           />
         </Col>
@@ -332,15 +328,16 @@ export const AccessibilityFocused: Story = {
   args: {
     id: 'search-accessible',
     placeholder: 'Otsi tooteid või teenuseid...',
-    ariaLabel: 'Otsi tooteid või teenuseid',
+    label: 'Otsi tooteid või teenuseid',
+    hideLabel: true,
   },
   parameters: {
     docs: {
       description: {
         story: `
 Always prefer a native \`<label>\` element for form controls.
-If the label must not be visible in the UI, hide it visually using an \`sr-only\` (or equivalent) class rather than removing it. This preserves correct semantics and provides the most reliable experience for screen reader users.
-Use \`ariaLabel\` only as a fallback when a real \`<label>\` cannot be rendered. This follows WCAG 2.1 and EN 301 549 9.2.5.3.
+If the label must not be visible in the UI, hide it with \`hideLabel\` rather than removing it. This preserves correct semantics and provides the most reliable experience for screen reader users.
+\`ariaLabel\` names the search landmark, not the field. Set it only when the page has more than one search.
           `,
       },
     },

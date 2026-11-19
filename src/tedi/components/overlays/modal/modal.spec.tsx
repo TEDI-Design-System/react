@@ -49,6 +49,64 @@ describe('Modal', () => {
     expect(document.getElementById(describedBy!)).toHaveTextContent('Description text');
   });
 
+  it('gives the title and description stable ids from the first render', () => {
+    // Records every change to an `id` attribute along with its previous value.
+    const observer = new MutationObserver(() => undefined);
+    observer.observe(document.body, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['id'],
+      attributeOldValue: true,
+    });
+
+    render(
+      <Modal defaultOpen>
+        <Modal.Content>
+          <Modal.Header title="Title text" description="Description text" />
+        </Modal.Content>
+      </Modal>
+    );
+    const heading = screen.getByRole('heading', { name: 'Title text' });
+    const description = screen.getByText('Description text');
+    const idChanges = observer
+      .takeRecords()
+      .filter((record) => record.target === heading || record.target === description);
+    observer.disconnect();
+
+    // Both are inserted with their final ids - they never start out empty and get patched later.
+    expect(idChanges).toHaveLength(0);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveAttribute('aria-labelledby', heading.id);
+    expect(dialog).toHaveAttribute('aria-describedby', description.id);
+  });
+
+  it('renders a numeric 0 title as the heading and dialog name', () => {
+    render(
+      <Modal defaultOpen>
+        <Modal.Content>
+          <Modal.Header title={0} />
+        </Modal.Content>
+      </Modal>
+    );
+
+    const heading = screen.getByRole('heading', { name: '0' });
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-labelledby', heading.id);
+  });
+
+  it('keeps the aria-label fallback when Modal.Header children are a bare 0', () => {
+    render(
+      <Modal defaultOpen>
+        <Modal.Content aria-label="Fallback name">
+          <Modal.Header>{0}</Modal.Header>
+        </Modal.Content>
+      </Modal>
+    );
+
+    const dialog = screen.getByRole('dialog', { name: 'Fallback name' });
+    expect(dialog).not.toHaveAttribute('aria-labelledby');
+    expect(dialog).not.toHaveAttribute('aria-describedby');
+  });
+
   it('closes when the header close button is clicked', () => {
     const onToggle = jest.fn();
     render(
@@ -259,5 +317,29 @@ describe('Modal', () => {
     expect(screen.queryByText('Controlled body')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'External open' }));
     expect(screen.getByText('Controlled body')).toBeInTheDocument();
+  });
+
+  it('keeps the trigger child ref attached across re-renders', () => {
+    const calls: (HTMLElement | null)[] = [];
+    const childRef = (node: HTMLElement | null) => {
+      calls.push(node);
+    };
+    const Host = ({ count }: { count: number }) => (
+      <Modal>
+        <Modal.Trigger>
+          <button type="button" ref={childRef}>
+            Open {count}
+          </button>
+        </Modal.Trigger>
+        <Modal.Content>
+          <Modal.Body>Body</Modal.Body>
+        </Modal.Content>
+      </Modal>
+    );
+    const { rerender } = render(<Host count={0} />);
+    for (let count = 1; count <= 5; count++) rerender(<Host count={count} />);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toBeInstanceOf(HTMLButtonElement);
   });
 });
