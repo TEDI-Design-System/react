@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { LabelProvider } from '../../../../../providers/label-provider';
 import { PrintingProvider, usePrint } from '../../../../../providers/printing-provider/printing-provider';
 import { SideNavItem } from './sidenav-item';
 
@@ -104,6 +105,25 @@ describe('SideNavItem', () => {
       const link = screen.getByRole('link', { name: /Test Item/ });
       expect(link).toHaveAttribute('href', '/dashboard');
       expect(screen.getByText('Dash')).toBeInTheDocument();
+    });
+
+    test('submenu toggle keeps a stable name; state comes from aria-expanded', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <LabelProvider locale="et">
+          <PrintingProvider>
+            <SideNavItem {...defaultProps} href="/test" subItems={[{ children: 'Child' }]} />
+          </PrintingProvider>
+        </LabelProvider>
+      );
+
+      const toggle = screen.getByRole('button', { name: 'Test Item alammenüü' });
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+      await user.click(toggle);
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(toggle).toHaveAccessibleName('Test Item alammenüü');
     });
 
     test('keyboard toggle works on Collapse button (Enter/Space)', async () => {

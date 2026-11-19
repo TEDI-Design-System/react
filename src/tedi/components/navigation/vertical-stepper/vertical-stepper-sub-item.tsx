@@ -42,10 +42,14 @@ export interface VerticalStepperSubItemProps {
    */
   as?: 'a' | 'button';
   /**
-   * Content rendered at the end of the sub-item, below the label — a `StatusBadge`,
-   * `Link`, `Button`, `Text`, etc. (Figma: "related assets".)
+   * Content rendered at the end of the sub-item, below the label (Figma: "related assets"). Links and
+   * buttons here need the sub-step title in their accessible name or `aria-describedby` (WCAG 2.4.4).
    */
   endSlot?: React.ReactNode;
+  /**
+   * `id` of the title text, for `aria-describedby` on `endSlot` actions.
+   */
+  titleId?: string;
   /**
    * Additional class name applied to the `<li>`.
    */
@@ -54,7 +58,7 @@ export interface VerticalStepperSubItemProps {
 
 export const VerticalStepperSubItem = forwardRef<HTMLLIElement, VerticalStepperSubItemProps>((props, ref) => {
   const { getLabel } = useLabels();
-  const { title, state = 'default', current = false, href, onClick, as, endSlot, className } = props;
+  const { title, state = 'default', current = false, href, onClick, as, endSlot, titleId, className } = props;
 
   const isStatic = state === 'disabled' || state === 'informative';
   const isInteractive = !isStatic && (href !== undefined || onClick !== undefined);
@@ -69,7 +73,9 @@ export const VerticalStepperSubItem = forwardRef<HTMLLIElement, VerticalStepperS
 
   const label = (
     <Text element="span" className={styles['tedi-vertical-stepper__label']}>
-      <span className={styles['tedi-vertical-stepper__label-text']}>{title}</span>
+      <span id={titleId} className={styles['tedi-vertical-stepper__label-text']}>
+        {title}
+      </span>
       {state === 'completed' && (
         <Icon
           name="check"

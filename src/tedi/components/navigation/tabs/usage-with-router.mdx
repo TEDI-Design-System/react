@@ -29,7 +29,7 @@ function TabsWithRouting() {
 
   return (
     <Tabs value={location.pathname} onChange={(path) => navigate(path)}>
-      <Tabs.List aria-label="Toimingud tabs">
+      <Tabs.List aria-label="Toimingud">
         {tabs.map((tab) => (
           <Tabs.Trigger key={tab.id} id={tab.id}>
             {tab.label}

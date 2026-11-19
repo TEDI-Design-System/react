@@ -221,15 +221,15 @@ describe('NumberField component', () => {
       expect(second).toHaveAccessibleName('Second');
     });
 
-    it('names the +/- buttons with the field context', () => {
+    it('names the +/- buttons without the field name or step', () => {
       render(
-        <LabelProvider locale="en">
-          <NumberField label="Amount" step={2} onChange={jest.fn()} />
+        <LabelProvider locale="et">
+          <NumberField label="Kogus" step={2} onChange={jest.fn()} />
         </LabelProvider>
       );
 
-      expect(screen.getByRole('button', { name: 'Decrease Amount by 2' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Increase Amount by 2' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Vähenda' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Suurenda' })).toBeInTheDocument();
     });
 
     it('announces value changes driven by an external/controlled update', () => {
@@ -252,8 +252,27 @@ describe('NumberField component', () => {
           jest.advanceTimersByTime(150);
         });
 
-        // Assert the user-facing localized announcement, not the fallback key.
-        expect(status).toHaveTextContent('Updated. New value 2');
+        expect(status).toHaveTextContent(/^2$/);
+      } finally {
+        jest.useRealTimers();
+      }
+    });
+
+    it('announces the value with its suffix', () => {
+      jest.useFakeTimers();
+      try {
+        render(
+          <LabelProvider locale="et">
+            <NumberField label="Kaal" suffix="kg" defaultValue={4} onChange={jest.fn()} />
+          </LabelProvider>
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: 'Suurenda' }));
+        act(() => {
+          jest.advanceTimersByTime(150);
+        });
+
+        expect(screen.getByRole('status')).toHaveTextContent(/^5 kg$/);
       } finally {
         jest.useRealTimers();
       }

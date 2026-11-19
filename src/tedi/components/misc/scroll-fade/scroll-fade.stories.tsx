@@ -1,6 +1,8 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
+import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import ScrollFade from './scroll-fade';
 
@@ -48,6 +50,30 @@ const ScrollbarTemplate: StoryFn<typeof ScrollFade> = (args) => (
     </Col>
   </Row>
 );
+
+const DynamicContentTemplate: StoryFn<typeof ScrollFade> = (args) => {
+  const [items, setItems] = useState([1, 2, 3, 4, 5, 6]);
+
+  return (
+    <div className="flex flex-column gap-3">
+      <div className="flex gap-3">
+        <Button onClick={() => setItems((prev) => [...prev, prev.length + 1])}>Add item</Button>
+        <Button visualType="secondary" onClick={() => setItems((prev) => prev.slice(0, -1))}>
+          Remove item
+        </Button>
+      </div>
+      <div style={{ maxWidth: '200px', maxHeight: '150px' }}>
+        <ScrollFade {...args}>
+          <div className="flex flex-column gap-3">
+            {items.map((item) => (
+              <p key={item}>Item {item}</p>
+            ))}
+          </div>
+        </ScrollFade>
+      </div>
+    </div>
+  );
+};
 
 const FadeSizeTemplate: StoryFn<typeof ScrollFade> = (args) => (
   <Row>
@@ -150,5 +176,15 @@ export const NoFadeWithoutScrollbar: Story = {
     children: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
       magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris Lorem ipsum dolor sit amet,
       consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
+  },
+};
+
+export const DynamicContent: Story = {
+  render: DynamicContentTemplate,
+  argTypes: {
+    children: { table: { disable: true } },
+  },
+  args: {
+    children: null,
   },
 };

@@ -126,6 +126,8 @@ function App() {
 
 `PrintingProvider` is required: `Collapse` and `SideNav` call `usePrint`, which throws outside it, so anything rendering a `Collapse` fails without it. `LabelProvider` is required for built-in labels. `AccessibilityProvider` exposes `useDeclareLoader` and other a11y hooks; omit it only if you have no loaders/announcements. `StyleProvider` is exported but currently renders its children unchanged, so it is optional.
 
+Keep `<html lang>` equal to the `LabelProvider` locale, and update it when the locale changes (`useLabels().locale`). TEDI does not set it. Screen readers choose the voice and pronunciation from `lang`, so Estonian labels under `lang="en"` are read with English pronunciation (WCAG 3.1.1).
+
 ### 2. Import core styles
 
 ```tsx
@@ -280,6 +282,12 @@ import { Alert, sendNotification, ToastContainer } from '@tedi-design-system/rea
 <ToastContainer />
 sendNotification({ type: 'success', title: 'Done', children: 'Task completed' });
 ```
+
+Pick `Alert`'s `role` by when the message appears (`sendNotification` passes it through):
+
+- `'none'`: static content already on the page at load. Some screen readers read a `role="alert"` present at load immediately.
+- `'status'`: non-urgent message that appears later (saved, info). Announced politely.
+- `'alert'` (default): urgent message that appears later (error, needs action). Announced assertively.
 
 ## Common Pitfalls
 

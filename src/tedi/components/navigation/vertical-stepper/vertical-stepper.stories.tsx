@@ -116,16 +116,21 @@ export const WithStatusBadges: Story = {
   ),
 };
 
+/**
+ * `titleId` puts an id on the step title, so an action in `endSlot` can reference it with `aria-describedby`.
+ * Links also appear in a screen reader's links list, where descriptions are not read: give them the context in their text instead (see With Links).
+ */
 export const WithButton: Story = {
   render: () => (
     <Frame>
       <VerticalStepper aria-label="Andmete sisestus">
         <VerticalStepper.Item
           title="Isikuandmed"
+          titleId="step-personal-data-title"
           state="completed"
           href="#b1"
           endSlot={
-            <Button visualType="secondary" size="small" iconLeft="add">
+            <Button visualType="secondary" size="small" iconLeft="add" aria-describedby="step-personal-data-title">
               Lisa isik
             </Button>
           }
@@ -148,7 +153,7 @@ export const WithLinks: Story = {
           href="#l1"
           endSlot={
             <Link href="#read-1" iconRight="arrow_forward">
-              Loe rohkem
+              Loe rohkem<span className="visually-hidden">: Vaimne tervis</span>
             </Link>
           }
         />
@@ -158,7 +163,7 @@ export const WithLinks: Story = {
           href="#l2"
           endSlot={
             <Link href="#read-2" iconRight="arrow_forward">
-              Loe rohkem
+              Loe rohkem<span className="visually-hidden">: Füüsiline tervis</span>
             </Link>
           }
         />

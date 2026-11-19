@@ -36,6 +36,12 @@ export interface OverlayContentProps {
   labelledBy?: string;
 
   /**
+   * Accessible name for the overlay container, for overlays without a visible heading to point
+   * `labelledBy` at.
+   */
+  ariaLabel?: string;
+
+  /**
    * ID of the element that describes the overlay content.
    *
    * This is used to set the `aria-describedby` attribute on the overlay container,
@@ -53,7 +59,7 @@ export interface OverlayContentProps {
 }
 
 export const OverlayContent = (props: OverlayContentProps) => {
-  const { children, classNames, labelledBy, describedBy, contentStyle } = props;
+  const { children, classNames, labelledBy, ariaLabel, describedBy, contentStyle } = props;
   const {
     open,
     x,
@@ -98,6 +104,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
         id: contentId,
         'aria-hidden': ariaHidden || undefined,
         'aria-labelledby': labelledBy,
+        'aria-label': labelledBy ? undefined : ariaLabel,
         'aria-describedby': describedBy,
         style: {
           position: strategy,

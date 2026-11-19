@@ -19,6 +19,10 @@ Wrap the provider around your app.
 </LabelProvider>
 ```
 
+Keep `<html lang>` equal to `locale`, and update it when the locale changes. TEDI does not set it. Screen readers
+choose the voice and pronunciation from `lang`, so Estonian labels under `lang="en"` are read with English
+pronunciation ([WCAG 3.1.1](https://www.w3.org/WAI/WCAG22/Understanding/language-of-page.html)).
+
 `Label` is an object of key-value pairs. Keys should follow this pattern:
 
 <ul>
