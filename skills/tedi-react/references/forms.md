@@ -486,9 +486,10 @@ const [name, setName] = useState('Mari Maasikas');
 - **Single-action vs multi-step controls (important):** only call `commit()` from a control's change handler when a single interaction completes the edit — e.g. picking a day in a single `DateField`, choosing one `Select` option, or flipping a `Toggle`. For **multi-step pickers** (`TimeField` hour+minute, `DateTimeField` date+time, multi-select `Select`, range `DateField`) do **not** call `commit()` on change — just update the draft and let the blur-commit fire when the picker closes. Committing on the first change closes the field mid-edit (e.g. after the hour, before the minute).
 - **Controlled or uncontrolled:** pass `value` + `onChange`, or `defaultValue`.
 - **`renderValue`:** formats the read view (e.g. format a `Date`, map an option to its label).
-- **`hideEditIcon`:** hides the pencil icon (shown by default, brand-coloured); the value stays clickable.
-- **`fullWidth`:** stretches the field so controls like `Select` / `Slider` fill the row.
-- **`disabled`:** renders the value as plain, non-interactive text (no dimming, no edit affordance).
+- **Width:** the row fills its container by default, so it keeps its width when the editor opens. `fitContent` sizes it to the value instead, which changes the width on open; use it only for a value inside running text.
+- **Edit icon:** always shown, at the trailing edge by default (`editIconPosition="inline"` puts it after the value), and hidden while the row is `invalid`.
+- **`helper`:** shown below the row and linked to the trigger and to the editor control through `aria-describedby`; an `error` helper or `invalid` also sets `aria-invalid` on the control.
+- **`readOnly` vs `disabled`:** `readOnly` renders plain text with no edit affordance, lined up with editable rows; for a block that is entirely read-only use `TextGroup`. `disabled` keeps the greyed trigger and icon, for transient states such as saving.
 - **Headless:** use the `useInlineEdit` hook for the state machine (`isEditing`, `edit`, `commit`, `cancel`, `value`) without the built-in markup.
 
 Controls whose value API differs need a one-line adapter. Single-action pickers call `commit()` on select; multi-step pickers (e.g. `TimeField`) omit it and let blur commit:
