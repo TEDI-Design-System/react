@@ -135,6 +135,8 @@ files. This is the part of this document worth maintaining by hand.
 - **`TableCard` is `Table`'s readable mobile form.** Below a breakpoint, render a list of
   `TableCard` (each row a stacked `<dl>` of label / value pairs with its own title / status /
   actions) instead of collapsing columns; swap via `useBreakpoint` + `isBreakpointBelow(bp, 'md')`.
+- **`Rating` is a native `radiogroup`, not a decorative widget.** It renders real radios, so it's
+  keyboard-navigable (arrow keys) and form-submittable like any radio group.
 
 ### Composition constraints
 
