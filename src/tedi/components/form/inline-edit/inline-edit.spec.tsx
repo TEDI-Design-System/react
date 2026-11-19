@@ -289,6 +289,22 @@ describe('InlineEdit', () => {
     expect(screen.getByRole('button', { name: /name/i })).not.toHaveClass('tedi-inline-edit--icon-end');
   });
 
+  it('fills its container until fitContent is set', () => {
+    const { rerender } = render(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v}>
+        {({ value, onChange }) => <TextField id="fc" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    expect(screen.getByRole('button', { name: /name/i })).not.toHaveClass('tedi-inline-edit--fit-content');
+
+    rerender(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v} fitContent>
+        {({ value, onChange }) => <TextField id="fc" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    expect(screen.getByRole('button', { name: /name/i })).toHaveClass('tedi-inline-edit--fit-content');
+  });
+
   it('defaults to the end icon position and default size', () => {
     render(
       <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v}>
