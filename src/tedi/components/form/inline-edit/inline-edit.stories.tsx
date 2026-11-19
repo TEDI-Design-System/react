@@ -198,14 +198,14 @@ const meta: Meta<typeof InlineEdit> = {
     size: {
       control: 'radio',
       options: ['default', 'small'],
-      description: 'Size of the read trigger and editor.',
+      description: 'Text size and row spacing of the read trigger and editor.',
       table: { type: { summary: 'default | small' }, defaultValue: { summary: 'default' } },
     },
     editIconPosition: {
       control: 'radio',
       options: ['end', 'inline'],
       description:
-        'Whether the edit icon is pushed to the trailing edge or sits straight after the value. Hidden while the row is invalid.',
+        'Places the edit icon at the trailing edge or straight after the value; hidden while the row is invalid.',
       table: { type: { summary: 'end | inline' }, defaultValue: { summary: 'end' } },
     },
     readOnly: {
@@ -217,7 +217,7 @@ const meta: Meta<typeof InlineEdit> = {
     disabled: {
       control: 'boolean',
       description:
-        'Disables editing while keeping the trigger and edit icon visible but greyed (for saving/pending or dependent fields). Differs from `readOnly`, which drops the edit affordance entirely.',
+        'Blocks editing and keeps the trigger and edit icon visible but greyed, for transient states such as saving.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
     fitContent: {
@@ -255,7 +255,7 @@ const meta: Meta<typeof InlineEdit> = {
     children: {
       control: false,
       description:
-        'Render function returning any TEDI control wired to the editor render props (`value`, `onChange`, `commit`, `cancel`).',
+        'Renders the editor: a TEDI control wired to the render props, forwarding `size` so it matches the read view.',
       table: { type: { summary: '(editor: InlineEditEditor<T>) => ReactNode' } },
     },
     id: { control: false, description: 'id applied to the read trigger.', table: { type: { summary: 'string' } } },

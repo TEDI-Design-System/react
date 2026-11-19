@@ -98,23 +98,17 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    */
   readOnly?: boolean;
   /**
-   * Disables editing while keeping the trigger and edit icon visible but greyed — use for
-   * transient states (saving/pending) or when the field depends on another. Clicking and keyboard
-   * activation are blocked and the trigger leaves the tab order, but a controlled `value` update
-   * still re-renders. Differs from `readOnly`, which drops the edit affordance entirely.
+   * Blocks editing and keeps the trigger and edit icon visible but greyed, for transient states such as saving.
    * @default false
    */
   disabled?: boolean;
   /**
-   * Marks the row as invalid — the read trigger gets an error border and
-   * `aria-invalid`. `helper` items with `type: 'error'` set this automatically.
+   * Marks the row as invalid, setting `aria-invalid` on the trigger and the editor; an `error` helper sets it too.
    * @default false
    */
   invalid?: boolean;
   /**
-   * Feedback text rendered below the field — a single `FeedbackTextProps` or an
-   * array. An `error` item also drives the invalid state (red border), a `valid`
-   * item the success state. Wired to the read trigger via `aria-describedby`.
+   * Feedback text below the field, linked to the trigger and the editor through `aria-describedby`.
    */
   helper?: FeedbackTextProps | FeedbackTextProps[];
   /**
@@ -123,19 +117,12 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    */
   fitContent?: boolean;
   /**
-   * Size of the read trigger and editor.
-   * - `default` — regular body text.
-   * - `small` — smaller body text for dense layouts.
-   * Both sizes use the same edit icon size. Dimensions follow the design tokens.
+   * Text size and row spacing of the read trigger and editor.
    * @default default
    */
   size?: InlineEditSize;
   /**
-   * Placement of the edit (pencil) icon on the read trigger. Hidden while the
-   * row is invalid.
-   * - `end` — the icon is pushed to the trailing edge, so icons line up across
-   *   stacked rows.
-   * - `inline` — the icon sits directly after the value.
+   * Places the edit icon at the trailing edge (`end`) or straight after the value (`inline`); hidden while the row is invalid.
    * @default end
    */
   editIconPosition?: 'inline' | 'end';
@@ -144,15 +131,16 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
   /** Additional class on the root element. */
   className?: string;
   /**
-   * Renders the edit view — return any TEDI control wired to the render props.
-   * The wrapper commits on focus leaving the editor and cancels on `Escape`.
-   * The editor also receives the field's `size` — forward it to the control so the
-   * editor matches the read view (a small field opens a small control).
+   * Renders the editor: return a TEDI control wired to the render props, forwarding `size` so it matches the read view.
    */
   children: (editor: InlineEditEditor<T> & { size: InlineEditSize }) => React.ReactNode;
 }
 
 const isEmpty = (value: unknown): boolean => value === undefined || value === null || value === '';
+
+const CONTROL_SELECTOR = 'fieldset, [role="radiogroup"], [role="combobox"], input, textarea';
+
+const splitIds = (value: string | null): string[] => (value ?? '').split(/\s+/).filter(Boolean);
 
 export function InlineEdit<T>({
   label,
@@ -238,6 +226,32 @@ export function InlineEdit<T>({
     target?.focus();
   }, [isEditing]);
 
+  // Links the helper text to the editor's control. The control can re-render over these attributes, so keep them set.
+  React.useEffect(() => {
+    const control = editorRef.current?.querySelector<HTMLElement>(CONTROL_SELECTOR);
+
+    if (!isEditing || !control) return;
+
+    const link = () => {
+      const current = splitIds(control.getAttribute('aria-describedby'));
+      const missing = splitIds(describedBy ?? null).filter((id) => !current.includes(id));
+
+      if (missing.length) {
+        control.setAttribute('aria-describedby', [...current, ...missing].join(' '));
+      }
+      if (isInvalid && !control.matches('fieldset') && control.getAttribute('aria-invalid') !== 'true') {
+        control.setAttribute('aria-invalid', 'true');
+      }
+    };
+
+    link();
+
+    const observer = new MutationObserver(link);
+    observer.observe(control, { attributes: true, attributeFilter: ['aria-describedby', 'aria-invalid'] });
+
+    return () => observer.disconnect();
+  }, [isEditing, describedBy, isInvalid]);
+
   const commitAndRestoreFocus = () => {
     restoreFocus.current = true;
     commit();
@@ -262,8 +276,10 @@ export function InlineEdit<T>({
         onKeyDown={(event) => {
           if (event.nativeEvent.isComposing) return;
           if (event.key === 'Escape') {
-            event.preventDefault();
             event.stopPropagation();
+            // The first Escape closes an open menu or popover; the next one cancels.
+            if ((event.target as HTMLElement).closest('[aria-expanded="true"]')) return;
+            event.preventDefault();
             cancelAndRestoreFocus();
             return;
           }

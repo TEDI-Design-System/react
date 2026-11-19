@@ -2,6 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 
+import { Radio } from '../radio';
+import { ISelectOption, Select } from '../select/select';
 import { TextField } from '../textfield/textfield';
 import { InlineEdit } from './inline-edit';
 
@@ -65,6 +67,143 @@ describe('InlineEdit', () => {
     await waitFor(() => expect(onChange).toHaveBeenLastCalledWith('Mari Maasikas'));
     await waitFor(() => expect(screen.queryByRole('textbox')).not.toBeInTheDocument());
     expect(screen.getByRole('button', { name: 'outside' })).toHaveFocus();
+  });
+
+  describe('helper text on the editor control', () => {
+    const helper = { text: 'Vigane väärtus', type: 'error' as const };
+
+    it('links the helper text and invalid state to a text field editor', async () => {
+      const user = userEvent.setup();
+      render(<TextEditor id="field" helper={helper} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveAttribute('aria-describedby', 'field-helper');
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      expect(document.getElementById('field-helper')).toHaveTextContent('Vigane väärtus');
+    });
+
+    it('keeps description ids the control already has', async () => {
+      const user = userEvent.setup();
+      render(
+        <InlineEdit<string> id="own" label="Name" defaultValue="Mari" helper={helper}>
+          {({ value, onChange }) => (
+            <input aria-label="Name" aria-describedby="hint" value={value} onChange={(e) => onChange(e.target.value)} />
+          )}
+        </InlineEdit>
+      );
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+
+      expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', 'hint own-helper');
+    });
+
+    it('links the helper text to a select editor', async () => {
+      const user = userEvent.setup();
+      render(
+        <InlineEdit<ISelectOption | null>
+          id="sel"
+          label="Riik"
+          defaultValue={{ value: 'ee', label: 'Eesti' }}
+          renderValue={(v) => (v ? (v.label as string) : '')}
+          helper={helper}
+        >
+          {({ value, onChange }) => (
+            <Select
+              id="country-helper"
+              label="Riik"
+              hideLabel
+              options={[{ value: 'ee', label: 'Eesti' }]}
+              value={value}
+              onChange={(next) => onChange(next as ISelectOption | null)}
+            />
+          )}
+        </InlineEdit>
+      );
+
+      await user.click(screen.getByRole('button', { name: /riik/i }));
+
+      expect(screen.getByRole('combobox').getAttribute('aria-describedby')?.split(' ')).toContain('sel-helper');
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('describes a radio group as a whole, not one radio', async () => {
+      const user = userEvent.setup();
+      render(
+        <InlineEdit<string> id="grp" label="Transport" defaultValue="bus" renderValue={(v) => v} helper={helper}>
+          {({ value, onChange }) => (
+            <Radio.Group id="transport" label="Transport" hideLabel value={value} onChange={onChange}>
+              <Radio value="bus" label="Buss" />
+              <Radio value="train" label="Rong" />
+            </Radio.Group>
+          )}
+        </InlineEdit>
+      );
+
+      await user.click(screen.getByRole('button', { name: /transport/i }));
+
+      const radios = screen.getAllByRole('radio');
+      radios.forEach((radio) => expect(radio).not.toHaveAttribute('aria-describedby', 'grp-helper'));
+      expect(document.querySelector('[aria-describedby~="grp-helper"]')).toBeInTheDocument();
+    });
+
+    it('adds nothing without helper text', async () => {
+      const user = userEvent.setup();
+      render(<TextEditor />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+
+      expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-describedby');
+      expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-invalid');
+    });
+  });
+
+  describe('Escape in a select editor', () => {
+    const options: ISelectOption[] = [
+      { value: 'ee', label: 'Eesti' },
+      { value: 'fi', label: 'Soome' },
+    ];
+
+    const SelectEditor = () => {
+      const [value, setValue] = useState<ISelectOption | null>(options[0]);
+      return (
+        <InlineEdit<ISelectOption | null>
+          label="Riik"
+          value={value}
+          onChange={setValue}
+          renderValue={(v) => (v ? (v.label as string) : '')}
+        >
+          {({ value: draft, onChange }) => (
+            <Select
+              id="country"
+              label="Riik"
+              hideLabel
+              options={options}
+              value={draft}
+              onChange={(next) => onChange(next as ISelectOption | null)}
+            />
+          )}
+        </InlineEdit>
+      );
+    };
+
+    it('closes the open menu on the first Escape and cancels on the second', async () => {
+      const user = userEvent.setup();
+      render(<SelectEditor />);
+
+      await user.click(screen.getByRole('button', { name: /riik/i }));
+      const combobox = screen.getByRole('combobox');
+      await user.keyboard('{ArrowDown}');
+      expect(combobox).toHaveAttribute('aria-expanded', 'true');
+
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'false');
+      expect(screen.queryByRole('button', { name: /riik/i })).not.toBeInTheDocument();
+
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('button', { name: /riik/i })).toBeInTheDocument();
+    });
   });
 
   it('cancels on Escape without committing', async () => {
