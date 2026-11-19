@@ -1,3 +1,10 @@
+# [21.0.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.22...react-21.0.0-rc.23) (2026-11-19)
+
+
+### Features
+
+* **rating:** new TEDI-Ready component [#531](https://github.com/TEDI-Design-System/react/issues/531) ([#958](https://github.com/TEDI-Design-System/react/issues/958)) ([3cf4193](https://github.com/TEDI-Design-System/react/commit/3cf419321d1d04da092a8f53ba24e94fdb01c8a2))
+
 # [21.0.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.21...react-21.0.0-rc.22) (2026-11-19)
 
 
