@@ -15,6 +15,9 @@ export interface CheckProps extends ChoiceInputProps {
   indeterminate?: boolean;
 }
 
+/**
+ * @deprecated Use `Checkbox` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Check = (props: CheckProps): JSX.Element => {
   const {
     id,

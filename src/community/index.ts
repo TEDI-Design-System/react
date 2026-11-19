@@ -66,6 +66,7 @@ export {
   Breadcrumbs,
   Button,
   Card,
+  Check,
   ChoiceGroup,
   DatePicker,
   DateTimePicker,

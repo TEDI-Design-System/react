@@ -2,6 +2,7 @@ import { withDeprecationWarning } from '../tedi/helpers/warn-deprecated/warn-dep
 import { Anchor as AnchorBase } from './components/anchor/anchor';
 import { Button as ButtonBase } from './components/button/button';
 import { Card as CardBase } from './components/card/card';
+import { Check as CheckBase } from './components/form/check/check';
 import { ChoiceGroup as ChoiceGroupBase } from './components/form/choice-group/choice-group';
 import { DatePicker as DatePickerBase } from './components/form/pickers/datepicker/datepicker';
 import { DateTimePicker as DateTimePickerBase } from './components/form/pickers/datetimepicker/datetimepicker';
@@ -43,6 +44,11 @@ export const Card = withDeprecationWarning(
   CardBase,
   'Community Card',
   'Use `Card` from `@tedi-design-system/react/tedi` instead.'
+);
+export const Check = withDeprecationWarning(
+  CheckBase,
+  'Community Check',
+  'Use `Checkbox` from `@tedi-design-system/react/tedi` instead.'
 );
 export const ChoiceGroup = withDeprecationWarning(
   ChoiceGroupBase,
