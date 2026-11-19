@@ -1,3 +1,10 @@
+# [21.0.0-rc.21](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.20...react-21.0.0-rc.21) (2026-11-19)
+
+
+### Bug Fixes
+
+* **scroll-fade:** recompute fade when content changes [#1170](https://github.com/TEDI-Design-System/react/issues/1170) ([#1171](https://github.com/TEDI-Design-System/react/issues/1171)) ([efc4c59](https://github.com/TEDI-Design-System/react/commit/efc4c596cdc8108cddf627b9dc84f235a2961d09))
+
 # [21.0.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.19...react-21.0.0-rc.20) (2026-11-18)
 
 
