@@ -44,6 +44,12 @@ import { Pagination, type PaginationProps } from '../../navigation/pagination';
 import styles from './table.module.scss';
 import { TableColumnsMenu } from './table-columns-menu/table-columns-menu';
 import { TableContext } from './table-context';
+import type {
+  TableFilterAction,
+  TableFilterContent,
+  TableFilterOptions,
+  TableFilterPopoverWidth,
+} from './table-filter-popover';
 import { TableHeaderButton } from './table-header-button/table-header-button';
 import { TableHeaderContent } from './table-header-content/table-header-content';
 import { TableToolbar } from './table-toolbar/table-toolbar';
@@ -60,7 +66,7 @@ import { useTablePersistence } from './use-table-persistence';
  * Wrapper spans still work for the "I want this *one* cell to be different" case;
  * `meta` covers the common "every cell in the column lines up the same way".
  */
-export interface TableColumnMeta {
+export interface TableColumnMeta<TData = unknown> {
   /**
    * Names a blank or non-text header (e.g. an actions column) for screen readers and in filter,
    * column drag and reorder labels; without it a blank header has no name and those labels use the
@@ -73,6 +79,18 @@ export interface TableColumnMeta {
    */
   sortable?: boolean;
   /**
+   * Adds a filter popover button to the column header; pass options to set its footer actions or width.
+   * @default false
+   */
+  filterable?: boolean | TableFilterOptions;
+  /**
+   * Custom input for the filter popover, receiving the draft value and `apply`, `clear` and `cancel`.
+   */
+  filterContent?: TableFilterContent<TData>;
+  /**
+   * @deprecated Use `filterable` and `filterContent` for the filter popover instead; the inline
+   * filter row is removed in a future major release.
+   *
    * Props forwarded to the built-in per-column filter input (the `TextField`
    * rendered for this column when `enableColumnFilters` is set). Use it to
    * constrain or tweak the filter field without replacing it — e.g. cap the
@@ -386,6 +404,19 @@ export interface TableProps<TData> {
    */
   highlightSelectedRows?: boolean;
   /**
+   * Footer buttons of the column filter popovers, in display order.
+   * @default ['clear', 'apply']
+   */
+  filterActions?: TableFilterAction[];
+  /**
+   * Width of the column filter popovers.
+   * @default 'small'
+   */
+  filterPopoverWidth?: TableFilterPopoverWidth;
+  /**
+   * @deprecated Use `meta.filterable` for a filter popover in the column header instead; the
+   * inline filter row is removed in a future major release.
+   *
    * Enables per-column filter inputs rendered below the header row.
    * Only columns whose `columnDef.enableColumnFilter !== false` render an input.
    */
@@ -777,15 +808,26 @@ export interface TableRowDropEvent {
 }
 
 /**
- * TanStack starts numeric columns in descending order. Columns with `meta.sortable` always cycle
- * ascending, descending, off unless they set `sortDescFirst` themselves; hand-built sort headers
- * keep TanStack's behaviour.
+ * Fills in column defaults that follow from `meta`:
+ * - `meta.sortable` columns cycle ascending, descending, off (TanStack starts numeric columns
+ *   descending), unless the column sets `sortDescFirst` itself.
+ * - `meta.filterable` columns with the default text popover use `includesString` (TanStack infers
+ *   `inNumberRange` for numeric columns), unless the column sets `filterFn` itself.
+ * Hand-built sort headers and custom filter content keep TanStack's behaviour.
  */
-const startSortingAscending = <TData,>(column: ColumnDef<TData>): ColumnDef<TData> => {
+const applyMetaDefaults = <TData,>(column: ColumnDef<TData>): ColumnDef<TData> => {
   const children = (column as { columns?: ColumnDef<TData>[] }).columns;
-  const withChildren = children ? { ...column, columns: children.map(startSortingAscending) } : column;
-  const isSortable = (column.meta as TableColumnMeta | undefined)?.sortable === true;
-  return isSortable && column.sortDescFirst === undefined ? { ...withChildren, sortDescFirst: false } : withChildren;
+  const result = (children ? { ...column, columns: children.map(applyMetaDefaults) } : column) as ColumnDef<TData>;
+  const meta = column.meta as TableColumnMeta<TData> | undefined;
+  const defaults: Partial<ColumnDef<TData>> = {};
+  if (meta?.sortable === true && column.sortDescFirst === undefined) defaults.sortDescFirst = false;
+  if (meta?.filterable && !meta.filterContent && column.filterFn === undefined) defaults.filterFn = 'includesString';
+  return Object.keys(defaults).length ? ({ ...result, ...defaults } as ColumnDef<TData>) : result;
+};
+
+const resolveFilterOptions = (filterable: TableColumnMeta['filterable']): TableFilterOptions | undefined => {
+  if (!filterable) return undefined;
+  return filterable === true ? {} : filterable;
 };
 
 const passthroughFilter: FilterFn<unknown> = () => true;
@@ -833,6 +875,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     rowSelectionLabel,
     highlightSelectedRows = true,
     enableColumnFilters = false,
+    filterActions,
+    filterPopoverWidth,
     renderSubComponent,
     getRowCanExpand,
     getSubRows,
@@ -1104,7 +1148,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       });
     }
 
-    return [...leading, ...columns.map(startSortingAscending)];
+    return [...leading, ...columns.map(applyMetaDefaults)];
   }, [
     columns,
     hasSelection,
@@ -1143,7 +1187,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     },
     enableRowSelection,
     enableMultiRowSelection: selectionMode !== 'single',
-    enableColumnFilters,
+    // Always on for TanStack so `column.getCanFilter()` works for `meta.filterable` popovers; the
+    // deprecated inline filter row is still gated by the `enableColumnFilters` prop.
+    enableColumnFilters: true,
     autoResetPageIndex: autoResetPageIndex ?? !manualPagination,
     paginateExpandedRows: paginationEnabled && !manualPagination ? paginateExpandedRows : true,
     manualPagination,
@@ -1711,18 +1757,24 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         ? 'descending'
                         : 'none'
                       : undefined;
-                    const headerMeta = header.column.columnDef.meta as TableColumnMeta | undefined;
+                    const headerMeta = header.column.columnDef.meta as TableColumnMeta<TData> | undefined;
                     const rawHeaderLabel =
                       headerMeta?.label ??
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
                     const headerLabel = rawHeaderLabel?.trim() ? rawHeaderLabel : undefined;
                     const headerDef = header.column.columnDef.header;
-                    const hasBuiltInSort = headerMeta?.sortable === true && header.column.getCanSort();
+                    const hasBuiltInControls =
+                      (headerMeta?.sortable === true && header.column.getCanSort()) ||
+                      (!!resolveFilterOptions(headerMeta?.filterable) && header.column.getCanFilter());
                     const headerContent = (
                       <TableHeaderContent
                         header={header}
                         label={headerLabel}
                         sortable={headerMeta?.sortable === true}
+                        filterOptions={resolveFilterOptions(headerMeta?.filterable)}
+                        filterContent={headerMeta?.filterContent}
+                        filterActions={filterActions}
+                        filterPopoverWidth={filterPopoverWidth}
                       />
                     );
                     const headerIsBlank =
@@ -1795,7 +1847,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             </button>
                             {headerContent}
                           </span>
-                        ) : headerIsBlank && headerLabel && !hasBuiltInSort ? (
+                        ) : headerIsBlank && headerLabel && !hasBuiltInControls ? (
                           <span className={styles['tedi-table__sr-only']}>{headerLabel}</span>
                         ) : (
                           headerContent

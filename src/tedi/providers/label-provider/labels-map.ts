@@ -719,6 +719,35 @@ export const labelsMap = validateDefaultLabels({
     en: (columnLabel?: string) => `Filter ${columnLabel ?? 'column'}`.trim(),
     ru: (columnLabel?: string) => `Фильтр ${columnLabel ?? ''}`.trim(),
   },
+  'table.filter-applied': {
+    description: 'Appended to the column filter button name while a filter is applied to the column.',
+    components: ['Table'],
+    et: 'rakendatud',
+    en: 'applied',
+    ru: 'применён',
+  },
+  'table.filter-apply': {
+    description: 'Apply action in the footer of the column filter popover.',
+    components: ['Table'],
+    et: 'Filtreeri',
+    en: 'Apply',
+    ru: 'Применить',
+  },
+  'table.filter-clear': {
+    description: 'Clear action in the footer of the column filter popover: removes the applied filter.',
+    components: ['Table'],
+    et: 'Tühjenda',
+    en: 'Clear',
+    ru: 'Сбросить',
+  },
+  'table.filter-cancel': {
+    description:
+      'Cancel action in the footer of the column filter popover: closes it without changing the applied filter.',
+    components: ['Table'],
+    et: 'Tühista',
+    en: 'Cancel',
+    ru: 'Отмена',
+  },
   'table.row-details': {
     description: 'Accessible label of the expand toggle in expandable rows.',
     components: ['Table'],
