@@ -1,3 +1,11 @@
+# [21.0.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.21...react-21.0.0-rc.22) (2026-11-19)
+
+
+### Features
+
+* **table:** add column filter popover with configurable actions [#1112](https://github.com/TEDI-Design-System/react/issues/1112) ([#1163](https://github.com/TEDI-Design-System/react/issues/1163)) ([17f12f1](https://github.com/TEDI-Design-System/react/commit/17f12f1d0f0d92f7f1ca865d3c5e7db52fcbdaef))
+* **table:** add meta.sortable shorthand for sort buttons [#1111](https://github.com/TEDI-Design-System/react/issues/1111) ([#1161](https://github.com/TEDI-Design-System/react/issues/1161)) ([07fe986](https://github.com/TEDI-Design-System/react/commit/07fe986ae692368e062e0fff86084d301b11e07d))
+
 # [21.0.0-rc.21](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.20...react-21.0.0-rc.21) (2026-11-19)
 
 
