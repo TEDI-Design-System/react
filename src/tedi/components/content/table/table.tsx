@@ -45,6 +45,7 @@ import styles from './table.module.scss';
 import { TableColumnsMenu } from './table-columns-menu/table-columns-menu';
 import { TableContext } from './table-context';
 import { TableHeaderButton } from './table-header-button/table-header-button';
+import { TableHeaderContent } from './table-header-content/table-header-content';
 import { TableToolbar } from './table-toolbar/table-toolbar';
 import { useTablePersistence } from './use-table-persistence';
 
@@ -66,6 +67,11 @@ export interface TableColumnMeta {
    * column id, a developer string such as "actions" (filter and reorder get `''` for `header: ''`).
    */
   label?: string;
+  /**
+   * Adds a built-in sort control to a sortable column header.
+   * @default false
+   */
+  sortable?: boolean;
   /**
    * Props forwarded to the built-in per-column filter input (the `TextField`
    * rendered for this column when `enableColumnFilters` is set). Use it to
@@ -770,6 +776,18 @@ export interface TableRowDropEvent {
   toIndex: number;
 }
 
+/**
+ * TanStack starts numeric columns in descending order. Columns with `meta.sortable` always cycle
+ * ascending, descending, off unless they set `sortDescFirst` themselves; hand-built sort headers
+ * keep TanStack's behaviour.
+ */
+const startSortingAscending = <TData,>(column: ColumnDef<TData>): ColumnDef<TData> => {
+  const children = (column as { columns?: ColumnDef<TData>[] }).columns;
+  const withChildren = children ? { ...column, columns: children.map(startSortingAscending) } : column;
+  const isSortable = (column.meta as TableColumnMeta | undefined)?.sortable === true;
+  return isSortable && column.sortDescFirst === undefined ? { ...withChildren, sortDescFirst: false } : withChildren;
+};
+
 const passthroughFilter: FilterFn<unknown> = () => true;
 const DEFAULT_FILTER_FNS = {
   text: passthroughFilter,
@@ -1086,7 +1104,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       });
     }
 
-    return [...leading, ...columns];
+    return [...leading, ...columns.map(startSortingAscending)];
   }, [
     columns,
     hasSelection,
@@ -1699,6 +1717,14 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
                     const headerLabel = rawHeaderLabel?.trim() ? rawHeaderLabel : undefined;
                     const headerDef = header.column.columnDef.header;
+                    const hasBuiltInSort = headerMeta?.sortable === true && header.column.getCanSort();
+                    const headerContent = (
+                      <TableHeaderContent
+                        header={header}
+                        label={headerLabel}
+                        sortable={headerMeta?.sortable === true}
+                      />
+                    );
                     const headerIsBlank =
                       !columnHasChildren &&
                       (headerDef === null ||
@@ -1767,12 +1793,12 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             >
                               <Icon name="drag_indicator" size={18} color="inherit" />
                             </button>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {headerContent}
                           </span>
-                        ) : headerIsBlank && headerLabel ? (
+                        ) : headerIsBlank && headerLabel && !hasBuiltInSort ? (
                           <span className={styles['tedi-table__sr-only']}>{headerLabel}</span>
                         ) : (
-                          flexRender(header.column.columnDef.header, header.getContext())
+                          headerContent
                         )}
                       </th>
                     );
