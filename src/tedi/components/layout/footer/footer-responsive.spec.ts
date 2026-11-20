@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs';
+import path from 'path';
+
 import { BreakpointSupport } from '../../../helpers';
 import {
   getResponsiveClassNames,
@@ -12,6 +15,16 @@ type Props = { align?: 'start' | 'end' };
 describe('footer-responsive', () => {
   it('lists every breakpoint except xs', () => {
     expect(RESPONSIVE_BREAKPOINTS).toEqual(['sm', 'md', 'lg', 'xl', 'xxl']);
+  });
+
+  it('matches the breakpoints the stylesheet generates classes for', () => {
+    const scss = readFileSync(path.resolve(__dirname, '../../../styles/_breakpoint-classes.scss'), 'utf8');
+    const names = /\$breakpoint-names:\s*\(([^)]*)\)/
+      .exec(scss)?.[1]
+      .split(',')
+      .map((name) => name.trim());
+
+    expect(names).toEqual(RESPONSIVE_BREAKPOINTS);
   });
 
   describe('getResponsiveValues', () => {
