@@ -277,20 +277,28 @@ export const Overlay = (props: OverlayProps) => {
         padding: arrowPadding,
       }),
     ],
-    whileElementsMounted: (reference, floating, update) =>
-      autoUpdate(
+    whileElementsMounted: (reference, floating, update) => {
+      // A controlled overlay may stay open after it is told to close, so a hidden trigger is reported once.
+      let hasReportedHidden = false;
+
+      return autoUpdate(
         reference,
         floating,
         () => {
           if (isReferenceHidden(reference)) {
-            onOpenChangeRef.current(false);
+            if (!hasReportedHidden) {
+              hasReportedHidden = true;
+              onOpenChangeRef.current(false);
+            }
             return;
           }
 
+          hasReportedHidden = false;
           update();
         },
         trackReferencePosition ? { animationFrame: true } : undefined
-      ),
+      );
+    },
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([

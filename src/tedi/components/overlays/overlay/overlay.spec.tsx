@@ -318,6 +318,35 @@ describe('Overlay component', () => {
       expect(onToggle).toHaveBeenCalledWith(false);
     });
 
+    it('reports a hidden trigger once while the consumer keeps the overlay open, and again if it is hidden anew', async () => {
+      const onToggle = jest.fn();
+      render(
+        <div data-testid="wrapper">
+          <Overlay open onToggle={onToggle} openWith="click">
+            <Overlay.Trigger>
+              <button>Open</button>
+            </Overlay.Trigger>
+            <Overlay.Content>Content</Overlay.Content>
+          </Overlay>
+        </div>
+      );
+      const wrapper = screen.getByTestId('wrapper');
+      const closes = () => onToggle.mock.calls.filter(([open]) => open === false).length;
+
+      wrapper.style.display = 'none';
+      await resize();
+      await resize();
+      await resize();
+      expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
+      expect(closes()).toBe(1);
+
+      wrapper.style.display = 'block';
+      await resize();
+      wrapper.style.display = 'none';
+      await resize();
+      expect(closes()).toBe(2);
+    });
+
     it('stays open when its trigger is inside a `display: contents` ancestor', async () => {
       renderOpenOverlay();
 
