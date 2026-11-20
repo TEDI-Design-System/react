@@ -84,20 +84,20 @@ export const FooterSection = ({
       <div className={styles['tedi-footer-section__container']}>
         <strong className={styles['tedi-footer-section__heading']}>{heading}</strong>
         {collapsible && (
-          <button
-            type="button"
-            className={styles['tedi-footer-section__toggle']}
-            aria-expanded={isOpen}
-            aria-controls={contentId}
-            onClick={() => setIsOpen((open) => !open)}
-          >
-            <Heading element="h6" color="white">
+          <Heading element="h6" color="white" className={styles['tedi-footer-section__toggle-heading']}>
+            <button
+              type="button"
+              className={styles['tedi-footer-section__toggle']}
+              aria-expanded={isOpen}
+              aria-controls={contentId}
+              onClick={() => setIsOpen((open) => !open)}
+            >
               {heading}
-            </Heading>
-            <span className={styles['tedi-footer-section__toggle-icon']}>
-              <Icon name="expand_more" color="inherit" filled size={18} />
-            </span>
-          </button>
+              <span className={styles['tedi-footer-section__toggle-icon']}>
+                <Icon name="expand_more" color="inherit" filled size={18} />
+              </span>
+            </button>
+          </Heading>
         )}
         <div
           id={contentId}

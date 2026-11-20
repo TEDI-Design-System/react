@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { execFileSync } from 'child_process';
 import path from 'path';
 import { renderToString } from 'react-dom/server.node';
@@ -78,6 +78,21 @@ describe('Footer', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('puts the toggle button inside the section heading, so the heading stays a heading', () => {
+    render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Heading" collapsible>
+            <a href="#">Link</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const heading = screen.getByRole('heading', { level: 6, name: 'Heading' });
+    expect(within(heading).getByRole('button', { name: 'Heading' })).toHaveAttribute('aria-controls');
   });
 
   it('non-collapsible section uses a heading element, not a button', () => {
