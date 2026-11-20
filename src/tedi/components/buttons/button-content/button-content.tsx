@@ -41,7 +41,7 @@ export type ButtonContentProps<
     /**
      * Button size. The 'extra-small' size is only intended for icon-only buttons (use with the `icon` prop).
      */
-    size?: 'default' | 'small' | 'large' | 'extra-small';
+    size?: 'default' | 'small' | 'extra-small';
     /**
      * Name of the icon when button only has an icon in it.
      */
@@ -147,7 +147,7 @@ const InternalButtonContent = forwardRef(
       });
 
       const defaultIconProps: Partial<IconWithoutBackgroundProps> = {
-        size: size === 'large' ? 24 : 18,
+        size: 18,
         className: iconBEM,
       };
 

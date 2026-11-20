@@ -2268,6 +2268,7 @@ describe('CategorySearch', () => {
     async (size) => {
       const user = userEvent.setup();
       const expectedSize = size ?? 'default';
+      const expectedButtonSize = expectedSize === 'small' ? 'small' : 'default';
       const category = defineCategorySearchCategory<Filters, string[]>({
         id: 'parcels',
         label: 'Parcels',
@@ -2290,9 +2291,9 @@ describe('CategorySearch', () => {
       const input = screen.getByRole('searchbox');
 
       expect(input.closest('[data-name="textfield"]')).toHaveClass(`tedi-textfield--${expectedSize}`);
-      expect(screen.getByRole('button', { name: 'Search' })).toHaveClass(`tedi-btn--${expectedSize}`);
+      expect(screen.getByRole('button', { name: 'Search' })).toHaveClass(`tedi-btn--${expectedButtonSize}`);
       await user.type(input, 'A');
-      expect(screen.getByRole('button', { name: 'Close' })).toHaveClass(`tedi-btn--${expectedSize}`);
+      expect(screen.getByRole('button', { name: 'Close' })).toHaveClass(`tedi-btn--${expectedButtonSize}`);
 
       await selectCategory(user, 'Parcels');
 
@@ -2300,7 +2301,7 @@ describe('CategorySearch', () => {
         `tedi-textfield--${expectedSize}`
       );
       for (const name of ['Filter', 'Close', 'Clear', 'Search']) {
-        expect(screen.getByRole('button', { name })).toHaveClass(`tedi-btn--${expectedSize}`);
+        expect(screen.getByRole('button', { name })).toHaveClass(`tedi-btn--${expectedButtonSize}`);
       }
     }
   );

@@ -87,14 +87,14 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                   {...{ [property]: value }}
                   id={`${baseId}-icon`}
                   ariaLabel={`${caption}, ikooniga`}
-                  button={{ icon: 'search', size: value, 'aria-label': 'Otsi' }}
+                  button={{ icon: 'search', 'aria-label': 'Otsi' }}
                 />
                 <Search
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-button`}
                   ariaLabel={`${caption}, tekstiga`}
-                  button={{ iconLeft: 'search', children: 'Otsi', size: value }}
+                  button={{ iconLeft: 'search', children: 'Otsi' }}
                 />
               </VerticalSpacing>
             </Col>
