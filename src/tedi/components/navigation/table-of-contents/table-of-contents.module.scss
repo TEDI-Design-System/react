@@ -26,7 +26,6 @@
 .tedi-table-of-contents--sticky {
   max-height: calc(100dvh - var(--tedi-affix-offset-top) - var(--tedi-affix-offset-bottom));
   overflow-y: auto;
-  overscroll-behavior: contain;
 }
 
 .tedi-table-of-contents__heading {
