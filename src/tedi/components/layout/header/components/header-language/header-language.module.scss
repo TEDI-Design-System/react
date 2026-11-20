@@ -1,3 +1,6 @@
+@use '../../../../../styles/breakpoint-classes';
+@use '@tedi-design-system/core/mixins';
+
 @mixin header-language-button {
   [data-name='button'],
   [data-name='link'] {
@@ -40,15 +43,6 @@
     }
   }
 
-  &__mobile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--layout-header-mobile-button-size);
-    min-width: var(--layout-header-mobile-button-min-size);
-    height: var(--layout-header-mobile-button-min-size);
-  }
-
   &__selected {
     display: flex;
     gap: var(--link-inner-spacing-x);
@@ -62,5 +56,25 @@
     align-items: flex-start;
 
     @include header-language-button;
+  }
+}
+
+// Below `md` the selector is a square button.
+@include breakpoint-classes.below(md) {
+  .tedi-header-language {
+    align-items: center;
+    justify-content: center;
+    width: var(--layout-header-mobile-button-size);
+    min-width: var(--layout-header-mobile-button-min-size);
+    height: var(--layout-header-mobile-button-min-size);
+  }
+}
+
+// The label is visually hidden below `lg`.
+@include breakpoint-classes.below(lg) {
+  .tedi-header-language__label {
+    @include mixins.visually-hidden;
+
+    white-space: nowrap;
   }
 }

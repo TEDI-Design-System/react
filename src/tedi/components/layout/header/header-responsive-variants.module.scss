@@ -1,0 +1,14 @@
+@use '../../../styles/breakpoint-classes';
+
+// Wraps one button variant. It adds no box of its own; `--hidden-<breakpoint>` hides it at that breakpoint.
+.tedi-header-variant {
+  display: contents;
+
+  @each $breakpoint in (xs, sm, md, lg, xl, xxl) {
+    &.tedi-header-variant--hidden-#{$breakpoint} {
+      @include breakpoint-classes.only($breakpoint) {
+        display: none;
+      }
+    }
+  }
+}
