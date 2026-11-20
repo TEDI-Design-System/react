@@ -1,4 +1,4 @@
-@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+@use '../../../styles/breakpoint-classes';
 
 .tedi-footer {
   background-color: var(--footer-background);
@@ -8,7 +8,7 @@
   display: flex;
 }
 
-.tedi-footer__container--mobile {
+@include breakpoint-classes.below-modifiers('.tedi-footer__container') {
   flex-direction: column;
 }
 
@@ -26,20 +26,59 @@
   padding: var(--layout-footer-padding-y) var(--layout-footer-padding-x);
 }
 
-.tedi-footer-body--grid {
+@mixin footer-body-grid($breakpoint) {
   display: grid;
+  grid-template-columns: repeat(var(--tedi-footer-body-columns-#{$breakpoint}), minmax(0, 1fr));
   align-items: start;
   justify-content: initial;
+
+  > * {
+    min-width: 0;
+  }
 }
 
-.tedi-footer-body--grid > * {
-  min-width: 0;
+@mixin footer-body-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  > * {
+    min-width: auto;
+  }
 }
 
-.tedi-footer-body--mobile {
+.tedi-footer-body--grid {
+  @include footer-body-grid(xs);
+}
+
+// One block per breakpoint, smallest first, so a larger breakpoint overrides a smaller one.
+@include breakpoint-classes.each-from using ($breakpoint) {
+  .tedi-footer-body--grid-from-#{$breakpoint} {
+    @include footer-body-grid($breakpoint);
+  }
+
+  .tedi-footer-body--flex-from-#{$breakpoint} {
+    @include footer-body-row;
+  }
+}
+
+// Below the mobile breakpoint the body always stacks into one column, whatever `columns` says.
+@include breakpoint-classes.below-modifiers('.tedi-footer-body') {
   flex-direction: column;
   gap: var(--layout-grid-gutters-08);
   padding: var(--layout-footer-padding-y) var(--layout-footer-padding-x);
+
+  &.tedi-footer-body--grid {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @each $grid-breakpoint in breakpoint-classes.$breakpoint-names {
+    &.tedi-footer-body--grid-from-#{$grid-breakpoint} {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
 }
 
 @mixin footer-links {
@@ -55,11 +94,6 @@
   align-items: flex-start;
 }
 
-.tedi-footer-section--collapsible {
-  width: 100%;
-  border-bottom: var(--tedi-borders-01) solid var(--general-border-transparent-white);
-}
-
 .tedi-footer-section__icon {
   padding: var(--icon-background-padding-lg);
   background: var(--footer-icon-background);
@@ -72,8 +106,69 @@
   @include footer-links;
 }
 
-.tedi-footer-section__container--mobile {
+.tedi-footer-section__heading {
+  margin: 0;
+  font-weight: var(--body-bold-weight);
+  color: var(--general-text-white);
+}
+
+// Toggle heading (collapsible sections only) is shown below the footer's mobile breakpoint, in place of the plain heading.
+.tedi-footer-section__toggle-heading {
+  display: none;
   width: 100%;
+  margin: 0;
+}
+
+.tedi-footer-section__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.tedi-footer-section__toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tedi-dimensions-13);
+  height: var(--tedi-dimensions-13);
+  color: var(--button-main-neutral-inverted-text-default);
+  background: var(--button-main-neutral-inverted-icon-only-background-default);
+  border-radius: var(--button-radius-default);
+  transition: transform 0.2s ease-in-out, color 300ms ease, background-color 300ms ease;
+
+  &:hover {
+    color: var(--button-main-neutral-inverted-text-hover);
+    background: var(--button-main-neutral-inverted-icon-only-background-hover);
+  }
+
+  &:active {
+    color: var(--button-main-neutral-inverted-text-active);
+    background: var(--button-main-neutral-inverted-icon-only-background-active);
+  }
+}
+
+// The focus ring is drawn on the chevron, like the icon-only collapse button.
+.tedi-footer-section__toggle:focus-visible {
+  outline: none;
+
+  .tedi-footer-section__toggle-icon {
+    color: var(--button-main-neutral-inverted-text-focus);
+    outline: var(--tedi-borders-02) solid var(--general-surface-primary);
+    outline-offset: 0;
+    background: var(--button-main-neutral-inverted-icon-only-background-focus);
+  }
+}
+
+.tedi-footer-section__toggle[aria-expanded='true'] .tedi-footer-section__toggle-icon {
+  transform: rotate(-180deg);
 }
 
 .tedi-footer-section__content {
@@ -84,14 +179,70 @@
   @include footer-links;
 }
 
-.tedi-footer-section__heading {
-  margin: 0;
-  font-weight: var(--body-bold-weight);
-  color: var(--general-text-white);
+@include breakpoint-classes.below-modifiers('.tedi-footer-section__icon') {
+  display: none;
 }
 
-.tedi-footer-section__collapse {
-  width: 100%;
+@include breakpoint-classes.below-modifiers('.tedi-footer-section') {
+  .tedi-footer-section__container {
+    width: 100%;
+  }
+
+  &.tedi-footer-section--collapsible {
+    width: 100%;
+    border-bottom: var(--tedi-borders-01) solid var(--general-border-transparent-white);
+
+    .tedi-footer-section__heading {
+      display: none;
+    }
+
+    .tedi-footer-section__toggle-heading {
+      display: block;
+    }
+
+    // The space between the toggle and the links is part of the open content, so a closed section takes no extra height.
+    .tedi-footer-section__container {
+      gap: 0;
+    }
+
+    .tedi-footer-section__content {
+      display: grid;
+      visibility: hidden;
+      grid-template-rows: 0fr;
+      margin-top: 0;
+      transition: grid-template-rows 300ms, visibility 300ms, margin-top 300ms;
+    }
+
+    .tedi-footer-section__content--open {
+      visibility: visible;
+      grid-template-rows: 1fr;
+      margin-top: var(--layout-footer-item-vertical-spacing);
+    }
+
+    // Clips the closed content; the margin leaves room for the links' focus ring.
+    .tedi-footer-section__content-inner {
+      min-height: 0;
+      overflow: clip;
+      overflow-clip-margin: 3px;
+    }
+
+    // Printing shows every section open, without the toggle.
+    @media print {
+      .tedi-footer-section__heading {
+        display: block;
+      }
+
+      .tedi-footer-section__toggle-heading {
+        display: none;
+      }
+
+      .tedi-footer-section__content {
+        visibility: visible;
+        grid-template-rows: 1fr;
+        margin-top: var(--layout-footer-item-vertical-spacing);
+      }
+    }
+  }
 }
 
 .tedi-footer-side {
@@ -100,35 +251,72 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding-right: var(--tedi-footer-side-padding-right);
+  padding-left: var(--tedi-footer-side-padding-left);
 }
 
-.tedi-footer-side--vertical-start {
-  justify-content: flex-start;
+// `placement` is turned into custom properties so the stacked (mobile) padding can follow it.
+@mixin footer-side-placement($placement) {
+  @if $placement == start {
+    --tedi-footer-side-padding-left: var(--layout-footer-padding-x);
+    --tedi-footer-side-padding-right: 0;
+    --tedi-footer-side-stacked-padding-top: var(--tedi-dimensions-13);
+    --tedi-footer-side-stacked-padding-bottom: 0;
+  } @else {
+    --tedi-footer-side-padding-left: 0;
+    --tedi-footer-side-padding-right: var(--layout-footer-padding-x);
+    --tedi-footer-side-stacked-padding-top: 0;
+    --tedi-footer-side-stacked-padding-bottom: var(--tedi-dimensions-13);
+  }
 }
 
-.tedi-footer-side--vertical-end {
-  justify-content: flex-end;
+@mixin footer-side-vertical($position) {
+  @if $position == start {
+    justify-content: flex-start;
+  } @else if $position == end {
+    justify-content: flex-end;
+  } @else {
+    justify-content: center;
+  }
 }
 
-.tedi-footer-side--start {
-  padding-left: var(--layout-footer-padding-x);
+@each $placement in (start, end) {
+  .tedi-footer-side--placement-#{$placement} {
+    @include footer-side-placement($placement);
+  }
 }
 
-.tedi-footer-side--end {
-  padding-right: var(--layout-footer-padding-x);
+@each $position in (start, center, end) {
+  .tedi-footer-side--vertical-#{$position} {
+    @include footer-side-vertical($position);
+  }
 }
 
-.tedi-footer-side--mobile {
+.tedi-footer-side--hidden {
+  display: none;
+}
+
+// One block per breakpoint, smallest first, so a larger breakpoint's rule overrides a smaller one's for every value.
+@include breakpoint-classes.each-from using ($breakpoint) {
+  .tedi-footer-side--hide-from-#{$breakpoint} {
+    display: none;
+  }
+
+  .tedi-footer-side--show-from-#{$breakpoint} {
+    display: flex;
+  }
+
+  @each $position in (start, center, end) {
+    .tedi-footer-side--vertical-#{$position}-from-#{$breakpoint} {
+      @include footer-side-vertical($position);
+    }
+  }
+}
+
+@include breakpoint-classes.below-modifiers('.tedi-footer-side') {
   width: 100%;
-  padding: var(--tedi-dimensions-13);
-}
-
-.tedi-footer-side--start.tedi-footer-side--mobile {
-  padding-bottom: 0;
-}
-
-.tedi-footer-side--end.tedi-footer-side--mobile {
-  padding-top: 0;
+  padding: var(--tedi-footer-side-stacked-padding-top) var(--tedi-dimensions-13)
+    var(--tedi-footer-side-stacked-padding-bottom);
 }
 
 .tedi-footer-bottom {
@@ -148,8 +336,10 @@
   padding-inline: var(--layout-footer-bottom-padding-x);
 }
 
-.tedi-footer-bottom--mobile .tedi-footer-bottom__inner {
-  gap: var(--layout-grid-gutters-16);
+@include breakpoint-classes.below-modifiers('.tedi-footer-bottom') {
+  .tedi-footer-bottom__inner {
+    gap: var(--layout-grid-gutters-16);
+  }
 }
 
 .tedi-footer-bottom__dot {

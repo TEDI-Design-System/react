@@ -328,6 +328,9 @@ export const LogoBreakpointSource: Story = {
  *   override flips it to its desktop side — `lg={{ placement: 'start' }}` for a left logo, or no
  *   override at all to keep it on the right.
  *
+ * A side that changes slot like this is rendered once in each slot and CSS shows the one that fits, so
+ * keyboard and screen-reader order follow what is on screen. Keep ids out of its content.
+ *
  * `position` sets the vertical alignment within the side slot on desktop. Both `placement` and
  * `position` accept breakpoint props. The first example is shown in a resizable frame so you can
  * watch the logo move; the rest reflow with the window.

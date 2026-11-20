@@ -27,6 +27,7 @@ Load the appropriate reference based on what you're doing:
 | Renaming, restructuring, extracting, merging | [refactoring.md](references/refactoring.md) |
 | Creating or updating Storybook stories | [stories.md](references/stories.md) |
 | Deprecating a component, removing its docs, or removing it from code | [deprecation.md](references/deprecation.md) |
+| Layout that changes at a breakpoint (mobile vs desktop), SSR layout shift | [responsive-layout.md](references/responsive-layout.md) |
 | Need to check coding patterns | [best-practices.md](references/best-practices.md) |
 | Reviewing a PR, or finishing work before opening one | [pr-review.md](references/pr-review.md) |
 | Refreshing `DESIGN.md` / `component.manifest.json` after a component or core change | [update-design-docs](../update-design-docs/SKILL.md) |

@@ -1,0 +1,41 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
+// Breakpoints a layout can switch at. `xs` is left out because nothing is below it.
+$breakpoint-names: (sm, md, lg, xl, xxl);
+
+// A breakpoint is a runtime prop and a media query cannot read props. The component picks a class
+// (`--below-md`, `-from-md`) and the media queries behind those classes are generated here, once per
+// breakpoint, so the layout is chosen by CSS and the server-rendered markup is right at every width.
+
+// `<selector>--below-<breakpoint>`: the content applies below the breakpoint, exactly where `from-modifiers` does not.
+@mixin below-modifiers($selector) {
+  @each $breakpoint in $breakpoint-names {
+    #{$selector}--below-#{$breakpoint} {
+      @media not all and (min-width: #{breakpoints.breakpoint-min($breakpoint)}) {
+        @content;
+      }
+    }
+  }
+}
+
+// `<selector>-from-<breakpoint>`: the content applies from the breakpoint up.
+@mixin from-modifiers($selector) {
+  @each $breakpoint in $breakpoint-names {
+    #{$selector}-from-#{$breakpoint} {
+      @include breakpoints.media-breakpoint-up($breakpoint) {
+        @content;
+      }
+    }
+  }
+}
+
+// One media query per breakpoint, from that breakpoint up. The content receives the breakpoint name
+// (`@include each-from using ($breakpoint) { ... }`), for a rule that reads a per-breakpoint value such as a
+// custom property named after the breakpoint.
+@mixin each-from {
+  @each $breakpoint in $breakpoint-names {
+    @include breakpoints.media-breakpoint-up($breakpoint) {
+      @content ($breakpoint);
+    }
+  }
+}

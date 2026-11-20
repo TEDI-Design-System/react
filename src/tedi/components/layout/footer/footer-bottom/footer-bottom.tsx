@@ -1,7 +1,6 @@
 import cn from 'classnames';
 import { Children, Fragment, isValidElement, ReactNode, useContext } from 'react';
 
-import { isBreakpointBelow, useBreakpoint } from '../../../../helpers';
 import styles from '../footer.module.scss';
 import { FooterContext } from '../footer-context';
 
@@ -24,16 +23,14 @@ export interface FooterBottomProps {
 }
 
 export const FooterBottom = ({ children, separator = false, className }: FooterBottomProps): JSX.Element => {
-  const breakpoint = useBreakpoint();
   const { mobileBreakpoint, maxWidth } = useContext(FooterContext);
-  const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
 
   const items = separator ? Children.toArray(children).filter((child) => isValidElement(child) || child) : null;
 
   return (
     <div
       data-name="footer-bottom"
-      className={cn(styles['tedi-footer-bottom'], { [styles['tedi-footer-bottom--mobile']]: isMobile }, className)}
+      className={cn(styles['tedi-footer-bottom'], styles[`tedi-footer-bottom--below-${mobileBreakpoint}`], className)}
     >
       {/* Inner wrapper keeps the strip background full-bleed while its content caps to `maxWidth`. */}
       <div className={styles['tedi-footer-bottom__inner']} style={maxWidth !== undefined ? { maxWidth } : undefined}>

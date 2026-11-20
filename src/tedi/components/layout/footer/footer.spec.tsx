@@ -1,15 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { execFileSync } from 'child_process';
+import path from 'path';
+import { renderToString } from 'react-dom/server.node';
 
-import { Breakpoint } from '../../../helpers';
 import { Footer } from './footer';
-
-const mockUseBreakpoint = jest.fn(() => 'lg' as Breakpoint);
-
-jest.mock('../../../helpers', () => ({
-  __esModule: true,
-  ...jest.requireActual('../../../helpers'),
-  useBreakpoint: () => mockUseBreakpoint(),
-}));
 
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: jest.fn(() => ({
@@ -23,10 +17,6 @@ jest.mock('../../../providers/printing-provider/printing-provider', () => ({
 }));
 
 describe('Footer', () => {
-  beforeEach(() => {
-    mockUseBreakpoint.mockReturnValue('lg');
-  });
-
   it('renders body sections and bottom slot when provided', () => {
     render(
       <Footer>
@@ -74,7 +64,6 @@ describe('Footer', () => {
   });
 
   it('collapsible section renders a toggle button below the mobile breakpoint and toggles aria-expanded on click', () => {
-    mockUseBreakpoint.mockReturnValue('xs');
     render(
       <Footer>
         <Footer.Body>
@@ -89,6 +78,21 @@ describe('Footer', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('puts the toggle button inside the section heading, so the heading stays a heading', () => {
+    render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Heading" collapsible>
+            <a href="#">Link</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const heading = screen.getByRole('heading', { level: 6, name: 'Heading' });
+    expect(within(heading).getByRole('button', { name: 'Heading' })).toHaveAttribute('aria-controls');
   });
 
   it('non-collapsible section uses a heading element, not a button', () => {
@@ -142,19 +146,12 @@ describe('Footer', () => {
     expect(bottomInner.style.maxWidth).toBe('1280px');
   });
 
-  it('lays the body out as a grid with the given column count above the mobile breakpoint', () => {
-    mockUseBreakpoint.mockReturnValue('lg');
+  it('lays the body out as a grid and hands the column count to CSS', () => {
     const { container } = render(
       <Footer>
         <Footer.Body columns={3}>
           <Footer.Section heading="A">
             <a href="#">A</a>
-          </Footer.Section>
-          <Footer.Section heading="B">
-            <a href="#">B</a>
-          </Footer.Section>
-          <Footer.Section heading="C">
-            <a href="#">C</a>
           </Footer.Section>
         </Footer.Body>
       </Footer>
@@ -162,19 +159,77 @@ describe('Footer', () => {
 
     const body = container.querySelector('.tedi-footer-body') as HTMLElement;
     expect(body.className).toMatch(/--grid/);
-    expect(body.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
+    expect(body.style.getPropertyValue('--tedi-footer-body-columns-xs')).toBe('3');
+    expect(body.style.getPropertyValue('--tedi-footer-body-columns-xxl')).toBe('3');
   });
 
-  it('ignores `columns` below the mobile breakpoint — the body stacks into one column', () => {
-    mockUseBreakpoint.mockReturnValue('xs');
+  it('resolves responsive `columns` mobile-first, keeping the previous value where a breakpoint has none', () => {
     const { container } = render(
       <Footer>
-        <Footer.Body columns={3}>
+        <Footer.Body columns={2} md={{ columns: 3 }} xl={{ columns: 4 }}>
           <Footer.Section heading="A">
             <a href="#">A</a>
           </Footer.Section>
-          <Footer.Section heading="B">
-            <a href="#">B</a>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const body = container.querySelector('.tedi-footer-body') as HTMLElement;
+    const columns = (bp: string) => body.style.getPropertyValue(`--tedi-footer-body-columns-${bp}`);
+    expect([columns('xs'), columns('sm'), columns('md'), columns('lg'), columns('xl'), columns('xxl')]).toEqual([
+      '2',
+      '2',
+      '3',
+      '3',
+      '4',
+      '4',
+    ]);
+  });
+
+  it('switches the grid on at the first breakpoint with columns, leaving the breakpoints below on the row', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body lg={{ columns: 4 }}>
+          <Footer.Section heading="A">
+            <a href="#">A</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const body = container.querySelector('.tedi-footer-body') as HTMLElement;
+    expect(body).toHaveClass('tedi-footer-body--grid-from-lg');
+    expect(body).not.toHaveClass('tedi-footer-body--grid');
+    expect(body.style.getPropertyValue('--tedi-footer-body-columns-lg')).toBe('4');
+  });
+
+  it('treats `columns: 0` as the row again from that breakpoint and back to the grid at a later one', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body columns={3} md={{ columns: 0 }} xl={{ columns: 2 }}>
+          <Footer.Section heading="A">
+            <a href="#">A</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const body = container.querySelector('.tedi-footer-body') as HTMLElement;
+    expect(body).toHaveClass(
+      'tedi-footer-body--grid',
+      'tedi-footer-body--flex-from-md',
+      'tedi-footer-body--grid-from-xl'
+    );
+    expect(body.className).not.toMatch(/--grid-from-(sm|md|lg)|--flex-from-(sm|lg|xl|xxl)/);
+    expect(body.style.getPropertyValue('--tedi-footer-body-columns-xl')).toBe('2');
+  });
+
+  it('does not use the grid when `columns` is not set', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="A">
+            <a href="#">A</a>
           </Footer.Section>
         </Footer.Body>
       </Footer>
@@ -182,8 +237,169 @@ describe('Footer', () => {
 
     const body = container.querySelector('.tedi-footer-body') as HTMLElement;
     expect(body.className).not.toMatch(/--grid/);
-    expect(body.className).toMatch(/--mobile/);
-    expect(body.style.gridTemplateColumns).toBe('');
+    expect(body.getAttribute('style')).toBeNull();
+  });
+
+  it('passes `mobileBreakpoint` to every part as a CSS class', () => {
+    const { container } = render(
+      <Footer mobileBreakpoint="md">
+        <Footer.Side>
+          <img alt="logo" />
+        </Footer.Side>
+        <Footer.Body>
+          <Footer.Section heading="A" collapsible>
+            <a href="#">A</a>
+          </Footer.Section>
+        </Footer.Body>
+        <Footer.Bottom>
+          <a href="#">Terms</a>
+        </Footer.Bottom>
+      </Footer>
+    );
+
+    expect(container.querySelector('.tedi-footer__container')?.className).toMatch(/--below-md/);
+    expect(container.querySelector('.tedi-footer-side')?.className).toMatch(/--below-md/);
+    expect(container.querySelector('.tedi-footer-body')?.className).toMatch(/--below-md/);
+    expect(container.querySelector('.tedi-footer-section')?.className).toMatch(/--below-md/);
+    expect(container.querySelector('.tedi-footer-bottom')?.className).toMatch(/--below-md/);
+  });
+
+  it('turns responsive `position` of a side into classes applied from each breakpoint', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Side position="start" lg={{ position: 'end' }}>
+          <img alt="logo" />
+        </Footer.Side>
+      </Footer>
+    );
+
+    const classes = (container.querySelector('.tedi-footer-side') as HTMLElement).className;
+    expect(classes).toContain('tedi-footer-side--vertical-start');
+    expect(classes).toContain('tedi-footer-side--vertical-end-from-lg');
+  });
+
+  it('renders a side once when its placement is the same at every breakpoint', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Side placement="end" sm={{ placement: 'end' }}>
+          <img alt="logo" />
+        </Footer.Side>
+      </Footer>
+    );
+
+    const sides = container.querySelectorAll('.tedi-footer-side');
+    expect(sides).toHaveLength(1);
+    expect(sides[0]).toHaveClass('tedi-footer-side--placement-end');
+    expect(sides[0].className).not.toMatch(/--hidden|--hide-from|--show-from/);
+  });
+
+  it('renders a side whose placement changes with the breakpoint in both slots, in visual order', () => {
+    render(
+      <Footer>
+        <Footer.Side placement="end" lg={{ placement: 'start' }}>
+          <a href="/">Home</a>
+        </Footer.Side>
+        <Footer.Body>
+          <Footer.Section heading="A">
+            <a href="#a">A link</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const links = screen.getAllByRole('link', { hidden: true });
+    expect(links.map((link) => link.textContent)).toEqual(['Home', 'A link', 'Home']);
+
+    const [startCopy, endCopy] = [links[0], links[2]].map((link) => link.closest('.tedi-footer-side') as HTMLElement);
+    expect(startCopy).toHaveClass(
+      'tedi-footer-side--placement-start',
+      'tedi-footer-side--hidden',
+      'tedi-footer-side--show-from-lg'
+    );
+    expect(endCopy).toHaveClass('tedi-footer-side--placement-end', 'tedi-footer-side--hide-from-lg');
+    expect(endCopy).not.toHaveClass('tedi-footer-side--hidden');
+  });
+
+  it('shows each copy again where the placement switches back at a later breakpoint', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Side placement="start" sm={{ placement: 'end' }} lg={{ placement: 'start' }}>
+          <img alt="logo" />
+        </Footer.Side>
+      </Footer>
+    );
+
+    const [startCopy, endCopy] = Array.from(container.querySelectorAll<HTMLElement>('.tedi-footer-side'));
+    expect(startCopy).toHaveClass('tedi-footer-side--hide-from-sm', 'tedi-footer-side--show-from-lg');
+    expect(startCopy).not.toHaveClass('tedi-footer-side--hidden');
+    expect(endCopy).toHaveClass(
+      'tedi-footer-side--hidden',
+      'tedi-footer-side--show-from-sm',
+      'tedi-footer-side--hide-from-lg'
+    );
+  });
+
+  it('renders a section icon that is hidden below `lg` by default', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Contact" icon="mail">
+            <a href="#">Email</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const icon = container.querySelector('.tedi-footer-section__icon');
+    expect(icon).toBeInTheDocument();
+    expect(icon?.className).toContain('tedi-footer-section__icon--below-lg');
+  });
+
+  it('hides the section icon below `iconBreakpoint`', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Contact" icon="mail" iconBreakpoint="md">
+            <a href="#">Email</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    expect(container.querySelector('.tedi-footer-section__icon')?.className).toContain(
+      'tedi-footer-section__icon--below-md'
+    );
+  });
+
+  it('renders no icon element without an `icon`', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Contact">
+            <a href="#">Email</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    expect(container.querySelector('.tedi-footer-section__icon')).not.toBeInTheDocument();
+  });
+
+  it('server-renders the same markup for every width: both headings, content once, no layout chosen by JS', () => {
+    const html = renderToString(
+      <Footer mobileBreakpoint="md">
+        <Footer.Body>
+          <Footer.Section heading="Contact" collapsible>
+            <a href="#">Phone</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    expect(html).toContain('<strong');
+    expect(html).toContain('aria-expanded="false"');
+    expect(html.match(/Phone/g)).toHaveLength(1);
+    expect(html).toContain('tedi-footer__container--below-md');
   });
 
   it('Footer.Bottom with `separator` inserts a decorative dot between items', () => {
@@ -202,5 +418,56 @@ describe('Footer', () => {
     const dots = bottom.querySelectorAll('.tedi-footer-bottom__dot');
     expect(dots).toHaveLength(2);
     dots.forEach((dot) => expect(dot).toHaveAttribute('aria-hidden', 'true'));
+  });
+});
+
+describe('Footer side responsive rules', () => {
+  // jsdom does not evaluate media queries, so the cascade is checked on the compiled stylesheet: classes of equal
+  // specificity apply by source order. The sass CLI runs in a child process, because the sass library does not
+  // work inside Jest's jsdom environment.
+  let css = '';
+
+  beforeAll(() => {
+    const root = path.resolve(__dirname, '../../../../..');
+    css = execFileSync(
+      path.join(root, 'node_modules/.bin/sass'),
+      [
+        '--quiet',
+        '--no-source-map',
+        `--load-path=${path.join(root, 'node_modules')}`,
+        path.resolve(__dirname, 'footer.module.scss'),
+      ],
+      { encoding: 'utf8' }
+    );
+  });
+
+  const BREAKPOINTS = ['sm', 'md', 'lg', 'xl', 'xxl'];
+  const ruleIndex = (selector: string): number => css.indexOf(`.${selector} {`);
+
+  it.each([
+    [
+      'side vertical alignment',
+      (bp: string) => ['start', 'center', 'end'].map((v) => `tedi-footer-side--vertical-${v}-from-${bp}`),
+    ],
+    ['side visibility', (bp: string) => [`tedi-footer-side--hide-from-${bp}`, `tedi-footer-side--show-from-${bp}`]],
+    ['body layout', (bp: string) => [`tedi-footer-body--grid-from-${bp}`, `tedi-footer-body--flex-from-${bp}`]],
+  ])('puts a larger breakpoint after a smaller one for the %s rules', (_family, selectorsAt) => {
+    BREAKPOINTS.forEach((smaller, i) => {
+      BREAKPOINTS.slice(i + 1).forEach((larger) => {
+        selectorsAt(smaller).forEach((first) => {
+          selectorsAt(larger).forEach((second) => {
+            expect(ruleIndex(first)).toBeGreaterThan(-1);
+            expect(ruleIndex(second)).toBeGreaterThan(ruleIndex(first));
+          });
+        });
+      });
+    });
+  });
+
+  it('makes `below` the exact opposite of `from`, with no gap between them', () => {
+    // core's media-breakpoint-down stops 0.02 short of the breakpoint (max-width), which leaves a sliver of
+    // fractional widths that neither query matches.
+    expect(css).toContain('@media not all and (min-width: 48rem) {\n  .tedi-footer-body--below-md');
+    expect(css).not.toMatch(/max-width/);
   });
 });
