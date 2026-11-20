@@ -71,6 +71,8 @@ node <skill>/scripts/detect-version.mjs .
   never a `package.json` range. Pass `--version <installed version>` to `resolve-target` so the target is
   the version already installed, and ask whether to go to `latest` instead.
 - `history` notes: an entry with `before: null` is the commit that added TEDI; it has no earlier version.
+  With `unresolved` it is not: the lockfile held several TEDI copies and none matched that revision's
+  `package.json` range, so ask the developer for `before` (the same holds for `uncommittedBump`).
   `historyTruncated` means only the latest 500 lockfile commits were read; `historyShallow` means the
   clone is shallow and older bumps may be missing.
 - `coreRange` not null means core is a direct dependency: leave core out (rule above). Otherwise
@@ -183,11 +185,13 @@ non-interactive run), stop here and put the summary in your final message.
 
 ### 5. Apply
 
-1. Set `Status: applying`, then install the target version with the project's package manager. Keep
-   the project's pinning style: an exact version stays exact (`npm install -E`, `pnpm add -E`,
-   `yarn add -E`, `bun add --exact`); a range keeps its operator, so pass it in the spec
-   (`npm install "@tedi-design-system/react@~<to>"`). Then check the installed core version against
-   `<core-to>` (step 2) before applying core items.
+1. Set `Status: applying`, then install exactly `<to>`, the version the plan covers, with the project's
+   package manager: `npm install -E "@tedi-design-system/react@<to>"` (`pnpm add -E`, `yarn add -E`,
+   `bun add --exact`). A range spec such as `~<to>` can resolve a later release the plan doesn't cover.
+   If `package.json` used a range, put its operator back in front of `<to>` and run the plain install
+   (`npm install`), which keeps the locked `<to>`. Re-run `detect-version.mjs`: `lockfileVersion` and
+   `installedVersion` must both be `<to>`; if not, stop and tell the developer. Then check the installed
+   core version against `<core-to>` (step 2) before applying core items.
 2. Work through the plan **in release order**; later releases can build on earlier renames. Ask the
    `assisted` questions as you reach them (batch similar ones), apply, tick the item.
 3. Crossing several majors: the installed package is the target, so code that is right for an

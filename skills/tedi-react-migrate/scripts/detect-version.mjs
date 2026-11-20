@@ -5,7 +5,16 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname, relative, resolve, sep } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import config from './config.mjs';
-import { parseArgs, rangeMinimum, printJson, LOCKFILES, lockedVersion, isExactVersion } from './lib.mjs';
+import {
+  parseArgs,
+  rangeMinimum,
+  printJson,
+  LOCKFILES,
+  lockedVersion,
+  isExactVersion,
+  yarnEntry,
+  yarnDependencyRange,
+} from './lib.mjs';
 
 const args = parseArgs();
 const dir = resolve(args._[0] ?? process.cwd());
@@ -33,12 +42,13 @@ if (!pj) {
 }
 const manifest = JSON.parse(pj);
 // npm precedence: an optionalDependencies entry overrides the same key in dependencies.
-const depOf = (name) =>
-  manifest.optionalDependencies?.[name] ??
-  manifest.dependencies?.[name] ??
-  manifest.devDependencies?.[name] ??
-  manifest.peerDependencies?.[name] ??
+const depIn = (m, name) =>
+  m?.optionalDependencies?.[name] ??
+  m?.dependencies?.[name] ??
+  m?.devDependencies?.[name] ??
+  m?.peerDependencies?.[name] ??
   null;
+const depOf = (name) => depIn(manifest, name);
 const range = depOf(pkg);
 result.packageJsonRange = range;
 result.coreRange = depOf(config.corePkg);
@@ -88,10 +98,11 @@ for (let d = dir; ; d = dirname(d)) {
   }
   if (dirname(d) === d || existsSync(join(d, '.git'))) break;
 }
-const lockedAt = (text, name = pkg) =>
+// `man` is the package.json of the same revision as `text`: yarn entries are keyed by its ranges.
+const lockedAt = (text, name = pkg, man = manifest, range = depIn(man, name)) =>
   text == null
     ? null
-    : lockedVersion(lock.file, text, name, lock.importer, depOf(name), lock.importer === '.' ? null : manifest.name);
+    : lockedVersion(lock.file, text, name, lock.importer, range, lock.importer === '.' ? null : manifest.name);
 // npm nests a copy the library needs under the library's own folder when the hoisted one differs.
 const nestedCoreAt = (text) => {
   if (lock.file !== 'package-lock.json' || text == null) return null;
@@ -107,8 +118,17 @@ const nestedCoreAt = (text) => {
     return null;
   }
 };
-const coreAt = (text) =>
-  text == null ? null : (result.coreRange ? null : nestedCoreAt(text)) ?? lockedAt(text, config.corePkg);
+// Core as the library's own entry resolves it, when core is not a direct dependency: yarn.lock lists the
+// library's core range under its entry, npm may nest a copy under the library.
+const coreAt = (text, man = manifest) => {
+  if (text == null) return null;
+  if (depIn(man, config.corePkg)) return lockedAt(text, config.corePkg, man);
+  if (lock.file === 'yarn.lock') {
+    const via = yarnDependencyRange(yarnEntry(text, pkg, depIn(man, pkg)), config.corePkg);
+    return lockedAt(text, config.corePkg, man, via);
+  }
+  return nestedCoreAt(text) ?? lockedAt(text, config.corePkg, man);
+};
 if (lock) {
   const text = readFileSync(join(lock.dir, lock.file), 'utf8');
   result.lockfile = relative(dir, join(lock.dir, lock.file)) || lock.file;
@@ -150,21 +170,40 @@ if (!result.coreVersion && !result.coreRange && libVersion) {
 // Every commit that changed the locked version (exact versions, along the first-parent line), and a
 // bump that is installed but not committed yet.
 const HISTORY_LIMIT = 500;
+const UNRESOLVED = `the lockfile lists several copies of ${pkg} and none matches that revision's package.json range; ask the developer`;
 result.history = null;
 if (lock && git(['rev-parse', '--is-inside-work-tree'], lock.dir)) {
   const lockPath = `./${lock.file}`;
   // Library and core versions from one lockfile revision, so a historical `from` gets its own core.
+  // The project's package.json in the same revision: its ranges pick the yarn entries.
+  const manifestPath = `./${relative(lock.dir, join(dir, 'package.json')).split(sep).join('/')}`;
+  const manifestAt = (rev) => {
+    try {
+      return JSON.parse(git(['show', `${rev}:${manifestPath}`], lock.dir));
+    } catch {
+      return null;
+    }
+  };
   const at = (rev) => {
     const text = git(['show', `${rev}:${lockPath}`], lock.dir);
-    return { lib: lockedAt(text), core: coreAt(text) };
+    const man = manifestAt(rev);
+    const lib = lockedAt(text, pkg, man);
+    // Listed, but no entry matches that revision's range (several copies): unknown, not absent.
+    const unresolved = !lib && Boolean(text?.includes(`${pkg}@`));
+    return { lib, core: coreAt(text, man), unresolved };
   };
   const committed = at('HEAD');
-  if (committed.lib && result.lockfileVersion && committed.lib !== result.lockfileVersion) {
+  const lockChanged = git(['diff', '--quiet', 'HEAD', '--', lock.file], lock.dir) === null;
+  if (
+    result.lockfileVersion &&
+    (committed.lib ? committed.lib !== result.lockfileVersion : committed.unresolved && lockChanged)
+  ) {
     result.uncommittedBump = {
       before: committed.lib,
       after: result.lockfileVersion,
       coreBefore: committed.core,
       coreAfter: result.coreLockfileVersion,
+      ...(committed.unresolved && { unresolved: UNRESOLVED }),
     };
   }
   const log =
@@ -199,6 +238,7 @@ if (lock && git(['rev-parse', '--is-inside-work-tree'], lock.dir)) {
         after: after.lib,
         coreBefore: before.core,
         coreAfter: after.core,
+        ...(before.unresolved && { unresolved: UNRESOLVED }),
       });
   }
 }

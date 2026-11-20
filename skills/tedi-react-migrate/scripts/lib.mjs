@@ -80,6 +80,32 @@ export const LOCKFILES = ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'b
 
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 
+// pnpm appends peer suffixes: "9.4.0_@x+core@20.0.0", "9.4.0(@x/core@20.0.0)".
+const exact = (v) => v?.match(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/)?.[0] ?? null;
+
+/**
+ * The yarn.lock entry (classic or berry) that `range`, the project's specifier, resolves to:
+ * `{ version, body }`. Without a matching selector it is the only entry, or null when several copies
+ * make it ambiguous.
+ */
+export function yarnEntry(rawText, pkg, range = null) {
+  const text = rawText.replace(/\r\n?/g, '\n');
+  const header = new RegExp(`^"?(${escapeRe(pkg)}@[^\\n]*):\\n((?:[ \\t]+[^\\n]*(?:\\n|$))*)`, 'gm');
+  const entries = [...text.matchAll(header)].map((m) => ({
+    specs: m[1].split(/,\s*/).map((s) => s.replace(/^"|"$/g, '')),
+    version: exact(m[2].match(/^[ \t]+version:?[ \t]+"?([^"\n]+)"?/m)?.[1]),
+    body: m[2],
+  }));
+  const r = range?.replace(/^npm:/, '');
+  const match = r && entries.find((e) => e.specs.some((s) => s === `${pkg}@${r}` || s === `${pkg}@npm:${r}`));
+  return match || (entries.length === 1 ? entries[0] : null);
+}
+
+/** The range a yarn.lock entry lists for a dependency: classic `"dep" "1.0.0"`, berry `dep: "npm:1.0.0"`. */
+export const yarnDependencyRange = (entry, dep) =>
+  entry?.body.match(new RegExp(`^[ \\t]+"?${escapeRe(dep)}"?:?[ \\t]+"?([^"\\n]+)"?`, 'm'))?.[1].replace(/^npm:/, '') ??
+  null;
+
 /**
  * The version of `pkg` that a lockfile resolves for one project. `importer` is the project's path
  * relative to the lockfile ("." for the lockfile's own folder); npm and pnpm workspaces key by it.
@@ -89,8 +115,6 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 export function lockedVersion(file, rawText, pkg, importer = '.', range = null, workspace = null) {
   const text = rawText.replace(/\r\n?/g, '\n');
   const escaped = escapeRe(pkg);
-  // pnpm appends peer suffixes: "9.4.0_@angular+core@20.0.0", "9.4.0(@angular/core@20.0.0)".
-  const exact = (v) => v?.match(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/)?.[0] ?? null;
   try {
     if (file === 'package-lock.json') {
       const lock = JSON.parse(text);
@@ -150,20 +174,7 @@ export function lockedVersion(file, rawText, pkg, importer = '.', range = null, 
       }
       return null;
     }
-    if (file === 'yarn.lock') {
-      // Classic: `"pkg@^9.0.0", "pkg@^9.1.0":` / berry: `"pkg@npm:^9.0.0":`, then `version`.
-      const entries = [
-        ...text.matchAll(
-          new RegExp(`^"?(${escaped}@[^\\n]*):\\n(?:[ \\t]+[^\\n]*\\n)*?[ \\t]+version:?[ \\t]+"?([^"\\n]+)"?`, 'gm')
-        ),
-      ].map((m) => ({
-        specs: m[1].split(/,\s*/).map((s) => s.replace(/^"|"$/g, '')),
-        version: exact(m[2]),
-      }));
-      const wanted = range && [`${pkg}@${range}`, `${pkg}@npm:${range}`];
-      const match = (wanted && entries.find((e) => e.specs.some((s) => wanted.includes(s)))) ?? entries[0];
-      return match?.version ?? null;
-    }
+    if (file === 'yarn.lock') return yarnEntry(text, pkg, range)?.version ?? null;
     if (file === 'bun.lock') {
       // JSONC with trailing commas. `packages[pkg]` is the top-level copy; nested copies are keyed
       // "<dependent>/<pkg>".
