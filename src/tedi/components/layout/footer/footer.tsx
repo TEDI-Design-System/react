@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { Children, isValidElement, ReactNode, useMemo } from 'react';
+import { Children, cloneElement, isValidElement, ReactElement, ReactNode, useMemo } from 'react';
 
 import { Breakpoint } from '../../../helpers';
 import styles from './footer.module.scss';
@@ -7,7 +7,7 @@ import { FooterBody } from './footer-body/footer-body';
 import { FooterBottom } from './footer-bottom/footer-bottom';
 import { FooterContext, FooterContextValue } from './footer-context';
 import { FooterSection } from './footer-section/footer-section';
-import { FooterSide, FooterSideProps } from './footer-side/footer-side';
+import { FooterSide, FooterSideProps, getSideSlots } from './footer-side/footer-side';
 
 export interface FooterProps {
   /**
@@ -54,26 +54,36 @@ export const Footer = ({ children, className, mobileBreakpoint = 'sm', maxWidth 
   let bottom: ReactNode = null;
   const passthrough: ReactNode[] = [];
 
-  Children.forEach(children, (child) => {
+  Children.toArray(children).forEach((child) => {
     if (!isValidElement(child)) {
-      if (child !== null && child !== undefined && child !== false) passthrough.push(child);
+      passthrough.push(child);
       return;
     }
-    const type = child.type;
-    if (type === FooterSide) {
-      // Source order follows the base placement; responsive placement overrides are applied with CSS `order`.
-      const { placement = 'start' } = child.props as FooterSideProps;
-      (placement === 'end' ? end : start).push(child);
+
+    if (child.type === FooterSide) {
+      const slots = getSideSlots(child.props as FooterSideProps);
+
+      slots.forEach((slot) => {
+        // One copy goes in each slot and CSS shows the one that fits.
+        const side =
+          slots.length > 1
+            ? cloneElement(child as ReactElement<FooterSideProps>, { key: `${child.key}-${slot}`, copy: slot })
+            : child;
+        (slot === 'end' ? end : start).push(side);
+      });
       return;
     }
-    if (type === FooterBody) {
+
+    if (child.type === FooterBody) {
       body = child;
       return;
     }
-    if (type === FooterBottom) {
+
+    if (child.type === FooterBottom) {
       bottom = child;
       return;
     }
+
     passthrough.push(child);
   });
 

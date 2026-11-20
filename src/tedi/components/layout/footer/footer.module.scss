@@ -251,7 +251,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  order: var(--tedi-footer-side-order);
   padding-right: var(--tedi-footer-side-padding-right);
   padding-left: var(--tedi-footer-side-padding-left);
 }
@@ -259,13 +258,11 @@
 // `placement` is turned into custom properties so the stacked (mobile) padding can follow it.
 @mixin footer-side-placement($placement) {
   @if $placement == start {
-    --tedi-footer-side-order: -1;
     --tedi-footer-side-padding-left: var(--layout-footer-padding-x);
     --tedi-footer-side-padding-right: 0;
     --tedi-footer-side-stacked-padding-top: var(--tedi-dimensions-13);
     --tedi-footer-side-stacked-padding-bottom: 0;
   } @else {
-    --tedi-footer-side-order: 1;
     --tedi-footer-side-padding-left: 0;
     --tedi-footer-side-padding-right: var(--layout-footer-padding-x);
     --tedi-footer-side-stacked-padding-top: 0;
@@ -295,12 +292,18 @@
   }
 }
 
+.tedi-footer-side--hidden {
+  display: none;
+}
+
 // One block per breakpoint, smallest first, so a larger breakpoint's rule overrides a smaller one's for every value.
 @include breakpoint-classes.each-from using ($breakpoint) {
-  @each $placement in (start, end) {
-    .tedi-footer-side--placement-#{$placement}-from-#{$breakpoint} {
-      @include footer-side-placement($placement);
-    }
+  .tedi-footer-side--hide-from-#{$breakpoint} {
+    display: none;
+  }
+
+  .tedi-footer-side--show-from-#{$breakpoint} {
+    display: flex;
   }
 
   @each $position in (start, center, end) {

@@ -264,23 +264,63 @@ describe('Footer', () => {
     expect(container.querySelector('.tedi-footer-bottom')?.className).toMatch(/--below-md/);
   });
 
-  it('turns responsive `placement` and `position` of a side into classes applied from each breakpoint', () => {
+  it('turns responsive `position` of a side into classes applied from each breakpoint', () => {
     const { container } = render(
       <Footer>
-        <Footer.Side placement="end" position="start" sm={{ placement: 'start' }} lg={{ position: 'end' }}>
+        <Footer.Side position="start" lg={{ position: 'end' }}>
           <img alt="logo" />
         </Footer.Side>
       </Footer>
     );
 
     const classes = (container.querySelector('.tedi-footer-side') as HTMLElement).className;
-    expect(classes).toContain('tedi-footer-side--placement-end');
-    expect(classes).toContain('tedi-footer-side--placement-start-from-sm');
     expect(classes).toContain('tedi-footer-side--vertical-start');
     expect(classes).toContain('tedi-footer-side--vertical-end-from-lg');
   });
 
-  it('keeps the class for a placement that switches back at a later breakpoint', () => {
+  it('renders a side once when its placement is the same at every breakpoint', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Side placement="end" sm={{ placement: 'end' }}>
+          <img alt="logo" />
+        </Footer.Side>
+      </Footer>
+    );
+
+    const sides = container.querySelectorAll('.tedi-footer-side');
+    expect(sides).toHaveLength(1);
+    expect(sides[0]).toHaveClass('tedi-footer-side--placement-end');
+    expect(sides[0].className).not.toMatch(/--hidden|--hide-from|--show-from/);
+  });
+
+  it('renders a side whose placement changes with the breakpoint in both slots, in visual order', () => {
+    render(
+      <Footer>
+        <Footer.Side placement="end" lg={{ placement: 'start' }}>
+          <a href="/">Home</a>
+        </Footer.Side>
+        <Footer.Body>
+          <Footer.Section heading="A">
+            <a href="#a">A link</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const links = screen.getAllByRole('link', { hidden: true });
+    expect(links.map((link) => link.textContent)).toEqual(['Home', 'A link', 'Home']);
+
+    const [startCopy, endCopy] = [links[0], links[2]].map((link) => link.closest('.tedi-footer-side') as HTMLElement);
+    expect(startCopy).toHaveClass(
+      'tedi-footer-side--placement-start',
+      'tedi-footer-side--hidden',
+      'tedi-footer-side--show-from-lg'
+    );
+    expect(endCopy).toHaveClass('tedi-footer-side--placement-end', 'tedi-footer-side--hide-from-lg');
+    expect(endCopy).not.toHaveClass('tedi-footer-side--hidden');
+  });
+
+  it('shows each copy again where the placement switches back at a later breakpoint', () => {
     const { container } = render(
       <Footer>
         <Footer.Side placement="start" sm={{ placement: 'end' }} lg={{ placement: 'start' }}>
@@ -289,10 +329,14 @@ describe('Footer', () => {
       </Footer>
     );
 
-    const classes = (container.querySelector('.tedi-footer-side') as HTMLElement).className;
-    expect(classes).toContain('tedi-footer-side--placement-start');
-    expect(classes).toContain('tedi-footer-side--placement-end-from-sm');
-    expect(classes).toContain('tedi-footer-side--placement-start-from-lg');
+    const [startCopy, endCopy] = Array.from(container.querySelectorAll<HTMLElement>('.tedi-footer-side'));
+    expect(startCopy).toHaveClass('tedi-footer-side--hide-from-sm', 'tedi-footer-side--show-from-lg');
+    expect(startCopy).not.toHaveClass('tedi-footer-side--hidden');
+    expect(endCopy).toHaveClass(
+      'tedi-footer-side--hidden',
+      'tedi-footer-side--show-from-sm',
+      'tedi-footer-side--hide-from-lg'
+    );
   });
 
   it('renders a section icon that is hidden below `lg` by default', () => {
@@ -401,18 +445,19 @@ describe('Footer side responsive rules', () => {
   const ruleIndex = (selector: string): number => css.indexOf(`.${selector} {`);
 
   it.each([
-    ['placement', ['start', 'end']],
-    ['vertical', ['start', 'center', 'end']],
-  ])('puts a larger breakpoint after a smaller one for every %s value', (family, values) => {
+    [
+      'side vertical alignment',
+      (bp: string) => ['start', 'center', 'end'].map((v) => `tedi-footer-side--vertical-${v}-from-${bp}`),
+    ],
+    ['side visibility', (bp: string) => [`tedi-footer-side--hide-from-${bp}`, `tedi-footer-side--show-from-${bp}`]],
+    ['body layout', (bp: string) => [`tedi-footer-body--grid-from-${bp}`, `tedi-footer-body--flex-from-${bp}`]],
+  ])('puts a larger breakpoint after a smaller one for the %s rules', (_family, selectorsAt) => {
     BREAKPOINTS.forEach((smaller, i) => {
       BREAKPOINTS.slice(i + 1).forEach((larger) => {
-        values.forEach((smallerValue) => {
-          values.forEach((largerValue) => {
-            const first = ruleIndex(`tedi-footer-side--${family}-${smallerValue}-from-${smaller}`);
-            const second = ruleIndex(`tedi-footer-side--${family}-${largerValue}-from-${larger}`);
-
-            expect(first).toBeGreaterThan(-1);
-            expect(second).toBeGreaterThan(first);
+        selectorsAt(smaller).forEach((first) => {
+          selectorsAt(larger).forEach((second) => {
+            expect(ruleIndex(first)).toBeGreaterThan(-1);
+            expect(ruleIndex(second)).toBeGreaterThan(ruleIndex(first));
           });
         });
       });
