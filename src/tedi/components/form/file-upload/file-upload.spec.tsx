@@ -202,6 +202,15 @@ describe('FileUpload component', () => {
     expect(container.querySelector('[class*="tedi-file-upload__clear-text"]')).toBeInTheDocument();
     expect(container.querySelector('[class*="tedi-file-upload__clear-icon"]')).toBeInTheDocument();
   });
+
+  it('clears the files from the icon clear button too', () => {
+    render(<FileUpload {...defaultProps} hasClearButton defaultFiles={[{ name: 'test.jpg', id: '1' }]} />);
+
+    fireEvent.click(screen.getAllByRole('button', { name: /clear/i })[1]);
+
+    expect(defaultProps.onChange).toHaveBeenCalledWith([]);
+  });
+
   it('renders the file list correctly', () => {
     const files = [
       { name: 'test1.jpg', id: '1' },
