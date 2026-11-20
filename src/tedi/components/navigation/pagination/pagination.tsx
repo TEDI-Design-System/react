@@ -223,7 +223,7 @@ export interface PaginationProps extends BreakpointSupport<PaginationBreakpointP
 
 // A breakpoint hides the slot below it with CSS. `true` removes the slot instead, so it needs no class.
 const hiddenBelow = (slot: 'results' | 'pager' | 'page-size', value: PaginationVisibility | undefined) =>
-  typeof value === 'string' ? styles[`tedi-pagination--no-${slot}-below-${value}`] : undefined;
+  typeof value === 'string' ? styles[`tedi-pagination--no-${slot}--below-${value}`] : undefined;
 
 export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, ref): JSX.Element => {
   const {

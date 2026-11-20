@@ -1,27 +1,27 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 @use '../../../styles/breakpoint-classes';
+@use 'sass:list';
 
-// `--no-<modifier>` removes a slot for good. `--no-<modifier>-below-<breakpoint>` hides it below that
-// breakpoint, and the layout rules below follow it, so the gap closes at the same widths.
-@mixin hide-slot-below($modifier, $slot) {
-  @each $breakpoint in breakpoint-classes.$breakpoint-names {
-    .tedi-pagination--no-#{$modifier}-below-#{$breakpoint} .tedi-pagination__#{$slot} {
-      @include breakpoints.media-breakpoint-down($breakpoint) {
-        display: none;
-      }
-    }
-  }
+// The lower of two breakpoints, so a rule that applies below both can use one `below()` query.
+@function lower-breakpoint($first, $second) {
+  @return if(
+    list.index(breakpoint-classes.$breakpoint-names, $first) < list.index(breakpoint-classes.$breakpoint-names, $second),
+    $first,
+    $second
+  );
 }
 
-// Rules that apply when the pager is gone: `&` is the slot they style.
+// Rules for the stacked layout (below `md`) when the pager is gone: `&` is the slot they style.
 @mixin no-pager-slot {
   .tedi-pagination--no-pager & {
-    @content;
+    @include breakpoint-classes.below(md) {
+      @content;
+    }
   }
 
   @each $breakpoint in breakpoint-classes.$breakpoint-names {
-    .tedi-pagination--no-pager-below-#{$breakpoint} & {
-      @include breakpoints.media-breakpoint-down($breakpoint) {
+    .tedi-pagination--no-pager--below-#{$breakpoint} & {
+      @include breakpoint-classes.below(lower-breakpoint($breakpoint, md)) {
         @content;
       }
     }
@@ -37,7 +37,7 @@
   width: 100%;
   padding: var(--pagination-padding-y) var(--pagination-padding-x);
 
-  @include breakpoints.media-breakpoint-down(md) {
+  @include breakpoint-classes.below(md) {
     grid-template-areas:
       'results'
       'pager'
@@ -55,17 +55,15 @@
 }
 
 .tedi-pagination.tedi-pagination--no-pager {
-  @include breakpoints.media-breakpoint-down(md) {
+  @include breakpoint-classes.below(md) {
     @include no-pager-grid;
   }
 }
 
 @each $breakpoint in breakpoint-classes.$breakpoint-names {
-  .tedi-pagination.tedi-pagination--no-pager-below-#{$breakpoint} {
-    @include breakpoints.media-breakpoint-down(md) {
-      @include breakpoints.media-breakpoint-down($breakpoint) {
-        @include no-pager-grid;
-      }
+  .tedi-pagination.tedi-pagination--no-pager--below-#{$breakpoint} {
+    @include breakpoint-classes.below(lower-breakpoint($breakpoint, md)) {
+      @include no-pager-grid;
     }
   }
 }
@@ -97,9 +95,23 @@
   display: none;
 }
 
-@include hide-slot-below(results, slot-start);
-@include hide-slot-below(pager, slot-center);
-@include hide-slot-below(page-size, slot-end);
+@include breakpoint-classes.below-modifiers('.tedi-pagination--no-results') {
+  .tedi-pagination__slot-start {
+    display: none;
+  }
+}
+
+@include breakpoint-classes.below-modifiers('.tedi-pagination--no-pager') {
+  .tedi-pagination__slot-center {
+    display: none;
+  }
+}
+
+@include breakpoint-classes.below-modifiers('.tedi-pagination--no-page-size') {
+  .tedi-pagination__slot-end {
+    display: none;
+  }
+}
 
 .tedi-pagination__status {
   position: absolute;
@@ -120,13 +132,13 @@
   justify-self: start;
   min-width: 0;
 
-  @include breakpoints.media-breakpoint-down(md) {
+  @include breakpoint-classes.below(md) {
     justify-content: center;
     justify-self: center;
   }
 
   @include no-pager-slot {
-    @include breakpoints.media-breakpoint-down(md) {
+    @include breakpoint-classes.below(md) {
       justify-content: flex-start;
       justify-self: start;
     }
@@ -147,13 +159,13 @@
   justify-self: end;
   min-width: 0;
 
-  @include breakpoints.media-breakpoint-down(md) {
+  @include breakpoint-classes.below(md) {
     justify-content: center;
     justify-self: center;
   }
 
   @include no-pager-slot {
-    @include breakpoints.media-breakpoint-down(md) {
+    @include breakpoint-classes.below(md) {
       justify-content: flex-end;
       justify-self: end;
     }
@@ -171,7 +183,7 @@
   align-items: center;
   justify-content: center;
 
-  @include breakpoints.media-breakpoint-down(md) {
+  @include breakpoint-classes.below(md) {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     gap: var(--layout-grid-gutters-08);
@@ -259,7 +271,7 @@
   padding: 0;
   color: var(--general-text-brand);
 
-  @include breakpoints.media-breakpoint-down(md) {
+  @include breakpoint-classes.below(md) {
     background: transparent;
     border: 0;
 
@@ -312,14 +324,14 @@
 }
 
 .tedi-pagination__button--nav-previous {
-  @include breakpoints.media-breakpoint-down(md) {
+  @include breakpoint-classes.below(md) {
     grid-column: 1;
     justify-self: end;
   }
 }
 
 .tedi-pagination__button--nav-next {
-  @include breakpoints.media-breakpoint-down(md) {
+  @include breakpoint-classes.below(md) {
     grid-column: 3;
     justify-self: start;
   }
@@ -366,7 +378,7 @@
   gap: var(--tedi-dimensions-05);
   align-items: center;
 
-  @include breakpoints.media-breakpoint-down(md) {
+  @include breakpoint-classes.below(md) {
     flex-direction: column;
     gap: var(--form-field-inner-spacing);
     align-items: center;
@@ -399,7 +411,7 @@
 
 // Both pickers are rendered, and the viewport decides which one is shown.
 .tedi-pagination .tedi-pagination__wide-only {
-  @include breakpoints.media-breakpoint-down(md) {
+  @include breakpoint-classes.below(md) {
     display: none;
   }
 }

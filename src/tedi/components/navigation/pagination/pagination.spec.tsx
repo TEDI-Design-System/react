@@ -498,9 +498,9 @@ describe('Pagination — compact mobile picker', () => {
 
 describe('Pagination — slots hidden below a breakpoint', () => {
   it.each([
-    ['hideResults', 'no-results-below-lg'],
-    ['hidePager', 'no-pager-below-lg'],
-    ['hidePageSize', 'no-page-size-below-lg'],
+    ['hideResults', 'no-results--below-lg'],
+    ['hidePager', 'no-pager--below-lg'],
+    ['hidePageSize', 'no-page-size--below-lg'],
   ] as const)('keeps the slot rendered and adds a class when %s is a breakpoint', (prop, expectedClass) => {
     const { container } = render(
       <Pagination
