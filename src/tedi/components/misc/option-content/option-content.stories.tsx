@@ -57,22 +57,22 @@ const SOURCE = {
   <Dropdown.Content>
     <Dropdown.Item index={0}>
       <OptionContent>
-        <OptionContent.Label>1st level</OptionContent.Label>
+        <OptionContent.Label>1. tase</OptionContent.Label>
       </OptionContent>
     </Dropdown.Item>
     <Dropdown.Item index={1} indent={1}>
       <OptionContent>
-        <OptionContent.Label>2nd level</OptionContent.Label>
+        <OptionContent.Label>2. tase</OptionContent.Label>
       </OptionContent>
     </Dropdown.Item>
     <Dropdown.Item index={2} indent={2}>
       <OptionContent>
-        <OptionContent.Label>3rd level</OptionContent.Label>
+        <OptionContent.Label>3. tase</OptionContent.Label>
       </OptionContent>
     </Dropdown.Item>
     <Dropdown.Item index={3} indent={3}>
       <OptionContent>
-        <OptionContent.Label>4th level</OptionContent.Label>
+        <OptionContent.Label>4. tase</OptionContent.Label>
       </OptionContent>
     </Dropdown.Item>
   </Dropdown.Content>
@@ -183,14 +183,14 @@ const SOURCE = {
     </Button>
   </Dropdown.Trigger>
   <Dropdown.Content>
-    <Dropdown.Item index={0} indent={1} isParent>
+    <Dropdown.Item index={0}>
       <OptionContent>
-        <OptionContent.Label>Parent</OptionContent.Label>
+        <OptionContent.Label>Ülemelement</OptionContent.Label>
       </OptionContent>
     </Dropdown.Item>
     <Dropdown.Item index={1} indent={1}>
       <OptionContent>
-        <OptionContent.Label>Child 1</OptionContent.Label>
+        <OptionContent.Label>Alamelement 1</OptionContent.Label>
       </OptionContent>
     </Dropdown.Item>
   </Dropdown.Content>
@@ -368,6 +368,8 @@ export const Default: Story = {
   ),
 };
 
+const ITEMS = ['Ligipääs terviseandmetele', 'Ligipääs isikuandmetele', 'Ligipääs isikuandmetele'];
+
 /**
  * Plain items, and a nested set indented by level.
  */
@@ -376,8 +378,8 @@ export const Items: Story = {
   render: () => (
     <Row>
       <Menu>
-        {['Juurdepääs terviseandmetele', 'Tahteavaldus', 'Kontaktid'].map((text, i) => (
-          <DropdownItem key={text} index={i} onClick={noop}>
+        {ITEMS.map((text, i) => (
+          <DropdownItem key={i} index={i} onClick={noop}>
             <OptionContent>
               <OptionContent.Label>{text}</OptionContent.Label>
             </OptionContent>
@@ -387,11 +389,10 @@ export const Items: Story = {
 
       <Menu>
         {[
-          { text: '1st level' },
-          { text: '2nd level', indent: 1 },
-          { text: '3rd level', indent: 2 },
-          { text: '3rd level', indent: 2 },
-          { text: '4th level', indent: 3 },
+          { text: '1. tase' },
+          { text: '2. tase', indent: 1 },
+          { text: '3. tase', indent: 2 },
+          { text: '4. tase', indent: 3 },
         ].map((level, i) => (
           <DropdownItem key={i} index={i} indent={level.indent} onClick={noop}>
             <OptionContent>
@@ -413,7 +414,7 @@ const CHECKBOX_GROUPS = [
   { label: 'Haiglad', children: ['PERH', 'ITK', 'Fertilitas'] },
 ];
 
-const CHECKBOX_LEVELS = ['1st level', '2nd level', '3rd level', '4th level'];
+const CHECKBOX_LEVELS = ['1. tase', '2. tase', '3. tase', '4. tase'];
 
 /**
  * Checkbox items for multi-select: groups whose checkbox reflects their items (checked, or
@@ -580,51 +581,43 @@ export const WithDescription: Story = {
 };
 
 /**
- * Tree variant — `Dropdown variant="tree"` draws connector lines for items that
- * have `indent`. Left: the parent is a plain top-level item, and the line starts
- * at its first child. Right: two groups where each parent also has `indent={1}`
- * and `isParent`, so it lines up with its children and the line starts from a
- * bullet on the parent.
+ * `Dropdown variant="tree"` draws connector lines for indented items.
  */
 export const WithTree: Story = {
   parameters: sourceParams(SOURCE.tree),
   render: () => {
-    const children = (start: number) =>
-      ['Child 1', 'Child 2', 'Child 3'].map((text, i) => (
-        <DropdownItem key={`${start}-${text}`} index={start + i} indent={1} onClick={noop}>
+    const group = (start: number) => [
+      <DropdownItem key={`parent-${start}`} index={start} onClick={noop}>
+        <OptionContent>
+          <OptionContent.Label>Ülemelement</OptionContent.Label>
+        </OptionContent>
+      </DropdownItem>,
+      ...['Alamelement 1', 'Alamelement 2', 'Alamelement 3'].map((text, i) => (
+        <DropdownItem key={`${start}-${text}`} index={start + 1 + i} indent={1} onClick={noop}>
           <OptionContent>
             <OptionContent.Label>{text}</OptionContent.Label>
           </OptionContent>
         </DropdownItem>
-      ));
+      )),
+    ];
 
     return (
       <Row>
-        <Menu variant="tree">
-          <DropdownItem index={0} onClick={noop}>
-            <OptionContent>
-              <OptionContent.Label>Parent</OptionContent.Label>
-            </OptionContent>
-          </DropdownItem>
-          {children(1)}
-        </Menu>
-
-        <Menu variant="tree">
-          {[0, 4].flatMap((start) => [
-            <DropdownItem key={`parent-${start}`} index={start} indent={1} isParent onClick={noop}>
-              <OptionContent>
-                <OptionContent.Label>Parent</OptionContent.Label>
-              </OptionContent>
-            </DropdownItem>,
-            ...children(start + 1),
-          ])}
-        </Menu>
+        <Menu variant="tree">{group(0)}</Menu>
+        <Menu variant="tree">{[0, 4].flatMap(group)}</Menu>
       </Row>
     );
   },
 };
 
-const STATES = ['Default', 'Hover', 'Selected', 'Disabled', 'Focus'] as const;
+const STATES = [
+  { id: 'Default', label: 'Default' },
+  { id: 'Hover', label: 'Hover' },
+  { id: 'Selected', label: 'Selected', selected: true },
+  { id: 'Disabled', label: 'Disabled', disabled: true },
+  { id: 'Focus', label: 'Focus' },
+  { id: 'SelectedFocus', label: 'Selected focus', selected: true },
+];
 
 const stateCells = [
   { id: 'label', content: <OptionContent.Label>Tekst</OptionContent.Label> },
@@ -681,23 +674,23 @@ export const States: Story = {
     ...sourceParams(SOURCE.states),
     pseudo: {
       hover: stateCells.map(({ id }) => `#Hover-${id} > *`),
-      focusVisible: stateCells.map(({ id }) => `#Focus-${id} > *`),
+      focusVisible: stateCells.flatMap(({ id }) => [`#Focus-${id} > *`, `#SelectedFocus-${id} > *`]),
     },
   },
   render: () => (
     <DropdownContext.Provider value={showcaseContext('default')}>
       <GridRow role="menu" aria-label="Näidis" cols={1} md={4} gutterX={3} gutterY={2} alignItems="center">
         {STATES.map((state) => (
-          <Fragment key={state}>
+          <Fragment key={state.id}>
             <Col>
-              <strong>{state}</strong>
+              <strong>{state.label}</strong>
             </Col>
             {stateCells.map(({ id, icon, content }) => (
               // DropdownItem takes no `id`, so the pseudo-states selectors reach the item
               // through this wrapper (`#Hover-label > *`).
-              <Col key={id} id={`${state}-${id}`} className="flex flex-column">
-                <DropdownItem active={state === 'Selected'} disabled={state === 'Disabled'} onClick={noop}>
-                  <OptionContent icon={icon} disabled={state === 'Disabled'}>
+              <Col key={id} id={`${state.id}-${id}`} className="flex flex-column">
+                <DropdownItem active={state.selected} disabled={state.disabled} onClick={noop}>
+                  <OptionContent icon={icon} disabled={state.disabled}>
                     {content}
                   </OptionContent>
                 </DropdownItem>

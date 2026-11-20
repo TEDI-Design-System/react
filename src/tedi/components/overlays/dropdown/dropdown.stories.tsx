@@ -684,8 +684,7 @@ const TREE_FACULTIES = [
 ];
 
 /**
- * `variant="tree"` draws connector lines from indented items to the item above them. Mark an item
- * with `isParent` (and give it the same `indent` as its children) to draw a bullet on the line.
+ * `variant="tree"` draws connector lines from indented items to the item above them.
  */
 export const Tree: Story = {
   parameters: { chromatic: { disableSnapshot: true } },
@@ -723,9 +722,9 @@ export const Tree: Story = {
           </Dropdown.Trigger>
           <Dropdown.Content>
             {TREE_FACULTIES.flatMap(({ name, fields }) =>
-              [name, ...fields].map((label, j) => ({ label, isParent: j === 0 }))
-            ).map(({ label, isParent }, i) => (
-              <Dropdown.Item key={label} index={i} indent={1} isParent={isParent}>
+              [name, ...fields].map((label, j) => ({ label, indent: j === 0 ? 0 : 1 }))
+            ).map(({ label, indent }, i) => (
+              <Dropdown.Item key={label} index={i} indent={indent}>
                 {label}
               </Dropdown.Item>
             ))}

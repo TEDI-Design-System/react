@@ -2,18 +2,18 @@ import { useLabels } from '../../../../../providers/label-provider';
 import { CalendarGrid } from '../../calendar-grid';
 
 export interface YearGridProps {
-  /*
+  /**
    * Current month being displayed in the calendar. Year will be extracted from this.
    */
   currentMonth: Date;
-  /*
+  /**
    * Callback fired when a year is selected from the grid.
    * Receives a Date object representing the selected year.
    * The month and day values may be normalized by the parent component
    * depending on the active calendar view (e.g. January 1st in year-only mode).
    */
   onSelectYear: (date: Date) => void;
-  /*
+  /**
    * Callback fired when navigating between year ranges in the grid
    * (e.g. when clicking the previous or next buttons).
    * Receives a Date object representing the first year of the
@@ -25,7 +25,7 @@ export interface YearGridProps {
    * Default is `true`.
    */
   showNavigation?: boolean;
-  /*
+  /**
    * Additional class name(s) to apply to the year grid container.
    */
   className?: string;

@@ -24,12 +24,12 @@ export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
    * Event handler for the button click event. Triggered when the user clicks on the close button.
    */
   onClick?: MouseEventHandler<HTMLButtonElement>;
-  /*
+  /**
    * Title for the button.
    * Used for accessibility and as a tooltip on hover. If not provided, the label provider's 'close' label will be used as a fallback.
    */
   title?: string;
-  /*
+  /**
    * Color variant of the ClosingButton
    * @default default
    */
