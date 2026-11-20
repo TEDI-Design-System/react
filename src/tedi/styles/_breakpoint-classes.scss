@@ -7,11 +7,11 @@ $breakpoint-names: (sm, md, lg, xl, xxl);
 // (`--below-md`, `-from-md`) and the media queries behind those classes are generated here, once per
 // breakpoint, so the layout is chosen by CSS and the server-rendered markup is right at every width.
 
-// `<selector>--below-<breakpoint>`: the content applies below the breakpoint.
+// `<selector>--below-<breakpoint>`: the content applies below the breakpoint, exactly where `from-modifiers` does not.
 @mixin below-modifiers($selector) {
   @each $breakpoint in $breakpoint-names {
     #{$selector}--below-#{$breakpoint} {
-      @include breakpoints.media-breakpoint-down($breakpoint) {
+      @media not all and (min-width: #{breakpoints.breakpoint-min($breakpoint)}) {
         @content;
       }
     }

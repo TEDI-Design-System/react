@@ -365,4 +365,11 @@ describe('Footer side responsive rules', () => {
       });
     });
   });
+
+  it('makes `below` the exact opposite of `from`, with no gap between them', () => {
+    // core's media-breakpoint-down stops 0.02 short of the breakpoint (max-width), which leaves a sliver of
+    // fractional widths that neither query matches.
+    expect(css).toContain('@media not all and (min-width: 48rem) {\n  .tedi-footer-body--below-md');
+    expect(css).not.toMatch(/max-width/);
+  });
 });

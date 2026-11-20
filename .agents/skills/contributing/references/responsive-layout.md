@@ -16,7 +16,7 @@ picks the class.
 ```scss
 @use '../../../styles/breakpoint-classes';
 
-// .tedi-thing--below-sm … .tedi-thing--below-xxl, each wrapping its rules in a max-width query
+// .tedi-thing--below-sm … .tedi-thing--below-xxl, each wrapping its rules in a query that is the exact opposite of the `from` one
 @include breakpoint-classes.below-modifiers('.tedi-thing') {
   flex-direction: column;
 }
