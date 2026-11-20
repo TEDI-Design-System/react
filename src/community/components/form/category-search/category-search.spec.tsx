@@ -916,7 +916,11 @@ describe('CategorySearch', () => {
     expect(screen.getByText('Backend validation details')).toBeVisible();
 
     const input = screen.getByRole('textbox');
-    await user.click(within(screen.getByRole('alert')).getByRole('button'));
+    await user.click(
+      within(screen.getByText('Backend validation details').closest<HTMLElement>('[data-name="alert"]')!).getByRole(
+        'button'
+      )
+    );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Parcels: Filter' })).toBeVisible();
     expect(screen.getByRole('textbox')).toBe(input);

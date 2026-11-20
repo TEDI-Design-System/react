@@ -368,7 +368,7 @@ export const Default: Story = {
   ),
 };
 
-const ITEMS = ['Ligipääs terviseandmetele', 'Ligipääs isikuandmetele', 'Ligipääs isikuandmetele'];
+const ITEMS = ['Ligipääs terviseandmetele', 'Ligipääs isikuandmetele', 'Juurdepääs kontaktandmetele'];
 
 /**
  * Plain items, and a nested set indented by level.

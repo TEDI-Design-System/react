@@ -12,7 +12,7 @@ description: >
 
 1. Read [best-practices](references/best-practices.md) for coding patterns.
 2. If creating or modifying a component, check if TEDI Angular (`../angular/src/tedi/components/`) has an equivalent; use it as a behavioural reference.
-3. Check TEDI Core (`../core/src/`) for available design tokens, mixins, and shared styles.
+3. Check the installed TEDI Core (`node_modules/@tedi-design-system/core/`: `variables/`, `tokens.json`, `_mixins.scss`) for available design tokens, mixins, and shared styles. It matches the version the library builds against. Read `../core/src/` only when core is being changed together with the component.
 4. Check `package.json` before considering any new dependency.
 
 ## Task Router

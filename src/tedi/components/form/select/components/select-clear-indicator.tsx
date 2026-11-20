@@ -12,9 +12,15 @@ type ClearIndicatorType = ClearIndicatorProps<ISelectOption> & { isClearIndicato
 
 export const SelectClearIndicator = ({
   isClearIndicatorVisible,
-  innerProps: { ref, ...restInnerProps },
+  innerProps: { ref, 'aria-hidden': _ariaHidden, ...restInnerProps },
 }: ClearIndicatorType) => {
   const { getLabel } = useLabels();
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.stopPropagation();
+    restInnerProps.onMouseDown?.(event as unknown as React.MouseEvent<HTMLDivElement>);
+  };
 
   return isClearIndicatorVisible ? (
     <>
@@ -23,10 +29,10 @@ export const SelectClearIndicator = ({
         ref={ref}
         iconSize={18}
         {...(restInnerProps as UnknownType)}
+        onKeyDown={handleKeyDown}
+        title={getLabel('clear')}
         className={cn(styles['tedi-select__clear-indicator'], (restInnerProps as UnknownType).className)}
-      >
-        {getLabel('clear')}
-      </ClosingButton>
+      />
       <Separator color="primary" axis="vertical" className={styles['tedi-select__separator']} />
     </>
   ) : null;

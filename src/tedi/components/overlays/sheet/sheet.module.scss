@@ -88,6 +88,7 @@ $sheet-fade-duration: 200ms;
   padding-top: var(--tedi-dimensions-04);
   touch-action: none;
   cursor: grab;
+  user-select: none;
   transform: translateX(-50%);
 }
 

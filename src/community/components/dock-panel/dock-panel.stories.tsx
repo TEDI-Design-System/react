@@ -1,11 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ReactNode, useId, useRef, useState } from 'react';
+import { ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { useArgs } from 'storybook/preview-api';
 
 import { Button } from '../../../tedi/components/buttons/button/button';
 import { TextField } from '../../../tedi/components/form/textfield/textfield';
 import { Col, Row } from '../../../tedi/components/layout/grid';
-import { DockPanel, DockPanelDimensionPreset, DockPanelLabels, DockPanelLayout, DockPanelProps } from './dock-panel';
+import { StatusBadge } from '../../../tedi/components/tags/status-badge/status-badge';
+import {
+  DockPanel,
+  DockPanelDimensionPreset,
+  DockPanelLabels,
+  DockPanelLayout,
+  DockPanelPresentation,
+  DockPanelProps,
+} from './dock-panel';
 
 const labels: DockPanelLabels = {
   collapse: 'Minimize panel',
@@ -276,6 +284,19 @@ local demo status (no backend call). Footer state survives minimization. All act
 Use \`id\` to connect external controls, \`className\`/\`style\` for styling, and \`headingElement\` for the heading level.
 The required title names the panel.
 
+### Mobile
+
+Below the md breakpoint, DockPanel opens as a TEDI **Sheet**. Use the \`mobile\` prop to control the presentation:
+\`true\` always displays the Sheet, while \`false\` always displays the **DockPanel**.
+Switching between presentations keeps the content mounted, preserving its state. However, changing \`mobile\` to or
+from \`false\` remounts the content and resets its state.
+In the Sheet presentation, \`placement\`, \`resizable\`, \`width\`, \`height\` and the min/max props are ignored.
+The Sheet adjusts its height to fit its content, up to **90dvh**.
+Dragging an expanded Sheet down minimizes it; dragging a minimized Sheet down requests \`onClose\`.
+The minimized Sheet is fixed to the viewport. DockPanelLayout reserves its height automatically. Other layouts can
+reserve \`var(--sheet-header-height)\` while \`<html>\` has \`data-tedi-dock-panel-sheet="minimized"\`, or
+combine \`onPresentationChange\` with \`onCollapsedChange\`.
+
 ### Examples
 
 Like the TEDI-Ready Modal documentation, examples begin with **opening buttons** rather than permanently open panels.
@@ -288,12 +309,14 @@ The default preview also provides live Controls. Select a story's Canvas for mor
 
 const publicProps = [
   'title',
+  'shortTitle',
   'description',
   'children',
   'labels',
   'placement',
   'size',
   'resizable',
+  'mobile',
   'width',
   'minWidth',
   'maxWidth',
@@ -306,6 +329,7 @@ const publicProps = [
   'onCollapsedChange',
   'onClose',
   'headerActions',
+  'onPresentationChange',
   'footer',
   'headingElement',
   'id',
@@ -335,6 +359,17 @@ const meta = {
       type: { name: 'string', required: true },
       description: 'Required. Visible heading and accessible name.',
       table: { category: 'Required props', type: { summary: 'string' } },
+    },
+    shortTitle: {
+      control: 'text',
+      description:
+        'Optional. Shown instead of title when the full title does not fit on one line. It is then the visible heading and accessible name. Truncated if it does not fit either.',
+      table: {
+        category: 'Optional props',
+        subcategory: 'Content',
+        type: { summary: 'string' },
+        defaultValue: { summary: 'undefined' },
+      },
     },
     description: {
       control: 'text',
@@ -380,6 +415,12 @@ const meta = {
       description:
         'Enables dragging the workspace-facing edge, within 8–92% of the workspace by default. Pixel min/max props replace the corresponding defaults. Minimize/restore preserves the resized dimensions.',
       table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: 'false' } },
+    },
+    mobile: {
+      control: 'inline-radio',
+      options: ['Automatic', 'Mobile', 'Desktop'],
+      mapping: { Automatic: undefined, Mobile: true, Desktop: false },
+      table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: 'Automatic (below md)' } },
     },
     width: {
       control: 'text',
@@ -486,6 +527,20 @@ const meta = {
         category: 'Optional props',
         subcategory: 'Content',
         type: { summary: 'ReactNode' },
+        defaultValue: { summary: 'undefined' },
+      },
+    },
+    onPresentationChange: {
+      control: false,
+      description:
+        'Receives docked or sheet after mount and whenever the presentation changes. Collapse changes do not call it.',
+      table: {
+        category: 'Optional props',
+        subcategory: 'Events',
+        type: {
+          summary: '(presentation: DockPanelPresentation) => void',
+          detail: 'DockPanelPresentation = docked | sheet',
+        },
         defaultValue: { summary: 'undefined' },
       },
     },
@@ -1418,6 +1473,237 @@ export const ResizeHeight: Story = {
           'Restore the workspace size: the panel keeps its height, and you can drag it taller again. ' +
           'Minimize, then click the title or bar to restore the saved height. The handle is hidden while minimized. ' +
           'To try pixel limits, close the panel, set minHeight=160 and maxHeight=400 in Controls, then reopen.',
+      },
+    },
+  },
+};
+
+export const Mobile: Story = {
+  args: { mobile: true, description: 'Additional information about this item.' },
+  argTypes: { mobile: { control: false } },
+  render: (args) => <PanelExample args={args} />,
+};
+
+const fittingTitle = 'Details of the selected item and its related documents';
+const fittingShortTitle = 'Item details';
+
+interface PresentationChoice {
+  presentation: DockPanelPresentation;
+  label: string;
+}
+
+const presentationChoices: readonly PresentationChoice[] = [
+  { presentation: 'docked', label: 'Docked panel' },
+  { presentation: 'sheet', label: 'Bottom sheet' },
+];
+
+// Fits the short title beside the controls but not the full one. The Sheet spans the viewport, so it gets a maxWidth.
+const narrowWidth = '25rem';
+
+const PresentationButtons = ({
+  active,
+  onSelect,
+}: {
+  active?: DockPanelPresentation;
+  onSelect: (presentation: DockPanelPresentation, trigger: HTMLButtonElement) => void;
+}) => (
+  <>
+    {presentationChoices.map((choice) => (
+      <Col key={choice.presentation} xs="auto">
+        <Button
+          visualType={active === choice.presentation ? 'primary' : 'secondary'}
+          aria-pressed={active === choice.presentation}
+          onClick={(event) => onSelect(choice.presentation, event.currentTarget)}
+        >
+          {choice.label}
+        </Button>
+      </Col>
+    ))}
+  </>
+);
+PresentationButtons.displayName = 'DockPanelPresentationButtons';
+
+const headerFitExampleSource = (props: string): string => `<DockPanel
+  title="${fittingTitle}"${props}
+  labels={labels}
+  headerActions={<StatusBadge color="warning">Draft</StatusBadge>}
+  onClose={handleClose}
+>
+  {content}
+</DockPanel>`;
+
+// Opens docked so the effect is visible without input; the bottom sheet would cover the Docs page.
+const HeaderFitExample = ({ args }: { args: DockPanelProps }) => {
+  const [presentation, setPresentation] = useState<DockPanelPresentation | undefined>('docked');
+  const [narrow, setNarrow] = useState(true);
+  const [withShortTitle, setWithShortTitle] = useState(true);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+
+  const handleClose = (): void => {
+    setPresentation(undefined);
+    triggerRef.current?.focus();
+    args.onClose?.();
+  };
+
+  const panel = presentation && (
+    <DockPanel
+      {...args}
+      shortTitle={withShortTitle ? args.shortTitle : undefined}
+      mobile={presentation === 'sheet'}
+      width="100%"
+      style={presentation === 'sheet' && narrow ? { ...args.style, maxWidth: narrowWidth } : args.style}
+      onClose={handleClose}
+      headerActions={<StatusBadge color="warning">Draft</StatusBadge>}
+    />
+  );
+
+  return (
+    <div style={{ display: 'grid', gap: 'var(--tedi-dimensions-10)' }}>
+      <Row gutterY={2}>
+        <PresentationButtons
+          active={presentation}
+          onSelect={(next, trigger) => {
+            triggerRef.current = trigger;
+            setPresentation(next);
+          }}
+        />
+        <Col xs="auto">
+          <Button visualType="secondary" onClick={() => setNarrow((value) => !value)}>
+            {narrow ? 'Use full width' : 'Use narrow width (400 px)'}
+          </Button>
+        </Col>
+        <Col xs="auto">
+          <Button visualType="secondary" onClick={() => setWithShortTitle((value) => !value)}>
+            {withShortTitle ? 'Remove short title' : 'Add short title'}
+          </Button>
+        </Col>
+      </Row>
+      {presentation === 'docked' && (
+        <div style={{ width: narrow ? narrowWidth : '100%', maxWidth: '100%' }}>
+          <Workspace height="20rem">{panel}</Workspace>
+        </div>
+      )}
+      {presentation === 'sheet' && panel}
+    </div>
+  );
+};
+HeaderFitExample.displayName = 'DockPanelHeaderFitExample';
+
+export const ShortTitle: Story = {
+  name: 'Short title',
+  args: { title: fittingTitle, shortTitle: fittingShortTitle },
+  argTypes: { mobile: { control: false }, width: { control: false } },
+  render: (args) => <HeaderFitExample args={args} />,
+  parameters: {
+    docs: {
+      source: {
+        language: 'tsx',
+        type: 'code',
+        code: headerFitExampleSource(`\n  shortTitle="${fittingShortTitle}"`),
+      },
+      description: {
+        story:
+          'At 400 px the full title does not fit, so the heading and the panel name show shortTitle. ' +
+          'Press Use full width to bring the full title back. ' +
+          'Press Remove short title to see the default: without shortTitle, the full title truncates with an ellipsis ' +
+          'and stays the accessible name. ' +
+          'Docked panel and Bottom sheet switch the presentation; the title is measured again in each.',
+      },
+    },
+  },
+};
+
+const presentationChangeExampleSource = `/* Reserves space for a minimized Sheet outside DockPanelLayout. */
+:root[data-tedi-dock-panel-sheet='minimized'] .app-main {
+  padding-bottom: var(--sheet-header-height);
+}
+
+const [presentation, setPresentation] = useState<DockPanelPresentation>();
+
+<main className="app-main">{page}</main>
+<DockPanel title="Details" labels={labels} onPresentationChange={setPresentation}>
+  {content}
+</DockPanel>`;
+
+const useRootMarker = () => {
+  const [marker, setMarker] = useState<string | null>(null);
+  useEffect(() => {
+    const root = document.documentElement;
+    const read = () => setMarker(root.getAttribute('data-tedi-dock-panel-sheet'));
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(root, { attributes: true, attributeFilter: ['data-tedi-dock-panel-sheet'] });
+    return () => observer.disconnect();
+  }, []);
+  return marker;
+};
+
+const PresentationChangeExample = (args: DockPanelProps) => {
+  const [presentation, setPresentation] = useState<DockPanelPresentation | undefined>('docked');
+  const [reported, setReported] = useState<DockPanelPresentation>();
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const marker = useRootMarker();
+
+  const handleClose = (): void => {
+    setPresentation(undefined);
+    setReported(undefined);
+    triggerRef.current?.focus();
+    args.onClose?.();
+  };
+
+  const panel = presentation && (
+    <DockPanel
+      {...args}
+      mobile={presentation === 'sheet'}
+      onClose={handleClose}
+      onPresentationChange={(next) => {
+        setReported(next);
+        args.onPresentationChange?.(next);
+      }}
+    />
+  );
+
+  return (
+    <div style={{ display: 'grid', gap: 'var(--tedi-dimensions-10)' }}>
+      <Row gutterY={2}>
+        <PresentationButtons
+          active={presentation}
+          onSelect={(next, trigger) => {
+            triggerRef.current = trigger;
+            setPresentation(next);
+          }}
+        />
+      </Row>
+      <dl style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 'var(--tedi-dimensions-04)', margin: 0 }}>
+        <dt>onPresentationChange</dt>
+        <dd style={{ margin: 0 }} aria-live="polite">
+          {reported ?? 'not called'}
+        </dd>
+        <dt>html attribute</dt>
+        <dd style={{ margin: 0 }} aria-live="polite">
+          {marker ? `data-tedi-dock-panel-sheet="${marker}"` : 'not set'}
+        </dd>
+      </dl>
+      {presentation === 'docked' && <Workspace height="20rem">{panel}</Workspace>}
+      {presentation === 'sheet' && panel}
+    </div>
+  );
+};
+PresentationChangeExample.displayName = 'DockPanelPresentationChangeExample';
+
+export const PresentationChange: Story = {
+  name: 'Presentation change',
+  argTypes: { mobile: { control: false } },
+  render: (args) => <PresentationChangeExample {...args} />,
+  parameters: {
+    docs: {
+      source: { language: 'tsx', type: 'code', code: presentationChangeExampleSource },
+      description: {
+        story:
+          'onPresentationChange has already reported docked after mount. Press Bottom sheet: it reports sheet. ' +
+          'Minimize the sheet: the callback is not called, and DockPanel sets data-tedi-dock-panel-sheet="minimized" ' +
+          'on the html element. Layouts other than DockPanelLayout can use that attribute to reserve ' +
+          'var(--sheet-header-height), as in the code example, without tracking mobile or collapsed state.',
       },
     },
   },

@@ -33,21 +33,34 @@ describe('Search component', () => {
     expect(input).toBeInTheDocument();
   });
 
-  it('does not name the search region with the placeholder (avoids double announcement)', () => {
+  it('leaves the search landmark unnamed by default', () => {
     render(<Search {...defaultProps} placeholder="Search by name or keyword" />);
-    const region = screen.getByRole('search');
-    expect(region).toHaveAttribute('aria-label', 'search');
-    expect(region.getAttribute('aria-label')).not.toBe('Search by name or keyword');
+    expect(screen.getByRole('search')).not.toHaveAttribute('aria-label');
   });
 
-  it('uses the provided ariaLabel as the search region name', () => {
+  it('names the search landmark with ariaLabel', () => {
     render(<Search {...defaultProps} ariaLabel="Search products" />);
     expect(screen.getByRole('search')).toHaveAttribute('aria-label', 'Search products');
   });
 
-  it('falls back to the generic label when ariaLabel is an empty string', () => {
+  it('leaves the search landmark unnamed when ariaLabel is an empty string', () => {
     render(<Search {...defaultProps} ariaLabel="" />);
-    expect(screen.getByRole('search')).toHaveAttribute('aria-label', 'search');
+    expect(screen.getByRole('search')).not.toHaveAttribute('aria-label');
+  });
+
+  it('keeps the field named by its label when ariaLabel is set', () => {
+    render(<Search {...defaultProps} ariaLabel="Search products" />);
+    expect(screen.getByRole('searchbox', { name: 'Search' })).toBeInTheDocument();
+  });
+
+  it('keeps the field named by a visually hidden label', () => {
+    render(<Search {...defaultProps} hideLabel ariaLabel="Search products" />);
+    expect(screen.getByRole('searchbox', { name: 'Search' })).toBeInTheDocument();
+  });
+
+  it('keeps the button name when ariaLabel is set', () => {
+    render(<Search {...defaultProps} ariaLabel="Search products" button={{}} />);
+    expect(screen.getByRole('button', { name: 'search' })).toBeInTheDocument();
   });
 
   it('renders the plain input as a searchbox', () => {

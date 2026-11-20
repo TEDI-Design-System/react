@@ -25,8 +25,8 @@ export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
    */
   onClick?: MouseEventHandler<HTMLButtonElement>;
   /**
-   * Title for the button.
-   * Used for accessibility and as a tooltip on hover. If not provided, the label provider's 'close' label will be used as a fallback.
+   * Accessible name and hover tooltip. Not rendered when `aria-label` is passed, so that label is the name.
+   * @default label provider's 'close' label
    */
   title?: string;
   /**
@@ -34,9 +34,9 @@ export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
    * @default default
    */
   color?: ClosingButtonColor;
-  /* Size of the icon inside the button
+  /**
+   * Size of the icon inside the button. At 18, the button size automatically adjusts to 'small'.
    * @default 24
-   * If iconSize is set to 18, the button size will automatically adjust to 'small'.
    */
   iconSize?: ClosingButtonIconSize;
 }
@@ -74,8 +74,7 @@ export const ClosingButton = (props: ClosingButtonProps): JSX.Element => {
       {...rest}
       className={buttonClass}
       onClick={onClick}
-      title={title}
-      aria-label={title}
+      title={rest['aria-label'] ? undefined : title}
     >
       <Icon name="close" size={resolvedIconSize} color="inherit" />
     </button>

@@ -17,7 +17,7 @@ export interface SplitPaneProps {
   direction: SplitPaneDirection;
   /** Draws an accent ring around the given pane to mark it as active. */
   highlightedSide?: PaneSide;
-  /** When provided, renders a close button on the divider. */
+  /** When provided, renders a close button next to the divider. */
   onClose?: () => void;
   /**
    * Initial size of the first pane as a percentage of the container, clamped to `minRatio`–`maxRatio`.
@@ -193,33 +193,30 @@ export const SplitPane = (props: SplitPaneProps): JSX.Element => {
         {highlightedSide === 'first' && <SplitPaneRing direction={direction} side="first" />}
       </div>
 
-      <div
-        role="separator"
-        tabIndex={0}
-        aria-orientation={isHorizontal ? 'vertical' : 'horizontal'}
-        aria-valuemin={minRatio}
-        aria-valuemax={maxRatio}
-        aria-valuenow={Math.round(ratio)}
-        aria-label={getLabel('splitPaneResize')}
-        data-testid="split-pane-divider"
-        className={styles['tedi-split-pane__divider']}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        onKeyDown={handleKeyDown}
-      >
-        <span data-testid="split-pane-handle" aria-hidden className={styles['tedi-split-pane__handle']}>
-          <Icon name={isHorizontal ? 'code' : 'unfold_more'} size={18} />
-        </span>
+      {/* The close button is a sibling of the separator: a separator's children are presentational in ARIA. */}
+      <div className={styles['tedi-split-pane__divider']}>
+        <div
+          role="separator"
+          tabIndex={0}
+          aria-orientation={isHorizontal ? 'vertical' : 'horizontal'}
+          aria-valuemin={minRatio}
+          aria-valuemax={maxRatio}
+          aria-valuenow={Math.round(ratio)}
+          aria-label={getLabel('splitPaneResize')}
+          data-testid="split-pane-divider"
+          className={styles['tedi-split-pane__separator']}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onKeyDown={handleKeyDown}
+        >
+          <span data-testid="split-pane-handle" aria-hidden className={styles['tedi-split-pane__handle']}>
+            <Icon name={isHorizontal ? 'code' : 'unfold_more'} size={18} />
+          </span>
+        </div>
 
         {onClose && (
           <div className={styles['tedi-split-pane__close']}>
-            <Button
-              data-testid="split-pane-close"
-              visualType="secondary"
-              icon="close"
-              onClick={onClose}
-              onMouseDown={(event) => event.stopPropagation()}
-            >
+            <Button data-testid="split-pane-close" visualType="secondary" icon="close" onClick={onClose}>
               {getLabel('close')}
             </Button>
           </div>

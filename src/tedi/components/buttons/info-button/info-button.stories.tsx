@@ -56,7 +56,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
             </Text>
           </Col>
           <Col xs={2} md={1} className="text-center">
-            <InfoButton color={color} {...buttonProps} aria-label={`Info button ${state}`} id={state} />
+            <InfoButton color={color} {...buttonProps} aria-label="Lisainfo" id={state} />
           </Col>
         </Row>
       ))}

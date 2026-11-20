@@ -451,7 +451,6 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>((props, ref) =>
                       id={`${baseId}-search`}
                       label={searchLabel ?? text}
                       hideLabel
-                      ariaLabel={searchLabel ?? text}
                       value={searchTerm}
                       onChange={setSearchTerm}
                     />

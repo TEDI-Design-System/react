@@ -75,8 +75,10 @@ $own-rows: ':where(.tedi-table__scroll) > :where(.tedi-table__table) > * > *';
 
 .tedi-table__cell {
   padding: var(--table-data-padding-y) var(--table-data-padding-x);
+  font-weight: inherit;
   vertical-align: middle;
   color: var(--general-text-primary);
+  text-align: inherit;
 }
 
 .tedi-table__cell--align-left {

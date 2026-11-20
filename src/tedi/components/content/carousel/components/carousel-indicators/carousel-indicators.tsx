@@ -32,9 +32,15 @@ export const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsP
     const { getLabel } = useLabels();
     const carousel = useCarouselContext();
     const { positions, activePositionIndex } = carousel;
+    const isGroup = variant === 'dots' || withArrows;
 
     return (
-      <div ref={ref} className={cn(styles['tedi-carousel__indicators'], className)}>
+      <div
+        ref={ref}
+        role={isGroup ? 'group' : undefined}
+        aria-label={isGroup ? getLabel('carousel.slides') : undefined}
+        className={cn(styles['tedi-carousel__indicators'], className)}
+      >
         {withArrows && (
           <Button visualType="neutral" icon="arrow_back" disabled={!carousel.canPrev} onClick={carousel.prev}>
             {getLabel('carousel.move-back')}

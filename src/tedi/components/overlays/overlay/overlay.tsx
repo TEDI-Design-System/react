@@ -27,6 +27,8 @@ import { OverlayContent } from './overlay-content';
 import { OverlayTrigger } from './overlay-trigger';
 
 export type OverlayOpenWith = 'click' | 'hover';
+export type OverlayDelay = 0 | 100 | 200 | 300;
+
 const GAP = 3 as const;
 
 export interface OverlayProps {
@@ -43,6 +45,11 @@ export interface OverlayProps {
    * @default hover
    */
   openWith?: OverlayOpenWith;
+  /**
+   * Time in ms the pointer has to stay over the trigger before the content opens on hover.
+   * @default 0
+   */
+  delay?: OverlayDelay;
   /**
    * Is open by default?<br />
    * Does not work with open and onToggle props.
@@ -191,6 +198,7 @@ export const Overlay = (props: OverlayProps) => {
     children,
     placement: placementDefault = 'top',
     openWith = isTouchDevice ? 'click' : 'hover',
+    delay = 0,
     defaultOpen = false,
     open: externalOpen,
     onToggle,
@@ -250,6 +258,7 @@ export const Overlay = (props: OverlayProps) => {
   const { getReferenceProps, getFloatingProps } = useInteractions([
     useHover(context, {
       enabled: openWith === 'hover',
+      delay: { open: delay, close: 0 },
       handleClose: safePolygon(),
     }),
     useClick(context, {

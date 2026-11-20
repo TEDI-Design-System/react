@@ -87,8 +87,8 @@ export interface SearchProps
    */
   button?: Partial<ButtonProps>;
   /**
-   * For accessibility: search field name (accessible name). Recommended to always set.
-   * E.g., "Search products" or "Search site".
+   * Accessible name for the search landmark. Unnamed by default; set it when the page has more than
+   * one search. It does not name the field, which keeps its own `label`.
    */
   ariaLabel?: string;
   /**
@@ -452,8 +452,6 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     onSearch?.(query);
   };
 
-  const searchAriaLabel = ariaLabel || getLabel('search');
-
   const resolvedLoadingText = loadingText ?? getLabel('search.loading');
   const resolvedNoResults = noResultsText ?? getLabel('search.no-results');
   const resolvedResultsCount = resultsCountText ?? ((count: number) => getLabel('search.results-count', count));
@@ -549,7 +547,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
         rest.size === 'large' && styles['tedi-search__wrapper--large']
       )}
       role="search"
-      aria-label={searchAriaLabel}
+      aria-label={ariaLabel || undefined}
       onBlur={handleBlur}
     >
       <TextField {...textFieldProps} />

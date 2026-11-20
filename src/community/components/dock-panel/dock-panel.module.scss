@@ -93,6 +93,24 @@
   }
 }
 
+/* A block inside the heading, so it carries its own ellipsis and clips the measuring copy. */
+.tedi-dock-panel__fitting-title {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tedi-dock-panel__title-measure {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  visibility: hidden;
+  inline-size: max-content;
+  pointer-events: none;
+}
+
 .tedi-dock-panel__body {
   display: flex;
   flex: 1 1 auto;
@@ -378,4 +396,46 @@
 .tedi-dock-panel-layout > .tedi-dock-panel[data-collapsed='true'][data-placement='bottom'],
 .tedi-dock-panel-layout > .tedi-dock-panel__resize-layout[data-collapsed='true'][data-placement='bottom'] {
   grid-area: bottom;
+}
+
+/* Keeps docked flex, gap and layout unchanged around the moving content node. */
+.tedi-dock-panel__slot {
+  display: contents;
+}
+
+/* Without a scroll lock, scrolling past the end would otherwise move the page behind. */
+.tedi-dock-panel__sheet-body {
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+}
+
+.tedi-dock-panel__sheet-description {
+  margin-bottom: var(--tedi-dimensions-05);
+}
+
+/* One line like Sheet's own header: actions keep their size and only the title truncates. */
+.tedi-dock-panel__sheet-actions {
+  display: flex;
+  gap: var(--tedi-dimensions-04);
+  align-items: center;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.tedi-dock-panel__sheet-spacer {
+  display: none;
+}
+
+/* The minimized Sheet is fixed to the viewport, so this keeps the workspace end clear of it. */
+.tedi-dock-panel-layout > .tedi-dock-panel__sheet-spacer {
+  display: block;
+  grid-area: bottom;
+  height: var(--sheet-header-height);
+}
+
+/* Matches Sheet's own toggle, whose chevron rule is private to its CSS module. */
+.tedi-dock-panel__sheet-toggle > * {
+  scale: 1 -1;
 }

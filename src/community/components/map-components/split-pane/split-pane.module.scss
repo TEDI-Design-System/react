@@ -21,8 +21,13 @@
     position: relative;
     z-index: 1;
     flex: 0 0 var(--drag-indicator-vertical-width);
-    touch-action: none;
     background-color: var(--drag-indicator-accent);
+  }
+
+  &__separator {
+    position: absolute;
+    inset: 0;
+    touch-action: none;
 
     &:focus-visible {
       outline: var(--tedi-dimensions-03) solid var(--general-border-accent);
