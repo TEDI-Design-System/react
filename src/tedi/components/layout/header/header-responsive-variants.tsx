@@ -19,8 +19,8 @@ export interface HeaderButtonVariant {
 /**
  * The button the visitor sees at each breakpoint, merged mobile-first like `useBreakpointProps`.
  * Without a `size`, the button is `small` below `md` and `default` from `md` up.
- * Breakpoints that end up with the same size and label share one variant, so the common case is a single button
- * and a header with a responsive `size` or `label` renders one button per distinct variant.
+ * Breakpoints that end up with the same size and label share one variant. Without a `size` prop that is still two
+ * variants (small below `md`, default from `md` up); each distinct responsive `size` or `label` adds one more.
  */
 export const getHeaderButtonVariants = (props: BreakpointSupport<HeaderButtonVariantProps>): HeaderButtonVariant[] => {
   const variants: HeaderButtonVariant[] = [];
@@ -56,7 +56,7 @@ export const HeaderResponsiveVariants = ({ variants, children }: HeaderResponsiv
   return (
     <>
       {variants.map((variant) => (
-        <span
+        <div
           // Every breakpoint belongs to exactly one variant, so the first one identifies it.
           key={variant.visibleAt[0]}
           data-name="header-variant"
@@ -68,7 +68,7 @@ export const HeaderResponsiveVariants = ({ variants, children }: HeaderResponsiv
           )}
         >
           {children(variant)}
-        </span>
+        </div>
       ))}
     </>
   );

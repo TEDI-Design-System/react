@@ -1,5 +1,5 @@
 import { Text } from '../../../../../../tedi/components/base/typography/text/text';
-import { BreakpointSupport } from '../../../../../helpers';
+import { Breakpoint, BreakpointSupport } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
 import { Button } from '../../../../buttons/button/button';
 import Link from '../../../../navigation/link/link';
@@ -23,6 +23,10 @@ interface HeaderLoginBreakpointProps {
 }
 
 export interface HeaderLoginProps extends BreakpointSupport<HeaderLoginBreakpointProps> {
+  /**
+   * @deprecated Ignored. The layout is chosen with CSS.
+   */
+  defaultServerBreakpoint?: Breakpoint;
   /** Click handler fired when the login button is activated. */
   onClick?: () => void;
   /** URL to navigate to when the login button is clicked. */

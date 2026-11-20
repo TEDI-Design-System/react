@@ -20,6 +20,12 @@ describe('HeaderLogout component', () => {
     expect(large).not.toHaveTextContent('header.logout.mobile');
   });
 
+  it('wraps each variant in a div, since the button can hold block content', () => {
+    const { container } = render(<HeaderLogout />);
+
+    expect(Array.from(getVariants(container)).map((variant) => variant.tagName)).toEqual(['DIV', 'DIV']);
+  });
+
   it('hides each variant at the breakpoints where the other one shows', () => {
     const { container } = render(<HeaderLogout />);
 

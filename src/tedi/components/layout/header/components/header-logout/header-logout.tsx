@@ -1,5 +1,5 @@
 import { Text } from '../../../../../../tedi/components/base/typography/text/text';
-import { BreakpointSupport } from '../../../../../helpers';
+import { Breakpoint, BreakpointSupport } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
 import { Button } from '../../../../buttons/button/button';
@@ -24,6 +24,10 @@ interface HeaderLogoutBreakpointProps {
 }
 
 export interface HeaderLogoutProps extends BreakpointSupport<HeaderLogoutBreakpointProps> {
+  /**
+   * @deprecated Ignored. The layout is chosen with CSS.
+   */
+  defaultServerBreakpoint?: Breakpoint;
   /** Click handler fired when the logout button is activated. */
   onClick?: () => void;
   /** URL to navigate to when the logout button is clicked. */
