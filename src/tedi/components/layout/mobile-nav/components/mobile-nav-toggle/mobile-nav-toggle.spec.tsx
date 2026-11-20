@@ -190,4 +190,21 @@ describe('MobileNavToggle', () => {
     expect(screen.getByRole('button')).toHaveClass('tedi-mobile-nav-toggle--collapse');
     expect(screen.getByRole('button')).toHaveClass('tedi-mobile-nav-toggle--open');
   });
+
+  test('exposes the mobile menu state and a stable data-name for the header', () => {
+    const { rerender } = render(<MobileNavToggle {...defaultProps} />);
+    const button = screen.getByRole('button');
+
+    expect(button).toHaveAttribute('data-name', 'mobile-nav-toggle');
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+
+    rerender(<MobileNavToggle {...defaultProps} menuOpen />);
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  test('does not set aria-expanded on the collapse variant', () => {
+    render(<MobileNavToggle {...defaultProps} variant="collapse" />);
+
+    expect(screen.getByRole('button')).not.toHaveAttribute('aria-expanded');
+  });
 });

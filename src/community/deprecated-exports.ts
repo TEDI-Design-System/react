@@ -9,6 +9,7 @@ import { Radio as RadioBase } from './components/form/radio/radio';
 import { Select as SelectBase } from './components/form/select/select';
 import { Breadcrumbs as BreadcrumbsBase } from './components/layout/breadcrumbs/breadcrumbs';
 import { Footer as FooterBase } from './components/layout/footer/footer';
+import { SkipLinks as SkipLinksBase } from './components/layout/header/components/skip-links/skip-links';
 import { Header as HeaderBase } from './components/layout/header/header/header';
 import { SideNav as SideNavBase } from './components/layout/sidenav/sidenav';
 import { ModalProvider as ModalProviderBase } from './components/modal/modal-provider';
@@ -93,6 +94,11 @@ export const SideNav = withDeprecationWarning(
   SideNavBase,
   'Community SideNav',
   'Use `SideNav` from `@tedi-design-system/react/tedi` instead.'
+);
+export const SkipLinks = withDeprecationWarning(
+  SkipLinksBase,
+  'Community SkipLinks',
+  'Use `SkipLinks` from `@tedi-design-system/react/tedi` instead.'
 );
 export const Table = withDeprecationWarning(
   TableBase,
