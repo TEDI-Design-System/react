@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
-import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import { Breakpoint } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button, ButtonProps } from '../../buttons/button/button';
@@ -85,9 +85,6 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
     ...rest
   } = props;
 
-  const currentBreakpoint = useBreakpoint();
-  const isVertical = direction ? direction === 'vertical' : isBreakpointBelow(currentBreakpoint, verticalBelow);
-
   const reactId = React.useId();
   const rowId = id ?? `tedi-attachment-${reactId}`;
   const feedbackId = feedback ? feedback.id ?? `${rowId}-feedback` : undefined;
@@ -99,8 +96,9 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
     {
       [styles['tedi-attachment--invalid']]: invalid,
       [styles['tedi-attachment--multi-line']]: isLoading,
-      [styles['tedi-attachment--vertical']]: isVertical,
+      [styles['tedi-attachment--vertical']]: direction === 'vertical',
     },
+    direction === undefined && styles[`tedi-attachment--below-${verticalBelow}`],
     className
   );
 

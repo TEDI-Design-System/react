@@ -33,6 +33,7 @@ import {
 } from 'react';
 
 import { useIsMounted, useIsTouchDevice } from '../../../helpers';
+import { isReferenceHidden } from '../../../helpers/is-reference-hidden';
 import { OverlayContent } from './overlay-content';
 import { OverlayTrigger } from './overlay-trigger';
 
@@ -200,18 +201,6 @@ export const OverlayContext = createContext<OverlayContextType>({
   scrollLock: undefined,
   contentId: '',
 });
-
-// An overlay renders in a portal, so it does not disappear with a hidden trigger. The trigger is hidden when it has
-// no box and an ancestor is `display: none` (a `display: contents` element has no box either, but it is not hidden).
-const isReferenceHidden = (reference: unknown): boolean => {
-  if (!(reference instanceof Element) || reference.getClientRects().length > 0) return false;
-
-  for (let node: Element | null = reference; node; node = node.parentElement) {
-    if (getComputedStyle(node).display === 'none') return true;
-  }
-
-  return false;
-};
 
 export const Overlay = (props: OverlayProps) => {
   const isTouchDevice = useIsTouchDevice();
