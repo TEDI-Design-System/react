@@ -168,7 +168,10 @@
   display: contents;
 }
 
-// The component adds this class to the group only with `enableMobileDropdown`.
-@include breakpoint-classes.below-modifiers('.tedi-button-group') {
+.tedi-button-group__buttons {
+  display: contents;
+}
+
+@include breakpoint-classes.below-modifiers('.tedi-button-group__buttons') {
   display: none;
 }

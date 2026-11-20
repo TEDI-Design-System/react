@@ -166,7 +166,6 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
         styles['tedi-button-group'],
         styles[`tedi-button-group--${type}`],
         { [styles['tedi-button-group--stretch']]: stretch },
-        enableMobileDropdown && styles[`tedi-button-group--below-${mobileBreakpoint}`],
         className
       )}
       role="group"
@@ -198,7 +197,8 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
 
   if (!enableMobileDropdown) return group;
 
-  // Below `mobileBreakpoint` the group is replaced by the dropdown. Both are rendered and CSS shows one.
+  // Below `mobileBreakpoint` the group is replaced by the dropdown. Both are rendered and CSS shows one, through
+  // wrappers that a `className` on the group cannot restyle.
   return (
     <>
       <span
@@ -210,7 +210,15 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
       >
         {dropdown}
       </span>
-      {group}
+      <span
+        data-name="button-group-buttons"
+        className={cn(
+          styles['tedi-button-group__buttons'],
+          styles[`tedi-button-group__buttons--below-${mobileBreakpoint}`]
+        )}
+      >
+        {group}
+      </span>
     </>
   );
 };

@@ -443,6 +443,7 @@ describe('ButtonGroup Component', () => {
     expect(buttons).toHaveLength(2);
     expect(screen.queryByText('Non-button child')).not.toBeInTheDocument();
   });
+
   it('renders the dropdown and the group, and picks one with CSS classes, when enableMobileDropdown is set', () => {
     const { container } = render(
       <ButtonGroup dropdownLabel="Menu" enableMobileDropdown mobileBreakpoint="lg">
@@ -452,8 +453,9 @@ describe('ButtonGroup Component', () => {
 
     const dropdown = container.querySelector('[data-name="button-group-dropdown"]') as HTMLElement;
     expect(dropdown.className).toContain('tedi-button-group__mobile-dropdown--below-lg');
-    const group = container.querySelector('[role="group"]') as HTMLElement;
-    expect(group.className).toContain('tedi-button-group--below-lg');
+    const buttons = container.querySelector('[data-name="button-group-buttons"]') as HTMLElement;
+    expect(buttons.className).toContain('tedi-button-group__buttons--below-lg');
+    expect(within(buttons).getByRole('group').className).not.toContain('--below-');
   });
 
   it('renders only the group, without a dropdown wrapper, when enableMobileDropdown is not set', () => {
@@ -464,7 +466,19 @@ describe('ButtonGroup Component', () => {
     );
 
     expect(container.querySelector('[data-name="button-group-dropdown"]')).not.toBeInTheDocument();
-    expect((container.querySelector('[role="group"]') as HTMLElement).className).not.toContain('--below-');
+    expect(container.querySelector('[data-name="button-group-buttons"]')).not.toBeInTheDocument();
+  });
+
+  it('hides the group through a wrapper, so a `className` on the group cannot show it again', () => {
+    const { container } = render(
+      <ButtonGroup className="flex" enableMobileDropdown>
+        <Button id="button1">Button 1</Button>
+      </ButtonGroup>
+    );
+
+    const buttons = container.querySelector('[data-name="button-group-buttons"]') as HTMLElement;
+    expect(buttons.className).toContain('--below-md');
+    expect(within(buttons).getByRole('group')).toHaveClass('flex');
   });
 
   it('closes the open mobile menu when the viewport widens and the dropdown gets hidden', async () => {
