@@ -28,6 +28,41 @@ export const getResponsiveValues = <T extends object, K extends keyof T>(
 };
 
 /**
+ * The value that applies at every breakpoint. The values are mobile-first, so a breakpoint without its own keeps
+ * the previous one (`undefined` before the first).
+ */
+export const getValuePerBreakpoint = <V>(entries: [Breakpoint, V][]): [Breakpoint, V | undefined][] => {
+  let current: V | undefined;
+
+  return breakpoints.map((bp) => {
+    current = entries.find(([entryBp]) => entryBp === bp)?.[1] ?? current;
+    return [bp, current];
+  });
+};
+
+/**
+ * The breakpoints where `isOn` changes for the value that applies there, with the new state. Together with the
+ * state it starts in (`startsOn`), that is all CSS needs to switch something on and off.
+ */
+export const getSwitchPoints = <V>(
+  entries: [Breakpoint, V][],
+  isOn: (value: V | undefined) => boolean,
+  startsOn = false
+): [Breakpoint, boolean][] => {
+  const points: [Breakpoint, boolean][] = [];
+  let state = startsOn;
+
+  getValuePerBreakpoint(entries).forEach(([bp, value]) => {
+    if (isOn(value) !== state) {
+      state = !state;
+      points.push([bp, state]);
+    }
+  });
+
+  return points;
+};
+
+/**
  * CSS-module class names for a responsive prop: `<prefix>-<value>` for the base value and
  * `<prefix>-<value>-from-<breakpoint>` for each breakpoint override (see `from-modifiers`).
  */

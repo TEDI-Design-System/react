@@ -26,20 +26,40 @@
   padding: var(--layout-footer-padding-y) var(--layout-footer-padding-x);
 }
 
-// Column counts are set per breakpoint by the component (custom properties), mobile-first.
-.tedi-footer-body--grid {
+@mixin footer-body-grid($breakpoint) {
   display: grid;
-  grid-template-columns: repeat(var(--tedi-footer-body-columns-xs), minmax(0, 1fr));
+  grid-template-columns: repeat(var(--tedi-footer-body-columns-#{$breakpoint}), minmax(0, 1fr));
   align-items: start;
   justify-content: initial;
 
-  @include breakpoint-classes.each-from using ($breakpoint) {
-    grid-template-columns: repeat(var(--tedi-footer-body-columns-#{$breakpoint}), minmax(0, 1fr));
+  > * {
+    min-width: 0;
   }
 }
 
-.tedi-footer-body--grid > * {
-  min-width: 0;
+@mixin footer-body-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  > * {
+    min-width: auto;
+  }
+}
+
+.tedi-footer-body--grid {
+  @include footer-body-grid(xs);
+}
+
+// One block per breakpoint, smallest first, so a larger breakpoint overrides a smaller one.
+@include breakpoint-classes.each-from using ($breakpoint) {
+  .tedi-footer-body--grid-from-#{$breakpoint} {
+    @include footer-body-grid($breakpoint);
+  }
+
+  .tedi-footer-body--flex-from-#{$breakpoint} {
+    @include footer-body-row;
+  }
 }
 
 // Below the mobile breakpoint the body always stacks into one column, whatever `columns` says.
@@ -51,6 +71,13 @@
   &.tedi-footer-body--grid {
     display: flex;
     justify-content: space-between;
+  }
+
+  @each $grid-breakpoint in breakpoint-classes.$breakpoint-names {
+    &.tedi-footer-body--grid-from-#{$grid-breakpoint} {
+      display: flex;
+      justify-content: space-between;
+    }
   }
 }
 

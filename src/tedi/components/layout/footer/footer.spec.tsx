@@ -186,6 +186,44 @@ describe('Footer', () => {
     ]);
   });
 
+  it('switches the grid on at the first breakpoint with columns, leaving the breakpoints below on the row', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body lg={{ columns: 4 }}>
+          <Footer.Section heading="A">
+            <a href="#">A</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const body = container.querySelector('.tedi-footer-body') as HTMLElement;
+    expect(body).toHaveClass('tedi-footer-body--grid-from-lg');
+    expect(body).not.toHaveClass('tedi-footer-body--grid');
+    expect(body.style.getPropertyValue('--tedi-footer-body-columns-lg')).toBe('4');
+  });
+
+  it('treats `columns: 0` as the row again from that breakpoint and back to the grid at a later one', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body columns={3} md={{ columns: 0 }} xl={{ columns: 2 }}>
+          <Footer.Section heading="A">
+            <a href="#">A</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const body = container.querySelector('.tedi-footer-body') as HTMLElement;
+    expect(body).toHaveClass(
+      'tedi-footer-body--grid',
+      'tedi-footer-body--flex-from-md',
+      'tedi-footer-body--grid-from-xl'
+    );
+    expect(body.className).not.toMatch(/--grid-from-(sm|md|lg)|--flex-from-(sm|lg|xl|xxl)/);
+    expect(body.style.getPropertyValue('--tedi-footer-body-columns-xl')).toBe('2');
+  });
+
   it('does not use the grid when `columns` is not set', () => {
     const { container } = render(
       <Footer>

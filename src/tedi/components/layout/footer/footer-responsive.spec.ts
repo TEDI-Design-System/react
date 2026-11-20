@@ -1,5 +1,11 @@
 import { BreakpointSupport } from '../../../helpers';
-import { getResponsiveClassNames, getResponsiveValues, RESPONSIVE_BREAKPOINTS } from './footer-responsive';
+import {
+  getResponsiveClassNames,
+  getResponsiveValues,
+  getSwitchPoints,
+  getValuePerBreakpoint,
+  RESPONSIVE_BREAKPOINTS,
+} from './footer-responsive';
 
 type Props = { align?: 'start' | 'end' };
 
@@ -27,6 +33,62 @@ describe('footer-responsive', () => {
 
     it('returns nothing when the prop is not set anywhere and has no default', () => {
       expect(getResponsiveValues<Props, 'align'>({}, 'align')).toEqual([]);
+    });
+  });
+
+  describe('getValuePerBreakpoint', () => {
+    it('keeps the previous value where a breakpoint has none, and nothing before the first', () => {
+      expect(
+        getValuePerBreakpoint<number>([
+          ['md', 3],
+          ['xl', 4],
+        ])
+      ).toEqual([
+        ['xs', undefined],
+        ['sm', undefined],
+        ['md', 3],
+        ['lg', 3],
+        ['xl', 4],
+        ['xxl', 4],
+      ]);
+    });
+  });
+
+  describe('getSwitchPoints', () => {
+    const isPositive = (value = 0) => value > 0;
+
+    it('lists where the state changes, starting off', () => {
+      expect(
+        getSwitchPoints<number>(
+          [
+            ['xs', 3],
+            ['md', 0],
+            ['xl', 2],
+          ],
+          isPositive
+        )
+      ).toEqual([
+        ['xs', true],
+        ['md', false],
+        ['xl', true],
+      ]);
+    });
+
+    it('lists nothing when the state never changes', () => {
+      expect(getSwitchPoints<number>([], isPositive)).toEqual([]);
+      expect(
+        getSwitchPoints<number>(
+          [
+            ['sm', 2],
+            ['lg', 5],
+          ],
+          isPositive,
+          true
+        )
+      ).toEqual([
+        ['xs', false],
+        ['sm', true],
+      ]);
     });
   });
 
