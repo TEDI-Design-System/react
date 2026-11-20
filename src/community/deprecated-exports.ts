@@ -25,96 +25,153 @@ import { Tooltip as TooltipBase } from './components/tooltip/tooltip';
  * `src/community/index.ts` re-exports these by name, which takes precedence over its `export *`.
  */
 
+/**
+ * @deprecated Use `Link` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Anchor = withDeprecationWarning(
   AnchorBase,
   'Community Anchor',
   'Use `Link` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use Breadcrumbs from `@tedi-design-system/react/tedi` instead.
+ */
 export const Breadcrumbs = withDeprecationWarning(
   BreadcrumbsBase,
   'Community Breadcrumbs',
   'Use Breadcrumbs from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Button` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Button = withDeprecationWarning(
   ButtonBase,
   'Community Button',
   'Use `Button` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Card` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Card = withDeprecationWarning(
   CardBase,
   'Community Card',
   'Use `Card` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Checkbox` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Check = withDeprecationWarning(
   CheckBase,
   'Community Check',
   'Use `Checkbox` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Radio.Group` or `Checkbox.Group` from `@tedi-design-system/react/tedi` instead.
+ */
 export const ChoiceGroup = withDeprecationWarning(
   ChoiceGroupBase,
   'Community ChoiceGroup',
   'Use `Radio.Group` or `Checkbox.Group` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `DateField` from `@tedi-design-system/react/tedi` instead.
+ */
 export const DatePicker = withDeprecationWarning(
   DatePickerBase,
   'Community DatePicker',
   'Use `DateField` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `DateTimeField` from `@tedi-design-system/react/tedi` instead.
+ */
 export const DateTimePicker = withDeprecationWarning(
   DateTimePickerBase,
   'Community DateTimePicker',
   'Use `DateTimeField` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Footer` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Footer = withDeprecationWarning(
   FooterBase,
   'Community Footer',
   'Use `Footer` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Header` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Header = withDeprecationWarning(
   HeaderBase,
   'Community Header',
   'Use `Header` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use Modal from `@tedi-design-system/react/tedi` instead.
+ */
 export const ModalProvider = withDeprecationWarning(
   ModalProviderBase,
   'Community ModalProvider',
   'Use Modal from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use EmptyState from `@tedi-design-system/react/tedi` instead.
+ */
 export const Placeholder = withDeprecationWarning(
   PlaceholderBase,
   'Community Placeholder',
   'Use EmptyState from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Radio` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Radio = withDeprecationWarning(
   RadioBase,
   'Community Radio',
   'Use `Radio` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Select` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Select = withDeprecationWarning(
   SelectBase,
   'Community Select',
   'Use `Select` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `SideNav` from `@tedi-design-system/react/tedi` instead.
+ */
 export const SideNav = withDeprecationWarning(
   SideNavBase,
   'Community SideNav',
   'Use `SideNav` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Table` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Table = withDeprecationWarning(
   TableBase,
   'Community Table',
   'Use `Table` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Tag` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Tag = withDeprecationWarning(
   TagBase,
   'Community Tag',
   'Use `Tag` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `CollapseButton` from `@tedi-design-system/react/tedi` instead.
+ */
 export const ToggleOpen = withDeprecationWarning(
   ToggleOpenBase,
   'Community ToggleOpen',
   'Use `CollapseButton` from `@tedi-design-system/react/tedi` instead.'
 );
+/**
+ * @deprecated Use `Tooltip` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Tooltip = withDeprecationWarning(
   TooltipBase,
   'Community Tooltip',
