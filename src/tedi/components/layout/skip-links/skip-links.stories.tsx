@@ -171,7 +171,7 @@ export const UsageExample: Story = {
           </Header.Actions>
         </Header>
         <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-          <SideNav ariaLabel="Peamenüü" linkAs="a" isMobileOpen={isOpen} navItems={navItems} />
+          <SideNav ariaLabel="Peamenüü" linkAs="a" isMobileOpen={isOpen} onMenuToggle={setIsOpen} navItems={navItems} />
           <main
             id="usage-example-main"
             style={{
