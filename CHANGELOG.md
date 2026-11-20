@@ -1,3 +1,16 @@
+# [21.0.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.23...react-21.0.0-rc.24) (2026-11-20)
+
+
+### Features
+
+* **button:** remove large size, move it into search and category-search [#1113](https://github.com/TEDI-Design-System/react/issues/1113) ([#1160](https://github.com/TEDI-Design-System/react/issues/1160)) ([5eb169f](https://github.com/TEDI-Design-System/react/commit/5eb169fee5a501c9715eef8d5ed36acf93c5c983))
+
+
+### BREAKING CHANGES
+
+* **button:** Button `size` no longer accepts "large". Search's `button`
+prop no longer accepts `size`; Search sets the button size from its own `size`.
+
 # [21.0.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.22...react-21.0.0-rc.23) (2026-11-19)
 
 
