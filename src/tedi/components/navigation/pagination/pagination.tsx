@@ -2,6 +2,7 @@ import cn from 'classnames';
 import { forwardRef, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { type Breakpoint, type BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import { isReferenceHidden } from '../../../helpers/is-reference-hidden';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
@@ -380,13 +381,21 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
     className
   );
 
+  const pageListRef = useRef<HTMLUListElement | null>(null);
+  const pageSizeRef = useRef<HTMLDivElement | null>(null);
+
+  // The trigger is hidden when the viewport changed while its modal was open, so focus goes to a visible control.
+  const restoreFocus = (trigger: HTMLElement | null, fallback: HTMLElement | null | undefined) => {
+    (trigger && !isReferenceHidden(trigger) ? trigger : fallback)?.focus();
+  };
+
   const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
   const mobileTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const prevModalOpenRef = useRef(isMobileModalOpen);
   useEffect(() => {
     if (prevModalOpenRef.current && !isMobileModalOpen) {
-      mobileTriggerRef.current?.focus();
+      restoreFocus(mobileTriggerRef.current, pageListRef.current?.querySelector<HTMLElement>('[aria-current="page"]'));
     }
     prevModalOpenRef.current = isMobileModalOpen;
   }, [isMobileModalOpen]);
@@ -397,7 +406,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
   const prevPageSizeModalOpenRef = useRef(isPageSizeModalOpen);
   useEffect(() => {
     if (prevPageSizeModalOpenRef.current && !isPageSizeModalOpen) {
-      pageSizeTriggerRef.current?.focus();
+      restoreFocus(pageSizeTriggerRef.current, pageSizeRef.current?.querySelector<HTMLElement>('input'));
     }
     prevPageSizeModalOpenRef.current = isPageSizeModalOpen;
   }, [isPageSizeModalOpen]);
@@ -487,7 +496,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
               ? null
               : renderEdgeButton('previous', previousItem, previousIcon, mergedLabels.previous)}
 
-            <ul className={cn(styles['tedi-pagination__list'], styles['tedi-pagination__wide-only'])}>
+            <ul ref={pageListRef} className={cn(styles['tedi-pagination__list'], styles['tedi-pagination__wide-only'])}>
               {pageItems.map((item, index) => {
                 const slotKey = `slot-${index}`;
                 if (item.type === 'ellipsis') {
@@ -553,7 +562,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
 
       <div className={styles['tedi-pagination__slot-end']}>
         {showPageSizeSelect && (
-          <div className={styles['tedi-pagination__page-size']}>
+          <div ref={pageSizeRef} className={styles['tedi-pagination__page-size']}>
             <Text
               className={styles['tedi-pagination__page-size-label']}
               color="secondary"

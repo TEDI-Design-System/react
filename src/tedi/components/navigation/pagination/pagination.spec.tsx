@@ -496,6 +496,45 @@ describe('Pagination — compact mobile picker', () => {
   });
 });
 
+describe('Pagination — focus after closing a picker modal', () => {
+  const closeWithEscape = (name: string) =>
+    act(() => {
+      fireEvent.keyDown(screen.getByRole('dialog', { name }), { key: 'Escape', code: 'Escape' });
+    });
+
+  it('returns focus to the compact page trigger', () => {
+    render(<Pagination pageCount={5} defaultPage={2} />);
+    const trigger = screen.getByRole('button', { name: /2 \/ 5/ });
+
+    fireEvent.click(trigger);
+    closeWithEscape('Pages');
+
+    expect(trigger).toHaveFocus();
+  });
+
+  it('focuses the current page when the trigger got hidden while its modal was open', () => {
+    render(<Pagination pageCount={5} defaultPage={2} />);
+    const trigger = screen.getByRole('button', { name: /2 \/ 5/ });
+
+    fireEvent.click(trigger);
+    trigger.style.display = 'none';
+    closeWithEscape('Pages');
+
+    expect(screen.getByRole('button', { name: 'Page 2' })).toHaveFocus();
+  });
+
+  it('focuses the page size select when its compact trigger got hidden while the modal was open', () => {
+    render(<Pagination pageCount={5} pageSizeOptions={[10, 20]} pageSize={10} />);
+    const trigger = screen.getByRole('button', { name: 'Page size 10' });
+
+    fireEvent.click(trigger);
+    trigger.style.display = 'none';
+    closeWithEscape('Page size');
+
+    expect(screen.getByRole('combobox')).toHaveFocus();
+  });
+});
+
 describe('Pagination — slots hidden below a breakpoint', () => {
   it.each([
     ['hideResults', 'no-results--below-lg'],
