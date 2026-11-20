@@ -1,4 +1,4 @@
-@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+@use '../../../../../styles/breakpoint-classes';
 @use '@tedi-design-system/core/mixins';
 
 @mixin header-language-button {
@@ -60,7 +60,7 @@
 }
 
 // Below `md` the selector is a square button.
-@include breakpoints.media-breakpoint-down(md) {
+@include breakpoint-classes.below(md) {
   .tedi-header-language {
     align-items: center;
     justify-content: center;
@@ -71,8 +71,10 @@
 }
 
 // The label is visually hidden below `lg`.
-@include breakpoints.media-breakpoint-down(lg) {
+@include breakpoint-classes.below(lg) {
   .tedi-header-language__label {
     @include mixins.visually-hidden;
+
+    white-space: nowrap;
   }
 }
