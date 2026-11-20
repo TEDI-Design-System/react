@@ -188,6 +188,43 @@ interface CalendarBreakpointProps extends Omit<DayPickerProps, 'mode' | 'selecte
 
 export type CalendarProps = BreakpointSupport<CalendarBreakpointProps>;
 
+interface CalendarDayContextValue {
+  dayLabel: (day: CalendarDay, modifiers: Modifiers) => string;
+  dayStatus?: DayStatusFn;
+  hasConsumerDayLabel: boolean;
+}
+
+// The day components are defined once and read render data from context, so a new locale or dayStatus identity
+// re-renders the buttons instead of remounting them (a remount drops focus and fires onDayFocus again).
+const CalendarDayContext = React.createContext<CalendarDayContextValue | null>(null);
+
+type DayPickerComponents = NonNullable<DayPickerProps['components']>;
+
+const CalendarDayCell: DayPickerComponents['Day'] = ({ day: _day, modifiers, ...tdProps }) =>
+  modifiers.hidden ? <td {...tdProps} /> : <td {...tdProps} role="presentation" aria-selected={undefined} />;
+
+const CalendarDayButton: DayPickerComponents['DayButton'] = (dayButtonProps) => {
+  const context = React.useContext(CalendarDayContext);
+  const status = context?.dayStatus?.(dayButtonProps.day.date);
+  const label =
+    !context || context.hasConsumerDayLabel
+      ? dayButtonProps['aria-label']
+      : context.dayLabel(dayButtonProps.day, dayButtonProps.modifiers);
+  const ariaLabel = [label, status?.label].filter(Boolean).join(', ') || undefined;
+
+  return (
+    <DayButton
+      {...dayButtonProps}
+      role="gridcell"
+      aria-selected={dayButtonProps.modifiers.selected || undefined}
+      aria-label={ariaLabel}
+    >
+      {dayButtonProps.children}
+      {status && <StatusIndicator type={status.type} size="sm" className={styles['tedi-calendar__day-status']} />}
+    </DayButton>
+  );
+};
+
 export const Calendar = (props: CalendarProps) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
@@ -303,35 +340,9 @@ export const Calendar = (props: CalendarProps) => {
           );
   }, [locale, localeDayLabel, formatLocale, timeZone]);
 
-  // Read through a ref so an inline dayStatus does not recreate the day components and remount every button.
-  const dayStatusRef = React.useRef(dayStatus);
-  dayStatusRef.current = dayStatus;
-
-  const dayComponents = React.useMemo<DayPickerProps['components']>(
-    () => ({
-      Day: ({ day: _day, modifiers, ...tdProps }) =>
-        modifiers.hidden ? <td {...tdProps} /> : <td {...tdProps} role="presentation" aria-selected={undefined} />,
-      DayButton: (dayButtonProps) => {
-        const status = dayStatusRef.current?.(dayButtonProps.day.date);
-        const label = hasConsumerDayLabel
-          ? dayButtonProps['aria-label']
-          : dayLabel(dayButtonProps.day, dayButtonProps.modifiers);
-        const ariaLabel = [label, status?.label].filter(Boolean).join(', ') || undefined;
-
-        return (
-          <DayButton
-            {...dayButtonProps}
-            role="gridcell"
-            aria-selected={dayButtonProps.modifiers.selected || undefined}
-            aria-label={ariaLabel}
-          >
-            {dayButtonProps.children}
-            {status && <StatusIndicator type={status.type} size="sm" className={styles['tedi-calendar__day-status']} />}
-          </DayButton>
-        );
-      },
-    }),
-    [dayLabel, hasConsumerDayLabel]
+  const dayContext = React.useMemo<CalendarDayContextValue>(
+    () => ({ dayLabel, dayStatus, hasConsumerDayLabel }),
+    [dayLabel, dayStatus, hasConsumerDayLabel]
   );
 
   return (
@@ -374,71 +385,74 @@ export const Calendar = (props: CalendarProps) => {
       )}
 
       {view === 'days' && (
-        <DayPicker
-          {...dayPickerProps}
-          {...selectionProps}
-          locale={locale}
-          month={currentMonth}
-          onMonthChange={setCurrentMonth}
-          showOutsideDays={showOutsideDays}
-          disabled={computedDisabled.length ? computedDisabled : undefined}
-          required={required}
-          components={{
-            MonthCaption: (props) => (
-              <CalendarHeader
-                {...props}
-                monthYearSelectType={monthYearSelectType}
-                onOpenMonthGrid={() => setView('months')}
-                onOpenYearGrid={() => setView('years')}
-                showNavigation={showNavigation}
-                localeCode={localeCode}
-                disabledMatchers={computedDisabled.length ? computedDisabled : undefined}
-                minYear={minYear}
-                maxYear={maxYear}
-              />
-            ),
-            Nav: () => <></>,
-            ...dayComponents,
-            ...(fullWidth
-              ? {
-                  Weekday: ({ children, ...weekdayProps }) => (
-                    <th {...weekdayProps}>
-                      <span className={styles['tedi-calendar__weekday-inner']}>{children}</span>
-                    </th>
-                  ),
-                }
-              : {}),
-          }}
-          footer={footer}
-          classNames={{
-            root: classNames(styles['tedi-calendar'], borderlessClass, fullWidthClass, className),
-            month_caption: styles['tedi-calendar__caption'],
-            head: styles['tedi-calendar__head'],
-            row: styles['tedi-calendar__row'],
-            day: styles['tedi-calendar__day'],
-            selected: styles['tedi-calendar__day--selected'],
-            weekday: styles['tedi-calendar__weekday'],
-            outside: styles['tedi-calendar__outside-days'],
-            range_start: styles['tedi-calendar__range-start'],
-            range_middle: styles['tedi-calendar__range-middle'],
-            range_end: styles['tedi-calendar__range-end'],
-            today: styles['tedi-calendar__today'],
-            disabled: styles['tedi-calendar__disabled'],
-            month: styles['tedi-calendar__month'],
-            months: styles['tedi-calendar__months-container'],
-            footer: styles['tedi-calendar__footer'],
-            week_number: styles['tedi-calendar__week-number'],
-          }}
-          modifiers={{
-            available: (date) => (availableDays ? isAvailable(date) : false),
-            unavailable: (date) => (unavailableDays ? isUnavailable(date) : false),
-          }}
-          modifiersClassNames={{
-            available: styles['tedi-calendar__available-day'],
-            unavailable: styles['tedi-calendar__unavailable-day'],
-          }}
-          onSelect={handleSelect}
-        />
+        <CalendarDayContext.Provider value={dayContext}>
+          <DayPicker
+            {...dayPickerProps}
+            {...selectionProps}
+            locale={locale}
+            month={currentMonth}
+            onMonthChange={setCurrentMonth}
+            showOutsideDays={showOutsideDays}
+            disabled={computedDisabled.length ? computedDisabled : undefined}
+            required={required}
+            components={{
+              MonthCaption: (props) => (
+                <CalendarHeader
+                  {...props}
+                  monthYearSelectType={monthYearSelectType}
+                  onOpenMonthGrid={() => setView('months')}
+                  onOpenYearGrid={() => setView('years')}
+                  showNavigation={showNavigation}
+                  localeCode={localeCode}
+                  disabledMatchers={computedDisabled.length ? computedDisabled : undefined}
+                  minYear={minYear}
+                  maxYear={maxYear}
+                />
+              ),
+              Nav: () => <></>,
+              Day: CalendarDayCell,
+              DayButton: CalendarDayButton,
+              ...(fullWidth
+                ? {
+                    Weekday: ({ children, ...weekdayProps }) => (
+                      <th {...weekdayProps}>
+                        <span className={styles['tedi-calendar__weekday-inner']}>{children}</span>
+                      </th>
+                    ),
+                  }
+                : {}),
+            }}
+            footer={footer}
+            classNames={{
+              root: classNames(styles['tedi-calendar'], borderlessClass, fullWidthClass, className),
+              month_caption: styles['tedi-calendar__caption'],
+              head: styles['tedi-calendar__head'],
+              row: styles['tedi-calendar__row'],
+              day: styles['tedi-calendar__day'],
+              selected: styles['tedi-calendar__day--selected'],
+              weekday: styles['tedi-calendar__weekday'],
+              outside: styles['tedi-calendar__outside-days'],
+              range_start: styles['tedi-calendar__range-start'],
+              range_middle: styles['tedi-calendar__range-middle'],
+              range_end: styles['tedi-calendar__range-end'],
+              today: styles['tedi-calendar__today'],
+              disabled: styles['tedi-calendar__disabled'],
+              month: styles['tedi-calendar__month'],
+              months: styles['tedi-calendar__months-container'],
+              footer: styles['tedi-calendar__footer'],
+              week_number: styles['tedi-calendar__week-number'],
+            }}
+            modifiers={{
+              available: (date) => (availableDays ? isAvailable(date) : false),
+              unavailable: (date) => (unavailableDays ? isUnavailable(date) : false),
+            }}
+            modifiersClassNames={{
+              available: styles['tedi-calendar__available-day'],
+              unavailable: styles['tedi-calendar__unavailable-day'],
+            }}
+            onSelect={handleSelect}
+          />
+        </CalendarDayContext.Provider>
       )}
     </div>
   );
