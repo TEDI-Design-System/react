@@ -1,5 +1,4 @@
 @use '../../../styles/breakpoint-classes';
-@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
 .tedi-attachment-wrapper {
   display: block;
@@ -132,7 +131,7 @@
   white-space: nowrap;
 }
 
-@include breakpoints.media-breakpoint-down(md) {
+@include breakpoint-classes.below(md) {
   .tedi-attachment__file-size {
     margin-left: 0;
   }

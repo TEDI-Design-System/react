@@ -1,5 +1,4 @@
 @use '../../../styles/breakpoint-classes';
-@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
 .tedi-button-group {
   display: flex;
@@ -34,7 +33,7 @@
         z-index: 1;
       }
 
-      @include breakpoints.media-breakpoint-down(md) {
+      @include breakpoint-classes.below(md) {
         flex: 1;
       }
 

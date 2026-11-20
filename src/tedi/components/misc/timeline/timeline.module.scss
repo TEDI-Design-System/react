@@ -1,3 +1,4 @@
+@use '../../../styles/breakpoint-classes';
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
 .tedi-timeline {
@@ -54,7 +55,7 @@
     background-color: var(--card-background-primary);
   }
 
-  @include breakpoints.media-breakpoint-down(lg) {
+  @include breakpoint-classes.below(lg) {
     .tedi-timeline-item .tedi-timeline__marker {
       grid-row: 1 / span 2;
     }
@@ -87,11 +88,10 @@
 }
 
 .tedi-timeline__timings > .tedi-timeline__timings-bottom {
-  @include breakpoints.media-breakpoint-down(lg) {
-    display: none;
-  }
+  display: none;
 
   @include breakpoints.media-breakpoint-up(lg) {
+    display: block;
     margin-top: auto;
     text-align: right;
   }
@@ -122,7 +122,7 @@
     }
   }
 
-  @include breakpoints.media-breakpoint-down(lg) {
+  @include breakpoint-classes.below(lg) {
     min-height: var(--timeline-text-min-height);
 
     &::before {
@@ -165,7 +165,7 @@
   padding-top: calc(var(--timeline-item-top) + var(--timeline-dot-offset-lg));
 }
 
-@include breakpoints.media-breakpoint-down(lg) {
+@include breakpoint-classes.below(lg) {
   .tedi-timeline-item.tedi-timeline__item--has-bottom .tedi-timeline__marker {
     grid-row: span 3;
   }

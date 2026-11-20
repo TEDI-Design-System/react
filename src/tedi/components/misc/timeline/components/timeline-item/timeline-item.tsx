@@ -21,7 +21,7 @@ export interface TimelineItemProps {
   /**
    * Content pinned to the bottom of the timings column on desktop and rendered after the
    * item content on mobile — e.g. a "last modified" note. It is rendered in both places and
-   * CSS shows one, so keep it to text: form fields and ids would be duplicated.
+   * CSS shows one, so keep it to text: ids, effects and state would exist twice.
    */
   timingsBottom?: ReactNode;
   /**
