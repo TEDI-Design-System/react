@@ -362,6 +362,37 @@ describe('Dropdown component', () => {
       expect(onOpenChange).toHaveBeenLastCalledWith(false);
     });
 
+    it('reports a hidden trigger once while the consumer keeps the menu open, and again if it is hidden anew', async () => {
+      const onOpenChange = jest.fn();
+      render(
+        <div data-testid="wrapper">
+          <Dropdown open onOpenChange={onOpenChange}>
+            <Dropdown.Trigger>
+              <span>Open menu</span>
+            </Dropdown.Trigger>
+            <Dropdown.Content>
+              <Dropdown.Item index={0}>Item</Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown>
+        </div>
+      );
+      const wrapper = screen.getByTestId('wrapper');
+      const closes = () => onOpenChange.mock.calls.filter(([open]) => open === false).length;
+
+      wrapper.style.display = 'none';
+      await resize();
+      await resize();
+      await resize();
+      expect(screen.getByText('Item')).toBeInTheDocument();
+      expect(closes()).toBe(1);
+
+      wrapper.style.display = 'block';
+      await resize();
+      wrapper.style.display = 'none';
+      await resize();
+      expect(closes()).toBe(2);
+    });
+
     it('stays open on resize when the trigger is not hidden', async () => {
       renderInWrapper();
       fireEvent.click(screen.getByText('Open menu'));

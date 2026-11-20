@@ -18,8 +18,8 @@ import cn from 'classnames';
 import React from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import { isReferenceHidden } from '../../../helpers/is-reference-hidden';
 import { useLabels } from '../../../providers/label-provider';
-import { isReferenceHidden } from '../overlay/is-reference-hidden';
 import styles from './dropdown.module.scss';
 import { DropdownContent } from './dropdown-content/dropdown-content';
 import { DropdownContext, DropdownContextValue } from './dropdown-context';
@@ -177,15 +177,23 @@ export const Dropdown = (props: DropdownProps) => {
     placement,
     onOpenChange: setOpen,
     middleware: [offset(DROPDOWN_OFFSET), flip(), shift()],
-    whileElementsMounted: (reference, floatingElement, update) =>
-      autoUpdate(reference, floatingElement, () => {
+    whileElementsMounted: (reference, floatingElement, update) => {
+      // A controlled dropdown may stay open after it is told to close, so a hidden trigger is reported once.
+      let hasReportedHidden = false;
+
+      return autoUpdate(reference, floatingElement, () => {
         if (isReferenceHidden(reference)) {
-          setOpenRef.current(false);
+          if (!hasReportedHidden) {
+            hasReportedHidden = true;
+            setOpenRef.current(false);
+          }
           return;
         }
 
+        hasReportedHidden = false;
         update();
-      }),
+      });
+    },
   });
 
   const { context, refs, x, y, strategy } = floating;

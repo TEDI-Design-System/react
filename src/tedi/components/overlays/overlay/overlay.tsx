@@ -33,7 +33,7 @@ import {
 } from 'react';
 
 import { useIsMounted, useIsTouchDevice } from '../../../helpers';
-import { isReferenceHidden } from './is-reference-hidden';
+import { isReferenceHidden } from '../../../helpers/is-reference-hidden';
 import { OverlayContent } from './overlay-content';
 import { OverlayTrigger } from './overlay-trigger';
 
