@@ -18,6 +18,23 @@
     }
   }
 
+  // A wrapping label lines the checkbox, radio, icon and meta up with its first line.
+  &:has(.tedi-option-content__label--no-clip) {
+    align-items: flex-start;
+
+    .tedi-option-content__indicator {
+      margin-top: calc((var(--body-regular-line-height) - var(--form-checkbox-radio-size-responsive)) / 2);
+    }
+
+    .tedi-option-content__icon {
+      margin-top: calc((var(--body-regular-line-height) - 1em) / 2);
+    }
+
+    .tedi-option-content__content {
+      align-items: baseline;
+    }
+  }
+
   &--disabled {
     cursor: not-allowed;
 

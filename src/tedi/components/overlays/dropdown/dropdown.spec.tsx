@@ -6,6 +6,11 @@ import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown, DropdownProps } from './dropdown';
 import styles from './dropdown.module.scss';
 
+jest.mock('@floating-ui/react', () => {
+  const actual = jest.requireActual('@floating-ui/react');
+  return { ...actual, flip: jest.fn(actual.flip) };
+});
+
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: () => ({
     getLabel: (key: string) => key,
@@ -347,6 +352,21 @@ describe('Dropdown component', () => {
     fireEvent.click(screen.getByText('Trigger'));
 
     expect(screen.getByRole('menu')).toHaveStyle({ width: '500px' });
+  });
+
+  describe('overflow fallback', () => {
+    it.each([
+      ['right-start', 'end'],
+      ['left', 'end'],
+      ['bottom-start', 'none'],
+      ['top-end', 'none'],
+    ] as const)('lets a %s dropdown fall back below or above: %s', (placement, direction) => {
+      renderDropdown({ children: <button>Trigger</button> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+        placement,
+      });
+
+      expect(FloatingUI.flip).toHaveBeenCalledWith({ fallbackAxisSideDirection: direction });
+    });
   });
 
   describe('hideOnScroll', () => {

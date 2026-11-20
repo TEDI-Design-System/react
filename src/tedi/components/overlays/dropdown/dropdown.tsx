@@ -200,7 +200,8 @@ export const Dropdown = (props: DropdownProps) => {
     onOpenChange: setOpen,
     middleware: [
       offset(DROPDOWN_OFFSET),
-      flip(),
+      // On a narrow screen neither side may fit, so a side dropdown falls back below or above.
+      flip({ fallbackAxisSideDirection: /^(left|right)/.test(placement) ? 'end' : 'none' }),
       shift(),
       size({
         // Re-measured on every position update, so it follows the trigger when it resizes.

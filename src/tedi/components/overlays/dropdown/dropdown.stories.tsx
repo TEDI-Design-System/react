@@ -15,6 +15,7 @@ import { Search } from '../../form/search/search';
 import { Col, Row } from '../../layout/grid';
 import { OptionContent } from '../../misc/option-content/option-content';
 import Separator from '../../misc/separator/separator';
+import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { Dropdown, DropdownProps } from './dropdown';
 
 /**
@@ -131,7 +132,8 @@ export const Position: Story = {
   ),
 };
 
-export const WithSelectedItem: Story = {
+export const ItemSelected: Story = {
+  name: 'Item selected',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [lang, setLang] = React.useState('EST');
@@ -142,7 +144,7 @@ export const WithSelectedItem: Story = {
         <div>
           <Dropdown>
             <Dropdown.Trigger>
-              <Button visualType="link" iconRight="expand_more">
+              <Button visualType="neutral" iconRight="keyboard_arrow_down">
                 {lang}
               </Button>
             </Dropdown.Trigger>
@@ -159,7 +161,7 @@ export const WithSelectedItem: Story = {
         <div>
           <Dropdown>
             <Dropdown.Trigger>
-              <Button visualType="link" iconRight="expand_more">
+              <Button visualType="neutral" iconRight="keyboard_arrow_down">
                 Sorteeri: {filter}
               </Button>
             </Dropdown.Trigger>
@@ -178,7 +180,8 @@ export const WithSelectedItem: Story = {
   },
 };
 
-export const WithActions: Story = {
+export const ActionDefault: Story = {
+  name: 'Action default',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Dropdown>
@@ -201,12 +204,13 @@ export const WithActions: Story = {
   ),
 };
 
-export const ActionsWithIcons: Story = {
+export const ActionsWithIcon: Story = {
+  name: 'Actions with icon',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Dropdown>
       <Dropdown.Trigger>
-        <Button visualType="secondary" iconLeft="more_vert">
+        <Button visualType="secondary" iconRight="keyboard_arrow_down">
           Rohkem
         </Button>
       </Dropdown.Trigger>
@@ -232,7 +236,7 @@ export const ActionsWithIcons: Story = {
   ),
 };
 
-export const WithCheckbox: Story = {
+export const Multiselect: Story = {
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [cities, setCities] = React.useState<string[]>(['tallinn', 'tartu']);
@@ -288,10 +292,29 @@ export const WithCheckbox: Story = {
   },
 };
 
+const COUNTIES: { name: string; towns: string[] }[] = [
+  { name: 'Harjumaa', towns: ['Tallinn', 'Maardu', 'Keila'] },
+  { name: 'Hiiumaa', towns: ['Kärdla'] },
+  { name: 'Ida-Virumaa', towns: ['Narva', 'Kohtla-Järve', 'Sillamäe'] },
+  { name: 'Jõgevamaa', towns: ['Jõgeva', 'Põltsamaa', 'Mustvee'] },
+  { name: 'Järvamaa', towns: ['Paide', 'Türi'] },
+  { name: 'Läänemaa', towns: ['Haapsalu'] },
+  { name: 'Lääne-Virumaa', towns: ['Rakvere', 'Tapa', 'Kunda'] },
+  { name: 'Põlvamaa', towns: ['Põlva', 'Räpina'] },
+  { name: 'Pärnumaa', towns: ['Pärnu', 'Sindi', 'Kilingi-Nõmme'] },
+  { name: 'Raplamaa', towns: ['Rapla'] },
+  { name: 'Saaremaa', towns: ['Kuressaare'] },
+  { name: 'Tartumaa', towns: ['Tartu', 'Elva', 'Kallaste'] },
+  { name: 'Valgamaa', towns: ['Valga', 'Tõrva', 'Otepää'] },
+  { name: 'Viljandimaa', towns: ['Viljandi', 'Võhma'] },
+  { name: 'Võrumaa', towns: ['Võru', 'Antsla'] },
+];
+
 type City = 'tallinn' | 'tartu' | 'parnu';
 const allCities: City[] = ['tallinn', 'tartu', 'parnu'];
 
-export const WithIndentedItems: Story = {
+export const WithIndent: Story = {
+  name: 'With indent',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [selected, setSelected] = React.useState<City[]>(['tartu']);
@@ -309,63 +332,82 @@ export const WithIndentedItems: Story = {
     };
 
     return (
-      <Dropdown>
-        <Dropdown.Trigger>
-          <Button iconRight="keyboard_arrow_down">Asukohad ({selected.length})</Button>
-        </Dropdown.Trigger>
+      <div className="flex flex-wrap gap-3">
+        <Dropdown>
+          <Dropdown.Trigger>
+            <Button iconRight="keyboard_arrow_down">Asukoht ({selected.length})</Button>
+          </Dropdown.Trigger>
 
-        <Dropdown.Content>
-          <Dropdown.Item index={0}>
-            <Checkbox
-              id="all"
-              label="Kõik asukohad"
-              checked={allChecked}
-              indeterminate={indeterminate}
-              onChange={toggleAll}
-              name=""
-              value=""
-            />
-          </Dropdown.Item>
+          <Dropdown.Content>
+            <Dropdown.Item index={0}>
+              <Checkbox
+                id="all"
+                label="Asukohad"
+                checked={allChecked}
+                indeterminate={indeterminate}
+                onChange={toggleAll}
+                name=""
+                value=""
+              />
+            </Dropdown.Item>
 
-          <Dropdown.Item index={1} indent={1}>
-            <Checkbox
-              id="tallinn"
-              label="Tallinn"
-              value="tallinn"
-              checked={selected.includes('tallinn')}
-              onChange={toggleOne('tallinn')}
-              name=""
-            />
-          </Dropdown.Item>
+            <Dropdown.Item index={1} indent={1}>
+              <Checkbox
+                id="tallinn"
+                label="Tallinn"
+                value="tallinn"
+                checked={selected.includes('tallinn')}
+                onChange={toggleOne('tallinn')}
+                name=""
+              />
+            </Dropdown.Item>
 
-          <Dropdown.Item index={2} indent={1}>
-            <Checkbox
-              id="tartu"
-              label="Tartu"
-              value="tartu"
-              checked={selected.includes('tartu')}
-              onChange={toggleOne('tartu')}
-              name=""
-            />
-          </Dropdown.Item>
+            <Dropdown.Item index={2} indent={1}>
+              <Checkbox
+                id="tartu"
+                label="Tartu"
+                value="tartu"
+                checked={selected.includes('tartu')}
+                onChange={toggleOne('tartu')}
+                name=""
+              />
+            </Dropdown.Item>
 
-          <Dropdown.Item index={3} indent={1}>
-            <Checkbox
-              id="parnu"
-              label="Pärnu"
-              value="parnu"
-              checked={selected.includes('parnu')}
-              onChange={toggleOne('parnu')}
-              name=""
-            />
-          </Dropdown.Item>
-        </Dropdown.Content>
-      </Dropdown>
+            <Dropdown.Item index={3} indent={1}>
+              <Checkbox
+                id="parnu"
+                label="Pärnu"
+                value="parnu"
+                checked={selected.includes('parnu')}
+                onChange={toggleOne('parnu')}
+                name=""
+              />
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+
+        <Dropdown maxHeight="18.75rem">
+          <Dropdown.Trigger>
+            <Button iconRight="keyboard_arrow_down">Asukoht</Button>
+          </Dropdown.Trigger>
+
+          <Dropdown.Content>
+            {COUNTIES.flatMap(({ name, towns }) =>
+              [name, ...towns].map((label, j) => ({ label, indent: j === 0 ? 0 : 1 }))
+            ).map(({ label, indent }, i) => (
+              <Dropdown.Item key={`${i}-${label}`} index={i} indent={indent}>
+                {label}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Content>
+        </Dropdown>
+      </div>
     );
   },
 };
 
 export const WithRadio: Story = {
+  name: 'With radio',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const cities = {
@@ -405,6 +447,7 @@ export const WithRadio: Story = {
 };
 
 export const CustomWidth: Story = {
+  name: 'Custom width',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row>
@@ -443,6 +486,7 @@ export const CustomWidth: Story = {
 };
 
 export const WithDescription: Story = {
+  name: 'With description',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const accessOptions = [
@@ -560,6 +604,7 @@ export const Divided: Story = {
 };
 
 export const WithSeparator: Story = {
+  name: 'With separator',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Dropdown>
@@ -581,7 +626,7 @@ export const WithSeparator: Story = {
         </Dropdown.Item>
         <Dropdown.Separator />
         <Dropdown.Item index={2}>
-          <OptionContent icon="archive">
+          <OptionContent icon="history">
             <OptionContent.Label>Arhiiv</OptionContent.Label>
           </OptionContent>
         </Dropdown.Item>
@@ -612,6 +657,7 @@ const STICKY_FOOTER_ITEMS = [
  * and the footer stays in place below them.
  */
 export const WithStickyFooter: Story = {
+  name: 'With sticky footer',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row gutterY={3}>
@@ -740,6 +786,7 @@ export const Tree: Story = {
  * Items keep one running `index` across groups.
  */
 export const WithGroupSubtitle: Story = {
+  name: 'With group subtitle',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row gutterY={3}>
@@ -802,6 +849,7 @@ export const WithGroupSubtitle: Story = {
  * Prefer rem, so the maximum height scales with the user's font size.
  */
 export const MaxHeight: Story = {
+  name: 'Max height',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row>
@@ -841,6 +889,7 @@ export const MaxHeight: Story = {
  * the dropdown's own items keeps it open.
  */
 export const HideOnScroll: Story = {
+  name: 'Hide on scroll',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <div
@@ -888,6 +937,7 @@ export const HideOnScroll: Story = {
  * to the first item and ArrowUp on the first item comes back.
  */
 export const CustomContent: Story = {
+  name: 'Custom content',
   parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [query, setQuery] = React.useState('');
@@ -911,14 +961,20 @@ export const CustomContent: Story = {
     return (
       <Dropdown width={300}>
         <Dropdown.Trigger>
-          <Button visualType="link" iconRight="keyboard_arrow_down">
+          <Button visualType="neutral" iconRight="keyboard_arrow_down">
             Vali esindatav
           </Button>
         </Dropdown.Trigger>
 
         <Dropdown.Content>
           <Dropdown.Header>
-            <Search id="dropdown-search" label="Otsi" value={query} onChange={(value) => setQuery(value)} />
+            <Search
+              id="dropdown-search"
+              label="Otsi esindatavat"
+              hideLabel
+              value={query}
+              onChange={(value) => setQuery(value)}
+            />
           </Dropdown.Header>
 
           {filtered.map((rep, i) => (
@@ -942,10 +998,199 @@ export const CustomContent: Story = {
               </OptionContent>
             </Dropdown.Item>
           ))}
+
+          <Dropdown.Footer>
+            <Button visualType="secondary" size="small" iconLeft="add" fullWidth>
+              Lisa esindatav
+            </Button>
+          </Dropdown.Footer>
         </Dropdown.Content>
       </Dropdown>
     );
   },
+};
+
+const WRAPPED_ITEMS = [
+  { icon: 'description', label: 'Juurdepääs terviseandmetele ja retseptidele' },
+  { icon: 'call', label: 'Tervisekassa kontaktid ja klienditeenindus' },
+  { icon: 'settings', label: 'Isikuandmete töötlemise seaded' },
+];
+
+/**
+ * A label too long for the item is cut off with an ellipsis (left). Set `clipContent={false}` on
+ * `OptionContent.Label` to let it wrap instead (right).
+ */
+export const WrappedContent: Story = {
+  name: 'Wrapped content',
+  parameters: { chromatic: { disableSnapshot: true } },
+  render: () => (
+    <div className="flex flex-wrap gap-3">
+      {[true, false].map((clipContent) => (
+        <Dropdown key={String(clipContent)} width={240}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconRight="keyboard_arrow_down">
+              {clipContent ? 'Truncated' : 'Wrapped'}
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            {WRAPPED_ITEMS.map(({ icon, label }, i) => (
+              <Dropdown.Item key={label} index={i}>
+                <OptionContent icon={icon}>
+                  <OptionContent.Label clipContent={clipContent}>{label}</OptionContent.Label>
+                </OptionContent>
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Content>
+        </Dropdown>
+      ))}
+    </div>
+  ),
+};
+
+type FilterChoice = { label: string; value: string };
+
+type FilterConfig = {
+  label: string;
+  options: FilterChoice[];
+  defaultSelected: string[];
+  searchable?: boolean;
+  footer?: string;
+};
+
+const FILTERS: FilterConfig[] = [
+  {
+    label: 'Teenused',
+    options: [
+      { label: 'Optometristi vastuvõtt', value: 'optometrist' },
+      { label: 'Silmaarsti vastuvõtt', value: 'silmaarst' },
+      { label: 'Hambaarsti vastuvõtt', value: 'hambaarst' },
+    ],
+    defaultSelected: ['optometrist', 'silmaarst'],
+  },
+  {
+    label: 'Arst',
+    options: [
+      { label: 'Dr Anna Tamm', value: 'tamm' },
+      { label: 'Dr Mari Kask', value: 'kask' },
+      { label: 'Dr Jaan Saar', value: 'saar' },
+    ],
+    defaultSelected: [],
+  },
+  {
+    label: 'Ajavahemik',
+    options: [
+      { label: 'Viimane nädal', value: 'week' },
+      { label: 'Viimane kuu', value: 'month' },
+      { label: 'Viimane aasta', value: 'year' },
+    ],
+    defaultSelected: [],
+  },
+  {
+    label: 'Raviasutus',
+    options: [
+      { label: 'Fertilitas', value: 'fertilitas' },
+      { label: 'Ida-Tallinna Keskhaigla', value: 'itk' },
+      { label: 'Lääne-Tallinna Keskhaigla', value: 'ltkh' },
+      { label: 'Põhja-Eesti Regionaalhaigla', value: 'perh' },
+      { label: 'Tallinna Lastehaigla', value: 'lastehaigla' },
+    ],
+    defaultSelected: ['perh', 'lastehaigla'],
+    searchable: true,
+    footer: 'Lisa asutus',
+  },
+];
+
+const FilterDropdown = ({ label, options, defaultSelected, searchable, footer }: FilterConfig) => {
+  const [selected, setSelected] = React.useState(defaultSelected);
+  const [query, setQuery] = React.useState('');
+  const id = `filter-${label.toLowerCase()}`;
+
+  const visible = options.filter((option) => option.label.toLowerCase().includes(query.trim().toLowerCase()));
+  const allSelected = visible.length > 0 && visible.every((option) => selected.includes(option.value));
+  const someSelected = visible.some((option) => selected.includes(option.value));
+  const offset = searchable ? 1 : 0;
+
+  const toggle = (value: string) => (_value: string, checked: boolean) => {
+    setSelected((prev) => (checked ? [...prev, value] : prev.filter((v) => v !== value)));
+  };
+
+  const toggleAll = (_value: string, checked: boolean) => {
+    const values = visible.map((option) => option.value);
+    setSelected((prev) =>
+      checked ? [...prev.filter((v) => !values.includes(v)), ...values] : prev.filter((v) => !values.includes(v))
+    );
+  };
+
+  return (
+    <Dropdown width={searchable ? 300 : undefined} maxHeight={searchable ? '12rem' : undefined}>
+      <Dropdown.Trigger>
+        <Button visualType="secondary" size="small" iconRight={{ name: 'arrow_drop_down', filled: true }}>
+          <span className="flex align-items-center gap-1">
+            {label}
+            {selected.length > 0 && <StatusBadge color="brand">{String(selected.length)}</StatusBadge>}
+          </span>
+        </Button>
+      </Dropdown.Trigger>
+
+      <Dropdown.Content>
+        {searchable && (
+          <Dropdown.Header>
+            <Search id={`${id}-search`} label={`Otsi: ${label}`} hideLabel value={query} onChange={setQuery} />
+          </Dropdown.Header>
+        )}
+        {searchable && (
+          <Dropdown.Item index={0}>
+            <Checkbox
+              id={`${id}-all`}
+              label="Vali kõik"
+              value="all"
+              checked={allSelected}
+              indeterminate={someSelected && !allSelected}
+              onChange={toggleAll}
+              name=""
+            />
+          </Dropdown.Item>
+        )}
+        {searchable && <Dropdown.Separator />}
+        {visible.map((option, i) => (
+          <Dropdown.Item key={option.value} index={i + offset}>
+            <Checkbox
+              id={`${id}-${option.value}`}
+              label={option.label}
+              value={option.value}
+              checked={selected.includes(option.value)}
+              onChange={toggle(option.value)}
+              name=""
+            />
+          </Dropdown.Item>
+        ))}
+        {footer && (
+          <Dropdown.Footer>
+            <Button visualType="secondary" size="small" iconLeft="add" fullWidth>
+              {footer}
+            </Button>
+          </Dropdown.Footer>
+        )}
+      </Dropdown.Content>
+    </Dropdown>
+  );
+};
+
+/**
+ * A row of filters, each a `Dropdown` with checkbox items. The last one adds a search field in
+ * `Dropdown.Header`, "Vali kõik" above a separator, a `maxHeight` and a `Dropdown.Footer` action.
+ * For a real filter bar, use `Filter` (see Filter → Examples).
+ */
+export const WithFilters: Story = {
+  name: 'With filters',
+  parameters: { chromatic: { disableSnapshot: true } },
+  render: () => (
+    <div className="flex flex-wrap gap-2">
+      {FILTERS.map((filter) => (
+        <FilterDropdown key={filter.label} {...filter} />
+      ))}
+    </div>
+  ),
 };
 
 /**
