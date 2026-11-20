@@ -1,7 +1,14 @@
+@use '../../../styles/breakpoint-classes';
+
 .tedi-top-nav {
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+
+// The bar is always rendered and hidden below `mobileBreakpoint`, where the drawer takes over.
+@include breakpoint-classes.below-modifiers('.tedi-top-nav') {
+  display: none;
 }
 
 .tedi-top-nav__bar {

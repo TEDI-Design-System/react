@@ -20,7 +20,17 @@ import {
   useRole,
   UseRoleProps,
 } from '@floating-ui/react';
-import { ComponentProps, createContext, ReactNode, useCallback, useId, useMemo, useRef, useState } from 'react';
+import {
+  ComponentProps,
+  createContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useIsMounted, useIsTouchDevice } from '../../../helpers';
 import { OverlayContent } from './overlay-content';
@@ -191,6 +201,18 @@ export const OverlayContext = createContext<OverlayContextType>({
   contentId: '',
 });
 
+// An overlay renders in a portal, so it does not disappear with a hidden trigger. The trigger is hidden when it has
+// no box and an ancestor is `display: none` (a `display: contents` element has no box either, but it is not hidden).
+const isReferenceHidden = (reference: unknown): boolean => {
+  if (!(reference instanceof Element) || reference.getClientRects().length > 0) return false;
+
+  for (let node: Element | null = reference; node; node = node.parentElement) {
+    if (getComputedStyle(node).display === 'none') return true;
+  }
+
+  return false;
+};
+
 export const Overlay = (props: OverlayProps) => {
   const isTouchDevice = useIsTouchDevice();
 
@@ -237,6 +259,11 @@ export const Overlay = (props: OverlayProps) => {
     [externalOpen, setOpen, onToggle]
   );
 
+  const onOpenChangeRef = useRef(onOpenChange);
+  useEffect(() => {
+    onOpenChangeRef.current = onOpenChange;
+  }, [onOpenChange]);
+
   const { x, y, refs, strategy, context, middlewareData, placement } = useFloating({
     placement: placementDefault,
     open: isOpen,
@@ -250,9 +277,28 @@ export const Overlay = (props: OverlayProps) => {
         padding: arrowPadding,
       }),
     ],
-    whileElementsMounted: trackReferencePosition
-      ? (reference, floating, update) => autoUpdate(reference, floating, update, { animationFrame: true })
-      : autoUpdate,
+    whileElementsMounted: (reference, floating, update) => {
+      // A controlled overlay may stay open after it is told to close, so a hidden trigger is reported once.
+      let hasReportedHidden = false;
+
+      return autoUpdate(
+        reference,
+        floating,
+        () => {
+          if (isReferenceHidden(reference)) {
+            if (!hasReportedHidden) {
+              hasReportedHidden = true;
+              onOpenChangeRef.current(false);
+            }
+            return;
+          }
+
+          hasReportedHidden = false;
+          update();
+        },
+        trackReferencePosition ? { animationFrame: true } : undefined
+      );
+    },
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
