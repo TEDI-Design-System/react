@@ -77,6 +77,10 @@ export interface PaginationLabels {
    */
   pageSize: string;
   /**
+   * Heading for the mobile page picker, translated by LabelProvider when omitted.
+   */
+  pagePickerTitle?: string;
+  /**
    * Announcement for the polite aria-live region when the page changes.
    * Lets screen reader users know they moved without stealing focus.
    * @default (page, total) => `Page ${page} of ${total}`
@@ -280,6 +284,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
       currentPageAriaLabel: pageAriaLabel,
       results: (count) => getLabel('pagination.results', count),
       pageSize: getLabel('pagination.page-size'),
+      pagePickerTitle: getLabel('pagination.select-page'),
       pageStatus: (current, total) => getLabel('pagination.page-status', current, total),
       ...labels,
     };
@@ -619,6 +624,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
           selectedValue={currentPage}
           onSelect={handlePageChange}
           ariaLabel={mergedLabels.ariaLabel}
+          title={mergedLabels.pagePickerTitle}
           ariaCurrent="page"
         />
       )}

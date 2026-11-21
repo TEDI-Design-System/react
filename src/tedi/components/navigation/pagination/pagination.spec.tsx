@@ -13,6 +13,8 @@ jest.mock('../../../providers/label-provider', () => ({
       switch (key) {
         case 'pagination.title':
           return 'Pages';
+        case 'pagination.select-page':
+          return 'Select page';
         case 'pagination.prev-page':
           return 'Previous page';
         case 'pagination.next-page':
@@ -476,8 +478,8 @@ describe('Pagination — compact mobile picker (below md)', () => {
     const onPageChange = jest.fn();
     render(<Pagination pageCount={5} defaultPage={2} onPageChange={onPageChange} />);
     fireEvent.click(screen.getByRole('button', { name: /2 \/ 5/ }));
-    const modal = screen.getByRole('dialog', { name: 'Pages' });
-    expect(modal).toBeInTheDocument();
+    const modal = screen.getByRole('dialog', { name: 'Select page' });
+    expect(within(modal).getByRole('heading', { name: 'Select page' })).toBeInTheDocument();
     fireEvent.click(within(modal).getByRole('button', { name: 'Page 4' }));
     expect(onPageChange).toHaveBeenCalledWith(4);
   });
@@ -486,6 +488,7 @@ describe('Pagination — compact mobile picker (below md)', () => {
 describe('pagination labels', () => {
   it('uses the agreed Estonian wording', () => {
     expect(labelsMap['pagination.title'].et).toBe('Lehed');
+    expect(labelsMap['pagination.select-page'].et).toBe('Vali lehekülg');
     expect(labelsMap['pagination.page'].et(3)).toBe('Leht 3');
     expect(labelsMap['pagination.page-status'].et(4, 10)).toBe('Leht 4 / 10');
     expect(labelsMap['pagination.prev-page'].et).toBe('Eelmine leht');

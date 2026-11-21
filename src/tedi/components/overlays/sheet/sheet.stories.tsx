@@ -8,8 +8,10 @@ import {
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
 import { Icon } from '../../base/icon/icon';
+import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
+import { ClosingButton } from '../../buttons/closing-button/closing-button';
 import { Accordion } from '../../content/accordion/accordion';
 import { TextGroup } from '../../content/text-group/text-group';
 import { Checkbox } from '../../form/checkbox/checkbox';
@@ -690,6 +692,31 @@ export const HeaderType: Story = {
               }
               endSlot={<Tag color="primary">2</Tag>}
             />
+          ),
+        },
+      ])}
+      {exampleGroup('Custom header', [
+        {
+          caption: 'Title with description',
+          content: (
+            <Sheet.Content aria-labelledby="sheet-type-custom-title">
+              <Sheet.Header variant="default">
+                <div className="flex flex-grow-1 align-items-center gap-2">
+                  <div className="flex-grow-1">
+                    <Heading element="h3" modifiers="h6" id="sheet-type-custom-title">
+                      Seaded
+                    </Heading>
+                    <Text modifiers="small" color="secondary">
+                      Muudatused salvestatakse automaatselt
+                    </Text>
+                  </div>
+                  <Sheet.Closer>
+                    <ClosingButton />
+                  </Sheet.Closer>
+                </div>
+              </Sheet.Header>
+              <Sheet.Body>{settingsBody('sheet-type-custom')}</Sheet.Body>
+            </Sheet.Content>
           ),
         },
       ])}
