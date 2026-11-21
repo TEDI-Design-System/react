@@ -92,14 +92,14 @@ export type InputGroupContextValue = {
    * wrapped form control.
    */
   invalid?: boolean;
-  /*
+  /**
    * Indicates if the InputGroup has an external label (i.e. FormLabel rendered by InputGroup).
    * This is used by child components to determine if they should render their own label or not.
    * E.g., if `hasExternalLabel` is true, an Input component inside the group might choose to hide its own label to avoid redundancy.
    * This is particularly important for accessibility, ensuring that screen readers do not announce duplicate labels.
    */
   hasExternalLabel?: boolean;
-  /*
+  /**
    * The ID to be applied to the input element within the group.
    * This allows the FormLabel rendered by InputGroup to correctly reference the input for accessibility.
    * If not provided, InputGroup will generate a unique ID internally.

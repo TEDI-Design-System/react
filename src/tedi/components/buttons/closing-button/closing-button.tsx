@@ -29,14 +29,14 @@ export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
    * @default label provider's 'close' label
    */
   title?: string;
-  /*
+  /**
    * Color variant of the ClosingButton
    * @default default
    */
   color?: ClosingButtonColor;
-  /* Size of the icon inside the button
+  /**
+   * Size of the icon inside the button. At 18, the button size automatically adjusts to 'small'.
    * @default 24
-   * If iconSize is set to 18, the button size will automatically adjust to 'small'.
    */
   iconSize?: ClosingButtonIconSize;
 }

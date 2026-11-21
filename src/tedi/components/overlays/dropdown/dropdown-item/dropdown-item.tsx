@@ -1,9 +1,14 @@
 import { useMergeRefs } from '@floating-ui/react';
 import cn from 'classnames';
-import { cloneElement, isValidElement } from 'react';
+import { Children, cloneElement, Fragment, isValidElement, ReactNode, useLayoutEffect, useRef } from 'react';
 
+import { Checkbox } from '../../../form/checkbox/checkbox';
+import { Radio } from '../../../form/radio/radio';
+import { OptionContent, OptionContentProps } from '../../../misc/option-content/option-content';
 import { useDropdownContext } from '../dropdown-context';
 import styles from './dropdown-item.module.scss';
+
+const CONTROL_SELECTOR = 'input[type="checkbox"], input[type="radio"]';
 
 const composeHandlers =
   <E extends { defaultPrevented: boolean }>(itemHandler?: (e: E) => void, childHandler?: (e: E) => void) =>
@@ -14,7 +19,8 @@ const composeHandlers =
 
 export type DropdownItemProps = {
   /**
-   * The content of the menu item (text, icons, checkbox, etc.)
+   * The content of the menu item (text, icons, checkbox, etc.). A `Checkbox` or `Radio` child
+   * becomes the `menuitemcheckbox` / `menuitemradio` itself, and toggling it keeps the dropdown open.
    */
   children: React.ReactNode;
   /**
@@ -41,22 +47,15 @@ export type DropdownItemProps = {
    */
   index?: number;
   /**
-   * Indentation level (in rem units). Useful for nested / hierarchical menus.
-   * Example: `indent={1}` → adds ~1rem left padding
+   * Nesting level; each level indents the item by `--dropdown-item-indent` (32px), or by 1rem in a
+   * `tree` dropdown.
    *
    * @default 0
    */
   indent?: number;
   /**
-   * Render the item as its child element instead of a `<button>`.
-   *
-   * - **Navigable child (default `closeOnSelect`)** — e.g. a `Link`: the item props (`role`,
-   *   roving `tabindex`, handlers, styles) are merged directly onto the child so it becomes the
-   *   single focusable `menuitem`. This avoids a focusable wrapper *and* a focusable child (a
-   *   double Tab stop) and keeps the role and accessible name on one element.
-   * - **Form control (`closeOnSelect={false}`)** — e.g. a `Checkbox` / `Radio`: the child is
-   *   wrapped in a plain `<div>` menuitem that forwards activation to the inner control.
-   *
+   * Renders the item as its child (e.g. a `Link`) with the item's role, tabindex, handlers and styles
+   * merged onto it; with `closeOnSelect={false}` the child is wrapped in a `<div>`.
    * @default false
    */
   asChild?: boolean;
@@ -69,30 +68,44 @@ export type DropdownItemProps = {
    */
   closeOnSelect?: boolean;
   /**
-   * Marks this item as a tree parent node when the Dropdown is in `variant="tree"` mode.
-   * - Renders a visual parent indicator (bullet) aligned to the tree trunk
-   * - Starts the tree trunk at the vertical center of this item
-   * - Does **not** apply tree indentation — parent items remain aligned with normal items
-   *
-   * This prop is **purely visual** and does not affect behavior or hierarchy.
-   * Child items must still use `indent` to participate in the tree.
-   * Ignored when `variant !== 'tree'`.
+   * In a `tree` dropdown, draws a bullet on the connector line and starts the line here; give it
+   * the same `indent` as its children.
    * @default false
    */
   isParent?: boolean;
-  /*
-   * Additional class name(s) to apply to the dropdown item
-   * @default undefined
+  /**
+   * Additional class name(s) for the dropdown item.
    */
   className?: string;
   /**
-   * ARIA role for the item. Defaults to `menuitem`; override to convey selection
-   * semantics (e.g. `menuitemcheckbox` / `menuitemradio` / `option`) and pair it
-   * with the matching `aria-checked` / `aria-selected`.
+   * ARIA role for the item; a checkbox or radio `OptionContent`, `Checkbox` or `Radio` child makes it
+   * `menuitemcheckbox` / `menuitemradio` unless set.
    * @default menuitem
    */
   role?: React.AriaRole;
 } & React.AriaAttributes;
+
+/** The only child, looking through fragments (e.g. `<><OptionContent /></>`), or `undefined`. */
+const onlyChild = (children: ReactNode): ReactNode => {
+  const nodes = Children.toArray(children);
+  if (nodes.length !== 1) return undefined;
+  const [node] = nodes;
+  return isValidElement<{ children?: ReactNode }>(node) && node.type === Fragment
+    ? onlyChild(node.props.children)
+    : node;
+};
+
+/**
+ * Calls a Floating UI item handler as if the event came from the inner control. The handlers find
+ * the item by `currentTarget`, and a `Checkbox` / `Radio` item registers its input, not the row.
+ */
+const retarget =
+  <E extends React.SyntheticEvent>(handler?: unknown) =>
+  (event: E) => {
+    if (typeof handler !== 'function') return;
+    const control = (event.currentTarget as HTMLElement).querySelector(CONTROL_SELECTOR);
+    handler(control ? { ...event, currentTarget: control } : event);
+  };
 
 export const DropdownItem = ({
   children,
@@ -100,7 +113,7 @@ export const DropdownItem = ({
   disabled,
   active,
   index,
-  indent,
+  indent = 0,
   asChild = false,
   closeOnSelect = true,
   isParent = false,
@@ -111,7 +124,75 @@ export const DropdownItem = ({
   const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant, navigation } = useDropdownContext();
 
   const Component = asChild ? 'div' : 'button';
-  const isSlot = asChild && closeOnSelect !== false && isValidElement(children);
+
+  // OptionContent's checkbox / radio is aria-hidden (unless indicatorSemantics="control"), so the
+  // item takes the menuitemcheckbox / menuitemradio role and aria-checked from its props.
+  const contentChild = onlyChild(children);
+  const optionContent =
+    isValidElement<OptionContentProps>(contentChild) && contentChild.type === OptionContent
+      ? contentChild.props
+      : undefined;
+  const checkType =
+    !navigation && optionContent?.indicatorSemantics !== 'control' && optionContent?.type !== 'default'
+      ? optionContent?.type
+      : undefined;
+  const checkRole = checkType && (checkType === 'checkbox' ? 'menuitemcheckbox' : 'menuitemradio');
+  const itemRole = role ?? checkRole;
+  const ariaChecked =
+    aria['aria-checked'] ??
+    (checkRole && itemRole === checkRole
+      ? checkType === 'checkbox' && optionContent?.indeterminate
+        ? 'mixed'
+        : !!optionContent?.selected
+      : undefined);
+
+  const isFormControl = isValidElement(children) && (children.type === Checkbox || children.type === Radio);
+  // A Checkbox / Radio item: its input is the menu item (role, roving tabindex, focus) and the row
+  // around it is presentational, so the item has one focusable control, not a control in a control.
+  const controlOwnsItem = isFormControl && !navigation;
+  const controlRole =
+    role ?? (isValidElement(children) && children.type === Radio ? 'menuitemradio' : 'menuitemcheckbox');
+  const rowRef = useRef<HTMLDivElement>(null);
+  const appliedAriaRef = useRef(new Set<string>());
+
+  useLayoutEffect(() => {
+    if (!controlOwnsItem) return;
+    const control = rowRef.current?.querySelector<HTMLInputElement>(CONTROL_SELECTOR);
+    if (!control) return;
+
+    control.setAttribute('role', controlRole);
+    control.tabIndex = activeIndex === index ? 0 : -1;
+
+    // The item's ARIA props go on the input, which is the menu item.
+    const applied = new Set<string>();
+    Object.entries(aria).forEach(([name, value]) => {
+      if (value === undefined || value === null) return;
+      control.setAttribute(name, String(value));
+      applied.add(name);
+    });
+    appliedAriaRef.current.forEach((name) => !applied.has(name) && control.removeAttribute(name));
+    appliedAriaRef.current = applied;
+
+    // The input's own checked state covers checked / unchecked; only "mixed" has to be spelled out.
+    if (!applied.has('aria-checked')) {
+      if ((children as React.ReactElement<{ indeterminate?: boolean }>).props.indeterminate) {
+        control.setAttribute('aria-checked', 'mixed');
+      } else {
+        control.removeAttribute('aria-checked');
+      }
+    }
+    if (disabled) control.setAttribute('aria-disabled', 'true');
+    else if (!applied.has('aria-disabled')) control.removeAttribute('aria-disabled');
+
+    if (typeof index !== 'number') return;
+    const items = listItemsRef.current;
+    items[index] = control as unknown as HTMLButtonElement;
+    // Unregister on unmount, as the callback ref does for other items, so arrow keys skip it.
+    return () => {
+      if (items[index] === (control as unknown as HTMLButtonElement)) items[index] = null;
+    };
+  });
+  const isSlot = asChild && closeOnSelect !== false && isValidElement(children) && !isFormControl;
 
   const setItemRef = (node: HTMLElement | null) => {
     if (typeof index === 'number') {
@@ -122,13 +203,9 @@ export const DropdownItem = ({
   const slotRef = useMergeRefs([setItemRef, childRef]);
 
   const getCssVars = (indent?: number): React.CSSProperties => {
-    // indent <= 0 means no indentation — leave `--dropdown-indent` unset so the
-    // base left padding applies (setting it to 0 would zero out the padding).
+    // indent <= 0 means no indentation, so the base left padding applies.
     if (typeof indent !== 'number' || indent <= 0) return {};
-    return {
-      '--dropdown-indent-level': indent,
-      '--dropdown-indent': `${indent}rem`,
-    } as React.CSSProperties;
+    return { '--dropdown-indent-level': indent } as React.CSSProperties;
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -138,9 +215,7 @@ export const DropdownItem = ({
     }
 
     // only trigger inner inputs if not disabled
-    const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>(
-      'input[type="checkbox"], input[type="radio"]'
-    );
+    const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>(CONTROL_SELECTOR);
     if (input) {
       // Clicks on the control or its label already toggle it natively
       if (!(e.target as HTMLElement).closest('input, label')) input.click();
@@ -161,14 +236,14 @@ export const DropdownItem = ({
     }
 
     if (e.key === 'Enter' || e.key === ' ') {
-      const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>(
-        'input[type="checkbox"], input[type="radio"]'
-      );
+      const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>(CONTROL_SELECTOR);
 
       if (input) {
+        // Space on the focused input already toggles it natively
+        if (e.key === ' ' && e.target === input) return;
         e.preventDefault();
         input.click();
-        if (!asChild && closeOnSelect) setOpen(false);
+        if (!asChild && !isFormControl && closeOnSelect) setOpen(false);
         return;
       }
 
@@ -203,17 +278,44 @@ export const DropdownItem = ({
     onClick: handleClick,
     onKeyDown: handleKeyDown,
     ...aria,
+    'aria-checked': ariaChecked,
   };
 
   const itemProps = navigation
     ? { ...baseProps, onKeyDown: undefined, tabIndex: disabled ? -1 : 0, role }
     : asChild && closeOnSelect === false
-    ? { ...baseProps, role }
+    ? { ...baseProps, role: itemRole }
     : getItemProps({
-        role: role ?? 'menuitem',
+        role: itemRole ?? 'menuitem',
         disabled: !asChild ? disabled : undefined,
         ...baseProps,
       });
+
+  if (controlOwnsItem) {
+    const hookProps = getItemProps({ role: 'none' }) as Record<string, unknown>;
+    // A disabled item disables its control too, so a click or Space on the input can't toggle it.
+    const control = children as React.ReactElement<{ disabled?: boolean }>;
+    const controlChild = disabled ? cloneElement(control, { disabled: control.props.disabled || disabled }) : children;
+
+    return (
+      <div
+        {...hookProps}
+        ref={rowRef}
+        role="none"
+        className={baseProps.className}
+        style={baseProps.style}
+        onFocus={retarget(hookProps.onFocus)}
+        onMouseMove={retarget(hookProps.onMouseMove)}
+        onClick={(e) => {
+          retarget(hookProps.onClick)(e);
+          handleClick(e);
+        }}
+        onKeyDown={handleKeyDown}
+      >
+        {controlChild}
+      </div>
+    );
+  }
 
   if (isSlot) {
     const child = children as React.ReactElement;
@@ -244,3 +346,5 @@ export const DropdownItem = ({
 
   return <Component {...itemProps}>{children}</Component>;
 };
+
+DropdownItem.displayName = 'DropdownItem';

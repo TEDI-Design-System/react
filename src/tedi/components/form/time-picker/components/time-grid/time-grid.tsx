@@ -39,7 +39,7 @@ export interface TimeGridProps {
    * - `'radio'` — card with the radio dot before the label.
    */
   variant?: 'button' | 'radio';
-  /*
+  /**
    * Additional CSS class name for custom styling
    */
   className?: string;

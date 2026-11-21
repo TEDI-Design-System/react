@@ -19,11 +19,11 @@ export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMo
    * @default dropdown
    */
   monthYearSelectType?: 'dropdown' | 'grid' | 'static';
-  /*
+  /**
    * Callback for opening month selection grid. Only used if `monthYearSelectType` is `'grid'`.
    */
   onOpenMonthGrid?: () => void;
-  /*
+  /**
    * Callback for opening year selection grid. Only used if `monthYearSelectType` is `'grid'`.
    */
   onOpenYearGrid?: () => void;

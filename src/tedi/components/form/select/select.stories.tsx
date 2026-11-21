@@ -5,6 +5,7 @@ import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { OptionContent } from '../../misc/option-content/option-content';
 import { Checkbox } from '../checkbox/checkbox';
 import { AsyncSelectTemplate } from './examples/async';
 import { EditableSelectTemplate } from './examples/editable';
@@ -684,6 +685,34 @@ export const Examples: Story = {
         isTagRemovable
       />
     </VerticalSpacing>
+  ),
+};
+
+const cityOptions: ISelectOption<{ county: string }>[] = [
+  { value: 'tln', label: 'Tallinn', customData: { county: 'Harjumaa' } },
+  { value: 'trt', label: 'Tartu', customData: { county: 'Tartumaa' } },
+  { value: 'prn', label: 'Pärnu', customData: { county: 'Pärnumaa' } },
+  { value: 'nrv', label: 'Narva', customData: { county: 'Ida-Virumaa' } },
+];
+
+/**
+ * Build a custom option from `OptionContent` in `renderOption`, here with a leading icon and
+ * the county as meta text.
+ */
+export const CustomOptionContent: Story = {
+  render: () => (
+    <Select
+      id="city-select"
+      label="Linn"
+      placeholder="Vali linn"
+      options={cityOptions}
+      renderOption={(props) => (
+        <OptionContent icon="location_on">
+          <OptionContent.Label>{props.data.label}</OptionContent.Label>
+          <OptionContent.Meta>{(props.data.customData as { county: string }).county}</OptionContent.Meta>
+        </OptionContent>
+      )}
+    />
   ),
 };
 

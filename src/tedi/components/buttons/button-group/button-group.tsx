@@ -59,7 +59,7 @@ export type ButtonGroupProps = {
    * If not provided, the label provider value for `sidenav.submenu` will be used as fallback.
    */
   dropdownLabel?: string;
-  /*
+  /**
    * Determines the source of the dropdown trigger button's label when the button group collapses on mobile.
    * - `'active'` – uses the label of the currently active button as the dropdown trigger label. If no button is active, falls back to `dropdownLabel`.
    * - `'static'` (default) – always uses `dropdownLabel`, regardless of which button is active.

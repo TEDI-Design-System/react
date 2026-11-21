@@ -11,13 +11,32 @@ export interface OptionContentSlotProps {
   children?: React.ReactNode;
   /** Additional class name. */
   className?: string;
-  /** @internal id wired up by `OptionContent` to link the indicator's `aria-labelledby`. */
-  id?: string;
 }
 
-export const OptionContentLabel = forwardRef<HTMLSpanElement, OptionContentSlotProps>(
-  ({ children, className, id }, ref) => (
-    <span ref={ref} id={id} className={cn(styles['tedi-option-content__label'], className)}>
+export interface OptionContentLabelProps extends OptionContentSlotProps {
+  /**
+   * Id of the label; `OptionContent` replaces it with its own when the label names the checkbox or radio.
+   */
+  id?: string;
+  /**
+   * Cuts a label too long for the item off with an ellipsis; `false` lets it wrap and keeps
+   * decorations outside the line box, such as a status indicator, visible.
+   * @default true
+   */
+  clipContent?: boolean;
+}
+
+export const OptionContentLabel = forwardRef<HTMLSpanElement, OptionContentLabelProps>(
+  ({ children, className, id, clipContent = true }, ref) => (
+    <span
+      ref={ref}
+      id={id}
+      className={cn(
+        styles['tedi-option-content__label'],
+        { [styles['tedi-option-content__label--no-clip']]: !clipContent },
+        className
+      )}
+    >
       {children}
     </span>
   )
@@ -90,7 +109,7 @@ export interface OptionContentProps {
 
 const renderIcon = (icon: string | IconProps, className: string): JSX.Element => {
   const props: IconProps = typeof icon === 'string' ? { name: icon } : icon;
-  return <Icon size={18} {...props} className={cn(className, props.className)} />;
+  return <Icon size={16} {...props} className={cn(className, props.className)} />;
 };
 
 const OptionContentInner = forwardRef<HTMLDivElement, OptionContentProps>(
@@ -138,7 +157,7 @@ const OptionContentInner = forwardRef<HTMLDivElement, OptionContentProps>(
     const content = hasLabelChild
       ? Children.map(children, (child) =>
           isValidElement(child) && child.type === OptionContentLabel
-            ? cloneElement(child as ReactElement<OptionContentSlotProps>, { id: labelId })
+            ? cloneElement(child as ReactElement<OptionContentLabelProps>, { id: labelId })
             : child
         )
       : children;
@@ -195,5 +214,3 @@ export const OptionContent = Object.assign(OptionContentInner, {
   Label: OptionContentLabel,
   Meta: OptionContentMeta,
 });
-
-export default OptionContent;

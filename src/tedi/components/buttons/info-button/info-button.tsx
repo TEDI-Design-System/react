@@ -14,7 +14,7 @@ export interface InfoButtonProps extends Omit<ButtonProps, 'size' | 'children' |
    * Children elements to be rendered inside the InfoButton
    */
   children?: React.ReactNode;
-  /*
+  /**
    * Color variant of the InfoButton
    * @default 'default'
    */

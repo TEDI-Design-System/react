@@ -3,15 +3,15 @@ import { Text } from '../../../../base/typography/text/text';
 import { CalendarGrid } from '../../calendar-grid';
 
 export interface MonthGridProps {
-  /*
+  /**
    * Current month being displayed in the calendar.
    */
   currentMonth: Date;
-  /*
+  /**
    * Callback when a month is selected from the grid. Receives a Date object with the selected month and current year.
    */
   onSelectMonth: (date: Date) => void;
-  /*
+  /**
    * Callback for navigating to a different month in the grid. Receives a Date object with the target month and current year.
    */
   onNavigate: (date: Date) => void;
@@ -24,7 +24,7 @@ export interface MonthGridProps {
    * Locale object for formatting and translating calendar labels (from `react-day-picker`).
    */
   localeCode?: string;
-  /*
+  /**
    * Additional class name(s) to apply to the month grid container.
    */
   className?: string;
