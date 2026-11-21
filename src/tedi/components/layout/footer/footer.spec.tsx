@@ -142,6 +142,24 @@ describe('Footer', () => {
     expect(bottomInner.style.maxWidth).toBe('1280px');
   });
 
+  it.each([
+    { maxWidth: '1280', expected: '1280px' },
+    { maxWidth: '80rem', expected: '80rem' },
+    { maxWidth: '', expected: '' },
+  ])('treats number-only `maxWidth` strings as pixels ($maxWidth)', ({ maxWidth, expected }) => {
+    const { container } = render(
+      <Footer maxWidth={maxWidth}>
+        <Footer.Body>
+          <Footer.Section heading="Heading">
+            <a href="#">Link</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    expect((container.querySelector('.tedi-footer__container') as HTMLElement).style.maxWidth).toBe(expected);
+  });
+
   it('lays the body out as a grid with the given column count above the mobile breakpoint', () => {
     mockUseBreakpoint.mockReturnValue('lg');
     const { container } = render(
@@ -162,7 +180,7 @@ describe('Footer', () => {
 
     const body = container.querySelector('.tedi-footer-body') as HTMLElement;
     expect(body.className).toMatch(/--grid/);
-    expect(body.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
+    expect(body.style.getPropertyValue('--_columns')).toBe('3');
   });
 
   it('ignores `columns` below the mobile breakpoint — the body stacks into one column', () => {
@@ -183,7 +201,62 @@ describe('Footer', () => {
     const body = container.querySelector('.tedi-footer-body') as HTMLElement;
     expect(body.className).not.toMatch(/--grid/);
     expect(body.className).toMatch(/--mobile/);
-    expect(body.style.gridTemplateColumns).toBe('');
+    expect(body.style.getPropertyValue('--_columns')).toBe('');
+  });
+
+  it('marks sections as mobile only below the footer mobile breakpoint', () => {
+    const renderFooter = () =>
+      render(
+        <Footer mobileBreakpoint="md">
+          <Footer.Body>
+            <Footer.Section heading="A">
+              <a href="#">A</a>
+            </Footer.Section>
+          </Footer.Body>
+        </Footer>
+      );
+
+    mockUseBreakpoint.mockReturnValue('md');
+    const { container, unmount } = renderFooter();
+    expect((container.querySelector('.tedi-footer-section') as HTMLElement).className).not.toMatch(/--mobile/);
+    unmount();
+
+    mockUseBreakpoint.mockReturnValue('sm');
+    const { container: mobile } = renderFooter();
+    expect((mobile.querySelector('.tedi-footer-section') as HTMLElement).className).toMatch(/--mobile/);
+  });
+
+  it('updates visible separators when new link text moves the row break', () => {
+    let firstRowEndsAfter = 2;
+    const offsetTop = jest
+      .spyOn(HTMLElement.prototype, 'offsetTop', 'get')
+      .mockImplementation(function (this: HTMLElement) {
+        const index = Array.from(this.parentElement?.children ?? []).indexOf(this);
+        return index < firstRowEndsAfter ? 0 : 24;
+      });
+
+    const footer = (firstLabel: string) => (
+      <Footer>
+        <Footer.Bottom separator>
+          <a href="#">{firstLabel}</a>
+          <a href="#">B</a>
+          <a href="#">C</a>
+        </Footer.Bottom>
+      </Footer>
+    );
+
+    try {
+      const { container, rerender } = render(footer('A'));
+      const followedItems = () =>
+        Array.from(container.querySelectorAll('.tedi-footer-bottom__item--followed'), (item) => item.textContent);
+      expect(followedItems()).toEqual(['A']);
+
+      firstRowEndsAfter = 1;
+      rerender(footer('A much longer label'));
+      expect(followedItems()).toEqual(['B']);
+    } finally {
+      offsetTop.mockRestore();
+    }
   });
 
   it('Footer.Bottom with `separator` inserts a decorative dot between items', () => {

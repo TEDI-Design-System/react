@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { ReactNode, useContext } from 'react';
+import { CSSProperties, ReactNode, useContext } from 'react';
 
 import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../helpers';
 import styles from '../footer.module.scss';
@@ -7,13 +7,13 @@ import { FooterContext } from '../footer-context';
 
 type FooterBodyBreakpointProps = {
   /**
-   * Number of equal-width columns laid out per row, controllable per breakpoint via the
+   * Maximum number of equal-width columns laid out per row, controllable per breakpoint via the
    * `sm`/`md`/`lg`/`xl`/`xxl` keys. The keys are **mobile-first** — a value applies at that
    * breakpoint and up — so raise the count as the viewport widens
    * (e.g. `columns={2} md={{ columns: 3 }} lg={{ columns: 4 }}`). When set, the body uses a CSS grid
-   * of `columns` equal tracks; when omitted, columns are content-sized and spread with
-   * `space-between` (the default). Ignored below the footer's `mobileBreakpoint`, where the body
-   * always stacks into a single column.
+   * that drops to fewer columns when the container is too narrow for `columns` of them; when omitted,
+   * columns are content-sized and spread with `space-between` (the default). Ignored below the
+   * footer's `mobileBreakpoint`, where the body always stacks into a single column.
    */
   columns?: number;
 };
@@ -47,7 +47,7 @@ export const FooterBody = (props: FooterBodyProps): JSX.Element => {
         { [styles['tedi-footer-body--mobile']]: isMobile, [styles['tedi-footer-body--grid']]: useGrid },
         className
       )}
-      style={useGrid ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } : undefined}
+      style={useGrid ? ({ '--_columns': columns } as CSSProperties) : undefined}
     >
       {children}
     </div>
