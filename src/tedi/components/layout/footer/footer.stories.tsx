@@ -162,7 +162,7 @@ const DeviceFrame = ({
   const ref = useRef<HTMLIFrameElement>(null);
   const outerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(320);
-  const [scale, setScale] = useState(1);
+  const [frameWidth, setFrameWidth] = useState(width);
 
   useEffect(() => {
     const iframe = ref.current;
@@ -194,7 +194,7 @@ const DeviceFrame = ({
   useEffect(() => {
     const el = outerRef.current;
     if (!el) return undefined;
-    const update = () => setScale(Math.min(1, el.clientWidth / width));
+    const update = () => setFrameWidth(Math.min(width, el.clientWidth));
     update();
     const observer = new ResizeObserver(update);
     observer.observe(el);
@@ -208,7 +208,7 @@ const DeviceFrame = ({
           {label}
         </Text>
       )}
-      <div style={{ height: height * scale, marginTop: 'var(--layout-grid-gutters-16)', overflow: 'hidden' }}>
+      <div style={{ height, marginTop: 'var(--layout-grid-gutters-16)', overflow: 'hidden' }}>
         <iframe
           ref={ref}
           title={label || `Jaluse eelvaade (${width} px)`}
@@ -216,11 +216,9 @@ const DeviceFrame = ({
           src={`iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`}
           style={{
             display: 'block',
-            width,
+            width: frameWidth,
             height,
             border: 0,
-            transform: `scale(${scale})`,
-            transformOrigin: 'top left',
           }}
         />
       </div>
