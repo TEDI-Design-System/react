@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -308,6 +309,10 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Text value</Text>
         <Textarea id="textarea-vt-text-value" label="Label" defaultValue="Text value" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Clear button on interaction</Text>
+        <VisualTestStory story={ClearButtonOnInteraction} component={Textarea} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Placeholder</Text>

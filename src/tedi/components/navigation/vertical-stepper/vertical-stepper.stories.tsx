@@ -176,24 +176,26 @@ export const WithLinks: Story = {
   ),
 };
 
+const CompactTemplate = ({ ariaLabel = 'Hindamise edenemine' }: { ariaLabel?: string }) => (
+  <Frame>
+    <VerticalStepper aria-label={ariaLabel} compact>
+      <VerticalStepper.Item title="Sotsiaalne võrgustik" current href="#c1" />
+      <VerticalStepper.Item title="Sotsiaalsed suhted" state="completed" defaultOpen>
+        <VerticalStepper.SubItem title="Sõbrad" state="completed" onClick={noop} />
+        <VerticalStepper.SubItem title="Pere" onClick={noop} />
+      </VerticalStepper.Item>
+      <VerticalStepper.Item title="Vaimne tervis" state="completed" href="#c3" />
+      <VerticalStepper.Item title="Füüsiline tervis" state="completed" href="#c4" />
+      <VerticalStepper.Item title="Elukeskkond" state="completed" href="#c5" />
+      <VerticalStepper.Item title="Hõivatus" state="error" href="#c6" />
+      <VerticalStepper.Item title="Vaba aeg ja huvitegevused" state="completed" href="#c7" />
+      <VerticalStepper.Item title="Igapäevaelu toimingud" href="#c8" />
+    </VerticalStepper>
+  </Frame>
+);
+
 export const Compact: Story = {
-  render: () => (
-    <Frame>
-      <VerticalStepper aria-label="Hindamise edenemine" compact>
-        <VerticalStepper.Item title="Sotsiaalne võrgustik" current href="#c1" />
-        <VerticalStepper.Item title="Sotsiaalsed suhted" state="completed" defaultOpen>
-          <VerticalStepper.SubItem title="Sõbrad" state="completed" onClick={noop} />
-          <VerticalStepper.SubItem title="Pere" onClick={noop} />
-        </VerticalStepper.Item>
-        <VerticalStepper.Item title="Vaimne tervis" state="completed" href="#c3" />
-        <VerticalStepper.Item title="Füüsiline tervis" state="completed" href="#c4" />
-        <VerticalStepper.Item title="Elukeskkond" state="completed" href="#c5" />
-        <VerticalStepper.Item title="Hõivatus" state="error" href="#c6" />
-        <VerticalStepper.Item title="Vaba aeg ja huvitegevused" state="completed" href="#c7" />
-        <VerticalStepper.Item title="Igapäevaelu toimingud" href="#c8" />
-      </VerticalStepper>
-    </Frame>
-  ),
+  render: () => <CompactTemplate />,
 };
 
 type StateDef<T> = { label: string; props: Partial<T>; noHover?: boolean };
@@ -407,7 +409,7 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Compact</Text>
-        <VisualTestStory story={Compact} />
+        <CompactTemplate ariaLabel="Hindamise edenemine, kompaktne" />
       </VerticalSpacing>
       <VerticalSpacing size={1}>
         <Text modifiers="bold">States: default</Text>
