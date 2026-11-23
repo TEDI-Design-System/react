@@ -2,7 +2,7 @@ import { Controls, Description, Primary, Stories, Subtitle, Title } from '@story
 import { Preview, StoryContext } from '@storybook/react-vite';
 
 import { freezeDateInChromatic } from './fixed-date';
-import StorybookDecorator from './storybook-decorator';
+import StorybookDecorator, { hasOwnStorybookDecorator } from './storybook-decorator';
 
 import '../src/tedi/styles/index.scss';
 import '../src/community/styles/index.scss';
@@ -45,7 +45,7 @@ export const decorators: Preview['decorators'] = [
     return (
       <ThemeProvider theme={theme}>
         <PrintingProvider>
-          {context.componentId === 'components-labelprovider' ? (
+          {hasOwnStorybookDecorator(context.title) ? (
             <Story />
           ) : (
             <StorybookDecorator>

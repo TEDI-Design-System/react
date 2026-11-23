@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { createRef, useState } from 'react';
 
+import { labelsMap } from '../../../providers/label-provider/labels-map';
 import { Pagination } from './pagination';
 import { usePagination } from './use-pagination';
 
@@ -11,14 +12,14 @@ jest.mock('../../../providers/label-provider', () => ({
     getLabel: (key: string, ...args: unknown[]) => {
       switch (key) {
         case 'pagination.title':
-          return 'Pagination';
+          return 'Pages';
         case 'pagination.prev-page':
           return 'Previous page';
         case 'pagination.next-page':
           return 'Next page';
         case 'pagination.page': {
-          const [page, isCurrent] = args as [number, boolean];
-          return isCurrent ? `Current page, page ${page}` : `Go to page ${page}`;
+          const [page] = args as [number];
+          return `Page ${page}`;
         }
         case 'pagination.results': {
           const [count] = args as [number];
@@ -120,11 +121,29 @@ describe('Pagination component', () => {
   it('renders numeric page buttons and marks the current one with aria-current', () => {
     render(<Pagination pageCount={5} defaultPage={3} />);
 
-    const current = screen.getByRole('button', { name: /Current page, page 3/i });
+    const current = screen.getByRole('button', { name: 'Page 3' });
     expect(current).toHaveAttribute('aria-current', 'page');
 
-    expect(screen.getByRole('button', { name: /Go to page 1/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Go to page 5/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Page 1' })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('button', { name: 'Page 5' })).not.toHaveAttribute('aria-current');
+  });
+
+  it('names the nav landmark and announces the current page in the live region', () => {
+    render(<Pagination pageCount={10} defaultPage={4} />);
+    expect(screen.getByRole('navigation', { name: 'Pages' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Page 4 of 10');
+  });
+
+  it('names the current page with pageAriaLabel unless currentPageAriaLabel is overridden', () => {
+    const { rerender } = render(
+      <Pagination pageCount={5} defaultPage={3} labels={{ pageAriaLabel: (page) => `Lehekülg ${page}` }} />
+    );
+    expect(screen.getByRole('button', { name: 'Lehekülg 3' })).toHaveAttribute('aria-current', 'page');
+
+    rerender(
+      <Pagination pageCount={5} defaultPage={3} labels={{ currentPageAriaLabel: (page) => `Praegune ${page}` }} />
+    );
+    expect(screen.getByRole('button', { name: 'Praegune 3' })).toHaveAttribute('aria-current', 'page');
   });
 
   it('renders Previous + Next nav buttons', () => {
@@ -137,10 +156,10 @@ describe('Pagination component', () => {
     const onPageChange = jest.fn();
     render(<Pagination pageCount={5} defaultPage={1} onPageChange={onPageChange} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Go to page 3/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Page 3' }));
     expect(onPageChange).toHaveBeenCalledWith(3);
 
-    expect(screen.getByRole('button', { name: /Current page, page 3/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Page 3' })).toBeInTheDocument();
   });
 
   it('respects controlled page and only updates when the prop changes', () => {
@@ -157,10 +176,10 @@ describe('Pagination component', () => {
     };
 
     render(<Wrapper />);
-    expect(screen.getByRole('button', { name: /Current page, page 2/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Page 2' })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'jump' }));
-    expect(screen.getByRole('button', { name: /Current page, page 4/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Page 4' })).toBeInTheDocument();
   });
 
   it('disables Previous on the first page and Next on the last when showPrevNextButtons keeps them rendered', () => {
@@ -367,7 +386,7 @@ describe('Pagination component', () => {
   it('ignores clicks on the current page (no-op)', () => {
     const onPageChange = jest.fn();
     render(<Pagination pageCount={5} defaultPage={3} onPageChange={onPageChange} />);
-    fireEvent.click(screen.getByRole('button', { name: /Current page, page 3/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Page 3' }));
     expect(onPageChange).not.toHaveBeenCalled();
   });
 
@@ -447,7 +466,7 @@ describe('Pagination — compact mobile picker (below md)', () => {
 
   it('swaps the page list for a compact trigger button labelled "current / total"', () => {
     render(<Pagination pageCount={10} defaultPage={3} />);
-    expect(screen.queryByRole('button', { name: /Go to page 5/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Page 5' })).not.toBeInTheDocument();
     const trigger = screen.getByRole('button', { name: /3 \/ 10/ });
     expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
@@ -457,9 +476,19 @@ describe('Pagination — compact mobile picker (below md)', () => {
     const onPageChange = jest.fn();
     render(<Pagination pageCount={5} defaultPage={2} onPageChange={onPageChange} />);
     fireEvent.click(screen.getByRole('button', { name: /2 \/ 5/ }));
-    const modal = screen.getByRole('dialog', { name: 'Pagination' });
+    const modal = screen.getByRole('dialog', { name: 'Pages' });
     expect(modal).toBeInTheDocument();
-    fireEvent.click(within(modal).getByRole('button', { name: 'Go to page 4' }));
+    fireEvent.click(within(modal).getByRole('button', { name: 'Page 4' }));
     expect(onPageChange).toHaveBeenCalledWith(4);
+  });
+});
+
+describe('pagination labels', () => {
+  it('uses the agreed Estonian wording', () => {
+    expect(labelsMap['pagination.title'].et).toBe('Lehed');
+    expect(labelsMap['pagination.page'].et(3)).toBe('Leht 3');
+    expect(labelsMap['pagination.page-status'].et(4, 10)).toBe('Leht 4 / 10');
+    expect(labelsMap['pagination.prev-page'].et).toBe('Eelmine leht');
+    expect(labelsMap['pagination.next-page'].et).toBe('Järgmine leht');
   });
 });

@@ -23,11 +23,11 @@ describe('TopNav', () => {
 
   it('renders a nav landmark with the supplied aria-label', () => {
     render(
-      <TopNav ariaLabel="Primary navigation">
+      <TopNav ariaLabel="Primary">
         <TopNav.Item href="/">Dashboard</TopNav.Item>
       </TopNav>
     );
-    expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
   });
 
   it('renders an <li> per TopNav.Item and ignores non-item children', () => {
@@ -216,12 +216,12 @@ describe('TopNav', () => {
   it('falls through to the shared Sidenav mobile drawer below the breakpoint', () => {
     setBreakpoint('sm');
     render(
-      <TopNav ariaLabel="Primary navigation" isMobileOpen>
+      <TopNav ariaLabel="Primary" isMobileOpen>
         <TopNav.Item href="/">Home</TopNav.Item>
         <TopNav.Item href="/docs">Docs</TopNav.Item>
       </TopNav>
     );
-    expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Docs' })).toBeInTheDocument();
   });

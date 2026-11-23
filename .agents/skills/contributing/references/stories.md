@@ -172,6 +172,7 @@ Rules:
 - [ ] Compound component? Sub-component props are live controls on the primary story via `subcomponentArgTypes` (not a separate `Playground`)
 - [ ] States story covers all visual states shown in Figma (default, hover, active, focus, disabled)
 - [ ] Controlled example included if the component is a form control
+- [ ] Example `ariaLabel`/`aria-label`/`label` values name the content only, never the role or the state ("Main", not "Main navigation"; "Notifications", not "Toggle button"). Consumers copy them, and the screen reader announces role and state itself
 - [ ] Figma link is in the meta `parameters.design` and in the JSDoc comment above `export default`,
       and only when it points to the TEDI Figma file (see section 4)
 - [ ] When multiple instances of the same component appear in one story, use unique IDs per instance to avoid conflicts

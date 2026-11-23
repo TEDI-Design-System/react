@@ -41,6 +41,33 @@ describe('Popover component', () => {
     expect(title).toHaveTextContent('Heading');
   });
 
+  it('names the popover with ariaLabel when there is no visible title', () => {
+    render(
+      <Popover>
+        <Popover.Trigger>Trigger</Popover.Trigger>
+        <Popover.Content ariaLabel="Filter Name">Content</Popover.Content>
+      </Popover>
+    );
+    fireEvent.click(screen.getByText('Trigger'));
+
+    expect(screen.getByRole('dialog', { name: 'Filter Name' })).toBeInTheDocument();
+  });
+
+  it('prefers the visible title over ariaLabel', () => {
+    render(
+      <Popover>
+        <Popover.Trigger>Trigger</Popover.Trigger>
+        <Popover.Content title="Heading" ariaLabel="Ignored">
+          Content
+        </Popover.Content>
+      </Popover>
+    );
+    fireEvent.click(screen.getByText('Trigger'));
+
+    const dialog = screen.getByRole('dialog', { name: 'Heading' });
+    expect(dialog).not.toHaveAttribute('aria-label');
+  });
+
   it('renders a title-only popover without a description wrapper', () => {
     render(
       <Popover>

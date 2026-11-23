@@ -164,6 +164,36 @@ describe('VerticalStepper', () => {
     expect(screen.getByText('extra detail')).toBeInTheDocument();
   });
 
+  it('describes endSlot actions with the step title through titleId', () => {
+    render(
+      <VerticalStepper>
+        <VerticalStepper.Item
+          title="Mental health"
+          state="completed"
+          titleId="step-mental"
+          defaultOpen
+          endSlot={
+            <a href="#m" aria-describedby="step-mental">
+              Read more
+            </a>
+          }
+        >
+          <VerticalStepper.SubItem
+            title="Friends"
+            titleId="sub-friends"
+            endSlot={
+              <a href="#f" aria-describedby="sub-friends">
+                Details
+              </a>
+            }
+          />
+        </VerticalStepper.Item>
+      </VerticalStepper>
+    );
+    expect(screen.getByRole('link', { name: 'Read more' })).toHaveAccessibleDescription('Mental health');
+    expect(screen.getByRole('link', { name: 'Details' })).toHaveAccessibleDescription('Friends');
+  });
+
   it('renders the description line', () => {
     render(
       <VerticalStepper>

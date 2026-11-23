@@ -147,16 +147,16 @@ export const Type = () => {
   return (
     <Row>
       <Col width="auto">
-        <Toggle id="toggle-1" defaultChecked label="Toggle button" />
+        <Toggle id="toggle-1" defaultChecked label="Notifications" />
       </Col>
       <Col width="auto">
-        <Toggle id="toggle-2" defaultChecked label="Toggle button" tooltip="Tooltip content" />
+        <Toggle id="toggle-2" defaultChecked label="Notifications" tooltip="Tooltip content" />
       </Col>
       <Col width="auto">
-        <Toggle id="toggle-3" defaultChecked label="Toggle button" size="large" />
+        <Toggle id="toggle-3" defaultChecked label="Notifications" size="large" />
       </Col>
       <Col width="auto">
-        <Toggle id="toggle-4" defaultChecked label="Toggle button" size="large" icon />
+        <Toggle id="toggle-4" defaultChecked label="Notifications" size="large" icon />
       </Col>
     </Row>
   );
@@ -167,8 +167,8 @@ export const LabelPosition = () => {
     <Row>
       <Col width="auto">
         <VerticalSpacing>
-          <Toggle id="toggle-label-1" defaultChecked label="Toggle button" labelPosition="left" />
-          <Toggle id="toggle-label-2" defaultChecked label="Toggle button" labelPosition="right" />
+          <Toggle id="toggle-label-1" defaultChecked label="Notifications" labelPosition="left" />
+          <Toggle id="toggle-label-2" defaultChecked label="Notifications" labelPosition="right" />
         </VerticalSpacing>
       </Col>
     </Row>

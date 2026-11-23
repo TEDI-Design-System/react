@@ -101,7 +101,16 @@
   }
 
   &--large &__suffix > button {
+    height: var(--form-field-height-lg);
     padding: calc(var(--form-field-padding-y-lg) - 2px) var(--form-field-padding-x-lg);
+  }
+
+  &--large &__mobile-controls > button {
+    height: var(--form-field-height-lg);
+  }
+
+  &--large &__actions > button {
+    height: var(--form-field-height-lg);
   }
 
   &__menu {
@@ -169,6 +178,10 @@
     padding-block-start: var(--layout-grid-gutters-08);
     margin-block-start: var(--tedi-dimensions-05);
     border-block-start: 1px solid var(--general-border-primary);
+
+    &--large > button {
+      height: var(--form-field-height-lg);
+    }
   }
 
   &__sr-only {

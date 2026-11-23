@@ -62,7 +62,7 @@ const AnimationDirectionTemplate: StoryFn<typeof ScrollVisibility> = (args) => {
     <>
       <ScrollVisibility {...args} animationDirection="up">
         <nav
-          aria-label="Üleval kinnituv navigatsioon"
+          aria-label="Üleval kinnituv"
           style={{
             width: '100%',
             position: 'fixed',
@@ -80,7 +80,7 @@ const AnimationDirectionTemplate: StoryFn<typeof ScrollVisibility> = (args) => {
       </ScrollVisibility>
       <ScrollVisibility {...args} animationDirection="left">
         <nav
-          aria-label="Vasakul kinnituv navigatsioon"
+          aria-label="Vasakul kinnituv"
           style={{
             width: NAVIGATION_HEIGHT,
             position: 'fixed',
@@ -99,7 +99,7 @@ const AnimationDirectionTemplate: StoryFn<typeof ScrollVisibility> = (args) => {
       </ScrollVisibility>
       <ScrollVisibility {...args} animationDirection="right">
         <nav
-          aria-label="Paremal kinnituv navigatsioon"
+          aria-label="Paremal kinnituv"
           style={{
             width: NAVIGATION_HEIGHT,
             position: 'fixed',
@@ -118,7 +118,7 @@ const AnimationDirectionTemplate: StoryFn<typeof ScrollVisibility> = (args) => {
       </ScrollVisibility>
       <ScrollVisibility {...args} animationDirection="down">
         <nav
-          aria-label="All kinnituv navigatsioon"
+          aria-label="All kinnituv"
           style={{
             width: '100%',
             position: 'fixed',

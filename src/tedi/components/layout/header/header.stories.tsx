@@ -6,7 +6,7 @@ import { getSubcomponentProps, subcomponentArgTypes } from '../../../../../.stor
 import Toggle from '../../../../tedi/components/form/toggle/toggle';
 import Separator from '../../../../tedi/components/misc/separator/separator';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
-import { LabelProvider, useLabels } from '../../../providers/label-provider';
+import { useLabels } from '../../../providers/label-provider';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
@@ -42,11 +42,6 @@ const meta: Meta<typeof Header> = {
     'Header.Search': Header.Search,
   } as never,
   decorators: [
-    (Story) => (
-      <LabelProvider locale="et">
-        <Story />
-      </LabelProvider>
-    ),
     (Story) => {
       const [globals, updateGlobals] = useGlobals();
       const originalThemeRef = useRef<string | null>(null);
@@ -387,15 +382,22 @@ const NavigationLinks = () => {
   );
 };
 
-const NavigationSideNav = ({ isMobileOpen }: { isMobileOpen: boolean }) => {
+const NavigationSideNav = ({
+  isMobileOpen,
+  onMenuToggle,
+}: {
+  isMobileOpen: boolean;
+  onMenuToggle: (open: boolean) => void;
+}) => {
   const { locale = 'en' } = useLabels();
   const pt = (key: keyof typeof translations) => translations[key][locale] ?? translations[key].et;
 
   return (
     <SideNav
-      ariaLabel="Main navigation"
+      ariaLabel="Main"
       linkAs="a"
       isMobileOpen={isMobileOpen}
+      onMenuToggle={onMenuToggle}
       navItems={[
         { children: pt('home'), href: '#' },
         { children: pt('services'), href: '#' },
@@ -530,9 +532,10 @@ export const Default: StoryObj = {
           <HideAt lg>
             <div style={{ flex: 1 }}>
               <SideNav
-                ariaLabel="Main navigation"
+                ariaLabel="Main"
                 linkAs="a"
                 isMobileOpen={isOpen}
+                onMenuToggle={setIsOpen}
                 navItems={[
                   {
                     children: 'Link text',
@@ -594,9 +597,10 @@ export const LoggedOut: Story = {
           <HideAt lg>
             <div style={{ flex: 1 }}>
               <SideNav
-                ariaLabel="Main navigation"
+                ariaLabel="Main"
                 linkAs="a"
                 isMobileOpen={isOpen}
+                onMenuToggle={setIsOpen}
                 navItems={[
                   {
                     children: 'Link text',
@@ -699,7 +703,7 @@ Use \`showLogo\` whenever you need to hide the logo at a custom breakpoint that 
 
           <HideAt lg>
             <div style={{ flex: 1 }}>
-              <NavigationSideNav isMobileOpen={isOpen} />
+              <NavigationSideNav isMobileOpen={isOpen} onMenuToggle={setIsOpen} />
             </div>
           </HideAt>
         </div>
@@ -1451,7 +1455,13 @@ export const LoggedInWithSidenav: Story = {
               </Header>
 
               <div style={{ flex: 1 }}>
-                <SideNav ariaLabel="Main navigation" linkAs="a" isMobileOpen={isOpen} navItems={loggedInNavItems} />
+                <SideNav
+                  ariaLabel="Main"
+                  linkAs="a"
+                  isMobileOpen={isOpen}
+                  onMenuToggle={setIsOpen}
+                  navItems={loggedInNavItems}
+                />
               </div>
             </SidenavLayout>
           )}
