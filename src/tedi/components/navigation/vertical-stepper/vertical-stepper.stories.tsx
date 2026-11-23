@@ -325,7 +325,6 @@ const RESPONSIVE_STEPS: CardStepperStepProps[] = [
  * toolbar) to see it switch.
  */
 export const Responsive: Story = {
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   render: function ResponsiveExample() {
     const [step, setStep] = useState(2);
 
@@ -422,6 +421,24 @@ export const VisualTest: Story = {
       <VerticalSpacing size={1}>
         <Text modifiers="bold">States: has subitems</Text>
         <StateMatrix states={SUB_STATES} renderCell={subCell} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={Responsive} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for VerticalStepper: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={Responsive} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

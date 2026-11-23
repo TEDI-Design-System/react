@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Popover from '../../overlays/popover/popover';
@@ -46,7 +47,6 @@ export const Default: Story = {
  * Resize the window to see that the ellipsis and popover appear only when content doesn't fit
  */
 export const ResponsiveExample: Story = {
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   args: {
     lineClamp: 1,
     children: (
@@ -76,7 +76,6 @@ export const LeadingStart: Story = {
  * Use this when you want to show popover always or with custom content
  */
 export const ResponsiveWithCustomPopover: Story = {
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   args: {
     lineClamp: 1,
     popover: false,
@@ -107,6 +106,32 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Leading start</Text>
         <Template {...(LeadingStart.args as EllipsisProps)} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={ResponsiveExample} component={Ellipsis} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive with custom popover</Text>
+        <VisualTestStory story={ResponsiveWithCustomPopover} component={Ellipsis} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for Ellipsis: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={ResponsiveExample} component={Ellipsis} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive with custom popover</Text>
+        <VisualTestStory story={ResponsiveWithCustomPopover} component={Ellipsis} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

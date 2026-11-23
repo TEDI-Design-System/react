@@ -380,7 +380,6 @@ export const LongTextValues: Story = {
  * the layout adapt.
  */
 export const Responsive: Story = {
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   render: () => {
     const rows = [
       { label: 'Patsient', value: 'Mari Maasikas' },
@@ -555,6 +554,7 @@ const visualTestBlocks: { label: string; content: ReactNode }[] = [
   { label: 'Long text values', content: <TemplateWithLayouts {...(LongTextValues.args as TextGroupProps)} /> },
   { label: 'Custom label', content: <VisualTestStory story={CustomLabel} /> },
   { label: 'With list', content: <VisualTestStory story={WithList} /> },
+  { label: 'Responsive', content: <VisualTestStory story={Responsive} /> },
 ];
 
 /** Chromatic snapshot for TextGroup: add every new visual variant here too. */
@@ -569,6 +569,20 @@ export const VisualTest: Story = {
           {content}
         </VerticalSpacing>
       ))}
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for TextGroup: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={Responsive} />
+      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

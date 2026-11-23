@@ -461,3 +461,21 @@ export const VisualTest: Story = {
     </VerticalSpacing>
   ),
 };
+
+/** Chromatic mobile snapshot for Timeline: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Position</Text>
+        <VisualTestStory story={Position} component={Timeline} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Timeline card</Text>
+        <VisualTestStory story={TimelineCard} component={Timeline} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};

@@ -151,7 +151,6 @@ export const Condensed: Story = {
  */
 export const ResponsiveVariant: Story = {
   render: Template,
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   args: {
     variant: 'short',
     md: { variant: 'long' },
@@ -222,6 +221,24 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Custom separator</Text>
         <VisualTestStory story={CustomSeparator} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive variant</Text>
+        <VisualTestStory story={ResponsiveVariant} props={{ ariaLabel: 'Responsive trail' }} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for Breadcrumbs: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive variant</Text>
+        <VisualTestStory story={ResponsiveVariant} props={{ ariaLabel: 'Responsive trail' }} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { ElementType } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text, TextProps } from '../../base/typography/text/text';
 import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
@@ -386,7 +387,6 @@ export const ResponsiveButton: Story = {
     children: 'Responsive Button',
   },
   parameters: {
-    chromatic: { disableSnapshot: false, viewports: [375, 1280] },
     viewport: {
       defaultViewport: 'responsive',
     },
@@ -521,12 +521,30 @@ export const VisualTest: Story = {
         <Button fullWidth>Button</Button>
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={ResponsiveButton} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Long text</Text>
         <LongTextTemplate>This is a very long button text that should wrap into multiple lines</LongTextTemplate>
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Visual type link</Text>
         <VisualTypeLinkTemplate />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for Button: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={ResponsiveButton} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

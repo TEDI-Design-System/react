@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Card, CardContent } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
@@ -575,6 +576,24 @@ export const VisualTest: Story = {
           {content}
         </VerticalSpacing>
       ))}
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for Separator: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Vertical dotted card example</Text>
+        <VisualTestStory story={VerticalDottedCardExample} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Vertical dotted small card example</Text>
+        <VisualTestStory story={VerticalDottedSmallCardExample} />
+      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

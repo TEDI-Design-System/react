@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -240,7 +241,6 @@ export const Responsive: Story = {
     helper: HINT,
     md: { labelPosition: 'horizontal', valuePosition: 'horizontal' },
   },
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
 };
 
 /**
@@ -317,6 +317,24 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Value hidden</Text>
         <ProgressBar value={60} ariaLabel="Edenemisriba pealkiri" showValue={false} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={Responsive} component={ProgressBar} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for ProgressBar: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={Responsive} component={ProgressBar} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

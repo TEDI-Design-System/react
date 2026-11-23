@@ -361,7 +361,6 @@ export const Borders: Story = {
  * see it appear/disappear.
  */
 export const ResponsiveVisibility: Story = {
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   args: {
     pageCount: 10,
     defaultPage: 3,
@@ -379,7 +378,6 @@ export const ResponsiveVisibility: Story = {
  * returns focus to the trigger.
  */
 export const MobilePicker: Story = {
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
   args: {
     pageCount: 24,
     defaultPage: 7,
@@ -662,6 +660,44 @@ export const VisualTest: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50, { value: 97, label: 'Show all' }]}
           labels={{ ariaLabel: 'Show all page size' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive visibility</Text>
+        <VisualTestStory
+          story={ResponsiveVisibility}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Responsive visibility' } }}
+        />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for Pagination: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Arrows primary variant</Text>
+        <VisualTestStory story={ArrowsPrimaryVariant} props={{ labels: { ariaLabel: 'Arrows primary variant' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive visibility</Text>
+        <VisualTestStory
+          story={ResponsiveVisibility}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Responsive visibility' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Mobile picker</Text>
+        <VisualTestStory
+          story={MobilePicker}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Mobile picker' } }}
         />
       </VerticalSpacing>
     </VerticalSpacing>

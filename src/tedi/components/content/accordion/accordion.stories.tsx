@@ -1112,3 +1112,17 @@ export const VisualTest: StoryObj = {
     </VerticalSpacing>
   ),
 };
+
+/** Chromatic mobile snapshot for Accordion: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: StoryObj = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Customized</Text>
+        <VisualTestStory story={Customized} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};

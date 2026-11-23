@@ -567,7 +567,6 @@ export const CardsWithIcons: StoryObj = {
  * regular radios from `md` up — resize the canvas to see it switch.
  */
 export const ResponsiveVariant: StoryObj = {
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   render: () => (
     <Radio.Group
       label="Tooraine"
@@ -750,6 +749,7 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
   { label: 'States', content: <States /> },
   { label: 'Card states primary', content: renderCardStates('primary') },
   { label: 'Card states secondary', content: renderCardStates('secondary') },
+  { label: 'Responsive variant', content: <VisualTestStory story={ResponsiveVariant} /> },
 ];
 
 /** Chromatic snapshot for Radio: add every new visual variant here too. */
@@ -779,6 +779,20 @@ export const VisualTest: StoryObj = {
           {content}
         </VerticalSpacing>
       ))}
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for Radio: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: StoryObj = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive variant</Text>
+        <VisualTestStory story={ResponsiveVariant} />
+      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };
