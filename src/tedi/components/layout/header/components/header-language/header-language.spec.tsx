@@ -1,17 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
 import { HeaderLanguage, Language } from './header-language';
 
 import '@testing-library/jest-dom';
-
-jest.mock('../../../../../helpers', () => ({
-  ...jest.requireActual('../../../../../helpers'),
-  useBreakpoint: jest.fn(),
-  isBreakpointBelow: jest.fn(),
-  useBreakpointProps: jest.fn(),
-}));
 
 jest.mock('../../../../../providers/label-provider', () => ({
   useLabels: jest.fn(),
@@ -29,11 +21,6 @@ describe('HeaderLanguage component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useBreakpoint as jest.Mock).mockReturnValue('lg');
-    (isBreakpointBelow as jest.Mock).mockReturnValue(false);
-    (useBreakpointProps as jest.Mock).mockReturnValue({
-      getCurrentBreakpointProps: jest.fn((props: Record<string, unknown>) => props),
-    });
     (useLabels as jest.Mock).mockReturnValue({
       getLabel: mockGetLabel,
       setLocale: mockSetLocale,
