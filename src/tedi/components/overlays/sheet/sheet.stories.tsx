@@ -119,17 +119,19 @@ interface TriggerSpec {
 }
 
 const labeledTrigger = (
-  caption: string,
+  caption: string | undefined,
   content: JSX.Element,
   trigger: TriggerSpec = {},
   sheetProps: Partial<SheetProps> = {}
 ) => {
   const { label = 'Seaded', icon = 'tune', visualType = 'secondary' } = trigger;
   return (
-    <VerticalSpacing size={0.25} key={caption}>
-      <Text modifiers="small" color="secondary">
-        {caption}
-      </Text>
+    <VerticalSpacing size={0.25} key={caption ?? label}>
+      {caption && (
+        <Text modifiers="small" color="secondary">
+          {caption}
+        </Text>
+      )}
       {/* Keep Floating UI's focus guards outside VerticalSpacing's child layout. */}
       <div>
         <Sheet {...sheetProps}>
@@ -155,11 +157,12 @@ const ExampleRow = ({ children }: { children: ReactNode }): JSX.Element => (
   <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: '1rem' }}>{children}</div>
 );
 
-const exampleRow = (examples: Example[]) => (
+const exampleRow = (examples: Example[], groupLabel?: string) => (
   <ExampleRow>
     {examples.map((ex) =>
       labeledTrigger(
-        ex.caption,
+        // A caption that only repeats the group label is left out.
+        ex.caption === groupLabel ? undefined : ex.caption,
         ex.content,
         { label: ex.label, icon: ex.icon, visualType: ex.visualType },
         ex.sheetProps
@@ -171,12 +174,10 @@ const exampleRow = (examples: Example[]) => (
 const exampleGroup = (label: string, examples: Example[]) => (
   <div key={label}>
     <VerticalSpacing size={0.75}>
-      {(examples.length > 1 || examples.some((example) => example.caption !== label)) && (
-        <div>
-          <Text modifiers="bold">{label}</Text>
-        </div>
-      )}
-      {exampleRow(examples)}
+      <div>
+        <Text modifiers="bold">{label}</Text>
+      </div>
+      {exampleRow(examples, label)}
     </VerticalSpacing>
   </div>
 );
@@ -492,7 +493,7 @@ export const ActionsSlot: Story = {
       {
         caption: 'Without footer',
         label: 'Loe lähemalt',
-        icon: 'menu_book',
+        icon: 'info',
         content: (
           <Sheet.Content>
             <Sheet.Header title="Loe lähemalt" variant="default" />
@@ -698,68 +699,6 @@ export const HeaderType: Story = {
 };
 
 /**
- * `Sheet.Content`'s `padding` sets the sheet-wide padding scale - header, body and
- * footer tighten together: `default` or `small`. For edge-to-edge body content,
- * reach for `Sheet.Body padding="none"` instead.
- */
-export const Padding: Story = {
-  render: () => (
-    <ExampleRow>
-      {(['default', 'small'] as const).map((padding) =>
-        labeledTrigger(
-          `padding="${padding}"`,
-          <Sheet.Content padding={padding}>
-            <Sheet.Header title="Seaded" variant="default" />
-            <Sheet.Body>{settingsBody(`sheet-padding-${padding}`)}</Sheet.Body>
-            <ApplyFooter more />
-          </Sheet.Content>
-        )
-      )}
-    </ExampleRow>
-  ),
-};
-
-/** `align` places the actions; `fullWidth` stretches them, with or without `right`. */
-export const FooterAlignment: Story = {
-  name: 'Footer alignment',
-  render: () => (
-    <ExampleRow>
-      {(['left', 'center', 'right'] as const).map((align) =>
-        labeledTrigger(
-          `align="${align}"`,
-          <Sheet.Content>
-            <Sheet.Header title="Seaded" variant="default" />
-            <Sheet.Body>{settingsBody(`sheet-footer-${align}`)}</Sheet.Body>
-            <Sheet.Footer align={align}>
-              <Sheet.Closer>
-                <Button visualType="secondary">Tühista</Button>
-              </Sheet.Closer>
-              <Button>Rakenda</Button>
-            </Sheet.Footer>
-          </Sheet.Content>
-        )
-      )}
-      {labeledTrigger(
-        'fullWidth',
-        <Sheet.Content>
-          <Sheet.Header title="Seaded" variant="default" />
-          <Sheet.Body>{settingsBody('sheet-footer-full')}</Sheet.Body>
-          <ApplyFooter />
-        </Sheet.Content>
-      )}
-      {labeledTrigger(
-        'fullWidth + right',
-        <Sheet.Content>
-          <Sheet.Header title="Seaded" variant="default" />
-          <Sheet.Body>{settingsBody('sheet-footer-full-right')}</Sheet.Body>
-          <ApplyFooter more />
-        </Sheet.Content>
-      )}
-    </ExampleRow>
-  ),
-};
-
-/**
  * The sheet can collapse to just its header while the page remains interactive.
  *
  * - Enable `collapsible` on `Sheet.Header`.
@@ -932,6 +871,68 @@ export const ScrollableContent: Story = {
         <ApplyFooter />
       </Sheet.Content>
     </Sheet>
+  ),
+};
+
+/**
+ * `Sheet.Content`'s `padding` sets the sheet-wide padding scale - header, body and
+ * footer tighten together: `default` or `small`. For edge-to-edge body content,
+ * reach for `Sheet.Body padding="none"` instead.
+ */
+export const Padding: Story = {
+  render: () => (
+    <ExampleRow>
+      {(['default', 'small'] as const).map((padding) =>
+        labeledTrigger(
+          `padding="${padding}"`,
+          <Sheet.Content padding={padding}>
+            <Sheet.Header title="Seaded" variant="default" />
+            <Sheet.Body>{settingsBody(`sheet-padding-${padding}`)}</Sheet.Body>
+            <ApplyFooter more />
+          </Sheet.Content>
+        )
+      )}
+    </ExampleRow>
+  ),
+};
+
+/** `align` places the actions; `fullWidth` stretches them, with or without `right`. */
+export const FooterAlignment: Story = {
+  name: 'Footer alignment',
+  render: () => (
+    <ExampleRow>
+      {(['left', 'center', 'right'] as const).map((align) =>
+        labeledTrigger(
+          `align="${align}"`,
+          <Sheet.Content>
+            <Sheet.Header title="Seaded" variant="default" />
+            <Sheet.Body>{settingsBody(`sheet-footer-${align}`)}</Sheet.Body>
+            <Sheet.Footer align={align}>
+              <Sheet.Closer>
+                <Button visualType="secondary">Tühista</Button>
+              </Sheet.Closer>
+              <Button>Rakenda</Button>
+            </Sheet.Footer>
+          </Sheet.Content>
+        )
+      )}
+      {labeledTrigger(
+        'fullWidth',
+        <Sheet.Content>
+          <Sheet.Header title="Seaded" variant="default" />
+          <Sheet.Body>{settingsBody('sheet-footer-full')}</Sheet.Body>
+          <ApplyFooter />
+        </Sheet.Content>
+      )}
+      {labeledTrigger(
+        'fullWidth + right',
+        <Sheet.Content>
+          <Sheet.Header title="Seaded" variant="default" />
+          <Sheet.Body>{settingsBody('sheet-footer-full-right')}</Sheet.Body>
+          <ApplyFooter more />
+        </Sheet.Content>
+      )}
+    </ExampleRow>
   ),
 };
 
