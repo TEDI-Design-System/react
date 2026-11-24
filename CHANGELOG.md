@@ -1,3 +1,10 @@
+# [21.0.0-rc.26](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.25...react-21.0.0-rc.26) (2026-11-24)
+
+
+### Bug Fixes
+
+* **sheet:** use a white handle on the brand header and align the stories [#1166](https://github.com/TEDI-Design-System/react/issues/1166) ([#1169](https://github.com/TEDI-Design-System/react/issues/1169)) ([8784c8e](https://github.com/TEDI-Design-System/react/commit/8784c8ee0ea06295520724a892fae52bd7e197e3))
+
 # [21.0.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.24...react-21.0.0-rc.25) (2026-11-24)
 
 
