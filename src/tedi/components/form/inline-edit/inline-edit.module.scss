@@ -67,6 +67,17 @@
     height: var(--_inline-edit-height);
   }
 
+  [class*='number-field__input-wrapper'],
+  [data-name='number-field'] button {
+    height: var(--_inline-edit-height);
+    min-height: var(--_inline-edit-height);
+  }
+
+  input[class*='number-field__input'] {
+    font-size: var(--_inline-edit-font-size);
+    line-height: var(--_inline-edit-line-height);
+  }
+
   :global(.select__control) {
     min-height: var(--_inline-edit-height);
     padding: calc(var(--form-field-padding-y-sm) - var(--tedi-borders-01))
