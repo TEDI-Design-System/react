@@ -42,7 +42,7 @@ Barrel exports: `src/tedi/index.ts` and `src/community/index.ts`.
 ### Key Patterns
 
 - **Polymorphic components**: Many components accept an `as` prop via `forwardRef` and generic typing (`<C extends React.ElementType>`). See `helpers/polymorphic/`.
-- **Breakpoint support**: Responsive props via `useBreakpointProps` hook — components accept per-breakpoint prop overrides.
+- **Breakpoint support**: Responsive props via `useBreakpointProps` hook — components accept per-breakpoint prop overrides. Layout that changes at a breakpoint is done with CSS media queries, not `useBreakpoint` (see `.agents/skills/contributing/references/responsive-layout.md`).
 - **CSS Modules with SCSS**: Styles use CSS modules with hash-based class names. SCSS files live alongside components or in `styles/` directories.
 - **Providers**: `ThemeProvider`, `StyleProvider`, `AccessibilityProvider`, `LabelProvider` in `src/tedi/providers/`.
 
