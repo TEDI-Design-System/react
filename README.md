@@ -106,6 +106,8 @@ npx skills add https://github.com/TEDI-Design-System/react --skill tedi-react-mi
 
 Then ask your agent to "upgrade TEDI to the latest version".
 
+npm projects are fully supported. With pnpm, Yarn or Bun the skill reads the lockfile where it can and asks you for any version it can't determine.
+
 ### For AI-driven design and UI generation: `DESIGN.md`
 
 [`DESIGN.md`](./DESIGN.md) is the machine-readable description of the design system, semantic tokens and TEDI-Ready component rules, that AI agents read to ground generated UI in real TEDI tokens and components. It ships in the npm package.
