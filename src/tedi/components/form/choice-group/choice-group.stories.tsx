@@ -591,10 +591,9 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
     label: 'With default value',
     content: (
       <VisualTestStory
-        story={{
-          args: { ...WithDefaultValue.args, id: 'example-2-vt-default-value', name: 'check-2-vt-default-value' },
-        }}
+        story={WithDefaultValue}
         component={ChoiceGroup}
+        props={{ id: 'example-2-vt-default-value', name: 'check-2-vt-default-value' }}
       />
     ),
   },
@@ -602,10 +601,9 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
     label: 'With indeterminate',
     content: (
       <VisualTestStory
-        story={{
-          args: { ...WithIndeterminate.args, id: 'example-2-vt-indeterminate', name: 'check-2-vt-indeterminate' },
-        }}
+        story={WithIndeterminate}
         component={ChoiceGroup}
+        props={{ id: 'example-2-vt-indeterminate', name: 'check-2-vt-indeterminate' }}
       />
     ),
   },

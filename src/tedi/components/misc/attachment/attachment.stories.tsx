@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory, type VisualTestStoryInput } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { HideAt } from '../../layout/hide-at/hide-at';
@@ -249,25 +250,19 @@ export const LabeledActions: StoryFn<AttachmentProps> = () => (
   </div>
 );
 
-const visualTestArgs: AttachmentProps = { name: 'Kodukülastusakt_Triin.pdf' };
+const withMetaArgs = (story: Story): VisualTestStoryInput => ({ ...story, args: { ...meta.args, ...story.args } });
 
-const visualTestBlocks: { label: string; content: JSX.Element }[] = [
-  {
-    label: 'Default',
-    content: renderWithDelete(visualTestArgs, {} as never),
-  },
-  { label: 'Read only', content: <ReadOnly {...visualTestArgs} /> },
-  { label: 'With progress', content: <WithProgress {...visualTestArgs} /> },
-  {
-    label: 'With file size',
-    content: renderWithDelete({ ...visualTestArgs, fileSize: '0,9 MB' }, {} as never),
-  },
-  { label: 'With icon', content: <WithIcon {...visualTestArgs} /> },
-  { label: 'Without delete button', content: <WithoutDeleteButton {...visualTestArgs} /> },
-  { label: 'With different actions', content: <WithDifferentActions {...visualTestArgs} /> },
-  { label: 'Vertical', content: <Vertical {...visualTestArgs} /> },
-  { label: 'With error', content: <WithError {...visualTestArgs} /> },
-  { label: 'Labeled actions', content: <LabeledActions {...visualTestArgs} /> },
+const visualTestBlocks: { label: string; story: VisualTestStoryInput }[] = [
+  { label: 'Default', story: withMetaArgs(Default) },
+  { label: 'Read only', story: { render: ReadOnly } },
+  { label: 'With progress', story: { render: WithProgress } },
+  { label: 'With file size', story: withMetaArgs(WithFileSize) },
+  { label: 'With icon', story: { render: WithIcon } },
+  { label: 'Without delete button', story: { render: WithoutDeleteButton } },
+  { label: 'With different actions', story: { render: WithDifferentActions } },
+  { label: 'Vertical', story: { render: Vertical } },
+  { label: 'With error', story: { render: WithError } },
+  { label: 'Labeled actions', story: { render: LabeledActions } },
 ];
 
 /** Chromatic snapshot for Attachment: add every new visual variant here too. */
@@ -276,10 +271,10 @@ export const VisualTest: Story = {
   parameters: { chromatic: { disableSnapshot: false } },
   render: () => (
     <VerticalSpacing size={2}>
-      {visualTestBlocks.map(({ label, content }) => (
+      {visualTestBlocks.map(({ label, story }) => (
         <VerticalSpacing size={0.5} key={label}>
           <Text modifiers="bold">{label}</Text>
-          {content}
+          <VisualTestStory story={story} />
         </VerticalSpacing>
       ))}
     </VerticalSpacing>
@@ -294,7 +289,7 @@ export const VisualTestMobile: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Labeled actions</Text>
-        <LabeledActions {...visualTestArgs} />
+        <VisualTestStory story={{ render: LabeledActions }} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

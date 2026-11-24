@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
@@ -167,23 +168,23 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <ClosingButton title="close" />
+        <VisualTestStory story={Default} component={ClosingButton} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Size</Text>
-        <SizeTemplate />
+        <VisualTestStory story={Size} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Icon sizes</Text>
-        <IconSizeTemplate />
+        <VisualTestStory story={IconSizes} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <StatesTemplate idPrefix="vt-states-" />
+        <StatesTemplate {...States.args} idPrefix="vt-states-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Color brand</Text>
-        <StatesTemplate idPrefix="vt-brand-" color="brand" />
+        <StatesTemplate {...ColorBrand.args} idPrefix="vt-brand-" />
       </VerticalSpacing>
       <Card background="brand-primary" borderless>
         <Card.Content>
@@ -191,7 +192,7 @@ export const VisualTest: Story = {
             <Text modifiers="bold" color="white">
               Color inverted
             </Text>
-            <StatesTemplate idPrefix="vt-inverted-" color="white" />
+            <StatesTemplate {...ColorInverted.args} idPrefix="vt-inverted-" />
           </VerticalSpacing>
         </Card.Content>
       </Card>

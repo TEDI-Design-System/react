@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory, type VisualTestStoryInput } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
@@ -217,62 +218,33 @@ export const WithActionButton: Story = {
   },
 };
 
+const visualTestStories: { label: string; story: VisualTestStoryInput }[] = [
+  { label: 'Default', story: Default },
+  { label: 'Sizes', story: Sizes },
+  { label: 'Headless', story: Headless },
+  { label: 'Global', story: Global },
+  { label: 'Without side borders', story: WithoutSideBorders },
+  { label: 'With icon', story: WithIcon },
+  { label: 'With close button', story: WithCloseButton },
+  { label: 'Alert types', story: AlertTypes },
+  { label: 'Without title, long text', story: WithoutTitleLongText },
+  { label: 'Without title, long text and closing button', story: WithoutTitleLongTextAndClosingButton },
+  { label: 'With title, long text and closing button', story: WithTitleLongTextAndClosingButton },
+  { label: 'With action button', story: WithActionButton },
+];
+
 /** Chromatic snapshot for Alert: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: { chromatic: { disableSnapshot: false } },
   render: () => (
     <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Default</Text>
-        <Alert {...Default.args} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Sizes</Text>
-        <TemplateColumn array={sizeArray} type="info" onClose={() => null}>
-          Content description
-        </TemplateColumn>
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Headless</Text>
-        <Alert>Content description</Alert>
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Global</Text>
-        <WithAndWithoutHeading {...Global.args} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Without side borders</Text>
-        <WithAndWithoutHeading {...WithoutSideBorders.args} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">With icon</Text>
-        <WithAndWithoutHeading {...WithIcon.args} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">With close button</Text>
-        <WithAndWithoutHeading {...WithCloseButton.args} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Alert types</Text>
-        <TypesTemplate {...AlertTypes.args} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Without title, long text</Text>
-        <Alert {...WithoutTitleLongText.args} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Without title, long text and closing button</Text>
-        <Alert {...WithoutTitleLongTextAndClosingButton.args} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">With title, long text and closing button</Text>
-        <Alert {...WithTitleLongTextAndClosingButton.args} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">With action button</Text>
-        <Alert {...WithActionButton.args} />
-      </VerticalSpacing>
+      {visualTestStories.map(({ label, story }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          <VisualTestStory story={story} component={Alert} />
+        </VerticalSpacing>
+      ))}
     </VerticalSpacing>
   ),
 };

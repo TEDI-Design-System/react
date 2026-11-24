@@ -410,17 +410,9 @@ export const VisualTest: Story = {
         <Text modifiers="bold">Compact</Text>
         <CompactTemplate ariaLabel="Hindamise edenemine, kompaktne" />
       </VerticalSpacing>
-      <VerticalSpacing size={1}>
-        <Text modifiers="bold">States: default</Text>
-        <StateMatrix states={ITEM_STATES} renderCell={(props) => itemCell(false, props)} />
-      </VerticalSpacing>
-      <VerticalSpacing size={1}>
-        <Text modifiers="bold">States: compact</Text>
-        <StateMatrix states={ITEM_STATES} renderCell={(props) => itemCell(true, props)} />
-      </VerticalSpacing>
-      <VerticalSpacing size={1}>
-        <Text modifiers="bold">States: has subitems</Text>
-        <StateMatrix states={SUB_STATES} renderCell={subCell} />
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <VisualTestStory story={States} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Responsive</Text>

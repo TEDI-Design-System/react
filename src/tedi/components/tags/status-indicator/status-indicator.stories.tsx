@@ -83,7 +83,7 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <StatusIndicator type="success" size="sm" hasBorder={false} />
+        <VisualTestStory story={Default} component={StatusIndicator} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">All variants</Text>

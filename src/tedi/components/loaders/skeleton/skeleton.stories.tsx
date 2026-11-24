@@ -6,6 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
@@ -150,6 +151,7 @@ const AccessibilityTemplate: StoryFn<AccessibilityTemplateProps> = ({ style, id,
  * **For optimal accessibility, it is strongly recommended to provide both label and completedLabel props.** These labels inform users about the type of content being loaded and when the loading process has finished, offering a more informative and accessible experience.
  */
 export const Accessibility: Story = {
+  parameters: { visualTest: false },
   render: (args) => {
     const [skeletons, setSkeletons] = React.useState<AccessibilityTemplateProps[]>([]);
 
@@ -206,32 +208,15 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Skeleton label="Loading something">
-          <Skeleton.Block width={50} height="h2" />
-        </Skeleton>
+        <VisualTestStory story={Default} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Height</Text>
-        <Skeleton label="Loading something">
-          <VerticalSpacing>
-            <Skeleton.Block height="p" />
-            <Skeleton.Block height="h3" />
-            <Skeleton.Block height="h2" />
-            <Skeleton.Block height="h1" />
-            <Skeleton.Block height={100} />
-          </VerticalSpacing>
-        </Skeleton>
+        <VisualTestStory story={SkeletonHeight} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Width</Text>
-        <Skeleton label="Loading something">
-          <VerticalSpacing>
-            <Skeleton.Block width={50} height="p" />
-            <Skeleton.Block width={75} height="h3" />
-            <Skeleton.Block width="36px" height="h2" />
-            <Skeleton.Block width="auto" height="h1" />
-          </VerticalSpacing>
-        </Skeleton>
+        <VisualTestStory story={SkeletonWidth} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

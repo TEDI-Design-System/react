@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text, TextProps } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -32,10 +33,12 @@ interface TemplateMultipleProps<Type = string> extends ToggleProps {
   titleColor?: TextProps['color'];
   size: ToggleProps['size'];
   property?: keyof ToggleProps;
+  /** Gives each toggle a unique id, so `VisualTest` can render the template more than once. */
+  idPrefix?: string;
 }
 
 const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
-  const { array } = args;
+  const { array, idPrefix } = args;
 
   return (
     <div className="example-list">
@@ -45,7 +48,12 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
             <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
           <Col width={12} sm={10} className="d-flex">
-            <Toggle id="toggle-column-1" label="Toggle" size={value as ToggleProps['size']} hideLabel />
+            <Toggle
+              id={idPrefix ? `${idPrefix}${value}` : 'toggle-column-1'}
+              label="Toggle"
+              size={value as ToggleProps['size']}
+              hideLabel
+            />
           </Col>
         </Row>
       ))}
@@ -54,7 +62,8 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
 };
 
 const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
-  const { array, titleColor, ...toggleProps } = args;
+  const { array, titleColor, idPrefix, ...toggleProps } = args;
+  const toggleId = (state: string, index: number) => (idPrefix ? `${idPrefix}${state}-${index}` : state);
 
   return (
     <>
@@ -72,7 +81,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
                 label="Toggle"
                 disabled={value === 'Disabled'}
                 isLoading={value === 'Loading'}
-                id={value}
+                id={toggleId(value, 0)}
               />
               <Toggle
                 {...toggleProps}
@@ -80,7 +89,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
                 defaultChecked
                 disabled={value === 'Disabled'}
                 isLoading={value === 'Loading'}
-                id={value}
+                id={toggleId(value, 1)}
               />
             </Col>
             <Col width="auto" className="flex align-items-center gap-3">
@@ -90,7 +99,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
                 size="large"
                 disabled={value === 'Disabled'}
                 isLoading={value === 'Loading'}
-                id={value}
+                id={toggleId(value, 2)}
               />
               <Toggle
                 {...toggleProps}
@@ -99,7 +108,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
                 size="large"
                 disabled={value === 'Disabled'}
                 isLoading={value === 'Loading'}
-                id={value}
+                id={toggleId(value, 3)}
               />
             </Col>
             <Col width="auto" className="flex align-items-center gap-3">
@@ -109,7 +118,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
                 size="large"
                 disabled={value === 'Disabled'}
                 isLoading={value === 'Loading'}
-                id={value}
+                id={toggleId(value, 4)}
                 icon
               />
               <Toggle
@@ -119,7 +128,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
                 size="large"
                 disabled={value === 'Disabled'}
                 isLoading={value === 'Loading'}
-                id={value}
+                id={toggleId(value, 5)}
                 icon
               />
             </Col>
@@ -294,28 +303,15 @@ export const WithFeedbackText: Story = {
   },
 };
 
-const visualTestStateVariants: { label: string; idPrefix: string; props: Partial<ToggleProps> }[] = [
-  { label: 'Primary', idPrefix: 'primary', props: {} },
-  { label: 'Primary outlined', idPrefix: 'primary-outlined', props: { type: 'outlined' } },
-  { label: 'Colored', idPrefix: 'colored', props: { color: 'colored' } },
-  { label: 'Colored outlined', idPrefix: 'colored-outlined', props: { color: 'colored', type: 'outlined' } },
+const visualTestStateVariants: { label: string; idPrefix: string; story: StoryObj<TemplateMultipleProps> }[] = [
+  { label: 'Primary', idPrefix: 'toggle-vt-primary-', story: Primary },
+  { label: 'Primary outlined', idPrefix: 'toggle-vt-primary-outlined-', story: PrimaryOutlined },
+  { label: 'Colored', idPrefix: 'toggle-vt-colored-', story: Colored },
+  { label: 'Colored outlined', idPrefix: 'toggle-vt-colored-outlined-', story: ColoredOutlined },
 ];
-
-const visualTestToggles: Partial<ToggleProps>[] = [
-  {},
-  { defaultChecked: true },
-  { size: 'large' },
-  { size: 'large', defaultChecked: true },
-  { size: 'large', icon: true },
-  { size: 'large', icon: true, defaultChecked: true },
-];
-
-const visualTestToggleId = (variant: string, state: string, index: number) => `toggle-vt-${variant}-${state}-${index}`;
 
 const visualTestPseudoIds = (state: string) =>
-  visualTestStateVariants.flatMap(({ idPrefix }) =>
-    visualTestToggles.map((_, index) => `#${visualTestToggleId(idPrefix, state, index)}`)
-  );
+  visualTestStateVariants.flatMap(({ idPrefix }) => [0, 1, 2, 3, 4, 5].map((index) => `#${idPrefix}${state}-${index}`));
 
 /** Chromatic snapshot for Toggle: add every new visual variant here too. */
 export const VisualTest: Story = {
@@ -332,22 +328,11 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Toggle id="toggle-vt-default" label="Toggle" />
+        <VisualTestStory story={Default} component={Toggle} props={{ id: 'toggle-vt-default' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Size</Text>
-        <div className="example-list">
-          {sizeArray.map((size, index) => (
-            <Row className={`${index === sizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={size}>
-              <Col width={12} sm={2}>
-                <Text modifiers="bold">{size.charAt(0).toUpperCase() + size.slice(1)}</Text>
-              </Col>
-              <Col width={12} sm={10} className="d-flex">
-                <Toggle id={`toggle-vt-size-${size}`} label="Toggle" size={size} hideLabel />
-              </Col>
-            </Row>
-          ))}
-        </div>
+        <TemplateColumn {...(Size.args as TemplateMultipleProps)} idPrefix="toggle-vt-size-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Type</Text>
@@ -361,39 +346,15 @@ export const VisualTest: Story = {
         <Text modifiers="bold">States</Text>
         <States />
       </VerticalSpacing>
-      {visualTestStateVariants.map(({ label, idPrefix, props }) => (
+      {visualTestStateVariants.map(({ label, idPrefix, story }) => (
         <VerticalSpacing size={0.5} key={idPrefix}>
           <Text modifiers="bold">{label}</Text>
-          <VerticalSpacing size={1}>
-            {stateArray.map((state) => (
-              <Row key={state}>
-                <Col lg={1} md={2} className="flex align-items-center">
-                  <Text modifiers="bold">{state}</Text>
-                </Col>
-                {[0, 2, 4].map((start) => (
-                  <Col width="auto" className="flex align-items-center gap-3" key={start}>
-                    {visualTestToggles.slice(start, start + 2).map((toggleProps, offset) => (
-                      <Toggle
-                        key={offset}
-                        {...props}
-                        {...toggleProps}
-                        id={visualTestToggleId(idPrefix, state, start + offset)}
-                        label="Toggle"
-                        hideLabel
-                        disabled={state === 'Disabled'}
-                        isLoading={state === 'Loading'}
-                      />
-                    ))}
-                  </Col>
-                ))}
-              </Row>
-            ))}
-          </VerticalSpacing>
+          <TemplateStates {...(story.args as TemplateMultipleProps)} idPrefix={idPrefix} />
         </VerticalSpacing>
       ))}
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With feedback text</Text>
-        <Toggle id="toggle-vt-feedback" label="Label" helper={{ text: 'Something went wrong', type: 'error' }} />
+        <VisualTestStory story={WithFeedbackText} component={Toggle} props={{ id: 'toggle-vt-feedback' }} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

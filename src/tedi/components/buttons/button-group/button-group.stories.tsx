@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -308,39 +309,39 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Template type="primary" stretch={false} idPrefix="vt-default-" />
+        <Template {...Default.args} idPrefix="vt-default-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Sizes</Text>
-        <TemplateSizes property="size" array={sizeArray} idPrefix="vt-sizes-" />
+        <TemplateSizes {...(Sizes.args as TemplateMultipleProps)} idPrefix="vt-sizes-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Types</Text>
-        <TemplateTypes idPrefix="vt-types-" />
+        <TemplateTypes {...Types.args} idPrefix="vt-types-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With icon</Text>
-        <TemplateWithIcons type="primary" idPrefix="vt-with-icon-" />
+        <TemplateWithIcons {...WithIcon.args} idPrefix="vt-with-icon-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Icon only</Text>
-        <TemplateIconOnly type="primary" idPrefix="vt-icon-only-" />
+        <TemplateIconOnly {...IconOnly.args} idPrefix="vt-icon-only-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Primary states</Text>
-        <TemplateColumn states={buttonStates} type="primary" />
+        <VisualTestStory story={Primary} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Secondary states</Text>
-        <TemplateColumn states={buttonStates} type="secondary" />
+        <VisualTestStory story={Secondary} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Different width buttons</Text>
-        <DifferentWidthTemplate type="primary" idPrefix="vt-different-width-" />
+        <DifferentWidthTemplate {...DifferentWidthButtons.args} idPrefix="vt-different-width-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Stretched</Text>
-        <Template stretch idPrefix="vt-stretched-" />
+        <Template {...Stretched.args} idPrefix="vt-stretched-" />
       </VerticalSpacing>
     </VerticalSpacing>
   ),
@@ -357,8 +358,20 @@ export const VisualTestMobile: Story = {
         <Template {...Default.args} idPrefix="vt-mobile-default-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <TemplateSizes {...(Sizes.args as TemplateMultipleProps)} idPrefix="vt-mobile-sizes-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With icon</Text>
         <TemplateWithIcons {...WithIcon.args} idPrefix="vt-mobile-with-icon-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Different width buttons</Text>
+        <DifferentWidthTemplate {...DifferentWidthButtons.args} idPrefix="vt-mobile-different-width-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Stretched</Text>
+        <Template {...Stretched.args} idPrefix="vt-mobile-stretched-" />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

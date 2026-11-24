@@ -141,15 +141,15 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Heading>Heading</Heading>
+        <VisualTestStory story={Default} component={Heading} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Headings</Text>
-        <TemplateHeadings />
+        <VisualTestStory story={Headings} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Custom modifier</Text>
-        <CustomModifierTemplate />
+        <VisualTestStory story={CustomModifier} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Semantic headings</Text>

@@ -449,32 +449,17 @@ const visualTestVariants: {
   label: string;
   idPrefix: string;
   inverted?: boolean;
-  props: Pick<ButtonProps<'button'>, 'visualType' | 'color'>;
+  story: StoryObj<TemplateMultipleProps>;
 }[] = [
-  { label: 'Primary', idPrefix: 'vt-primary', props: { visualType: 'primary' } },
-  {
-    label: 'Primary inverted',
-    idPrefix: 'vt-primary-inverted',
-    inverted: true,
-    props: { visualType: 'primary', color: 'inverted' },
-  },
-  { label: 'Secondary', idPrefix: 'vt-secondary', props: { visualType: 'secondary' } },
-  {
-    label: 'Secondary inverted',
-    idPrefix: 'vt-secondary-inverted',
-    inverted: true,
-    props: { visualType: 'secondary', color: 'inverted' },
-  },
-  { label: 'Neutral', idPrefix: 'vt-neutral', props: { visualType: 'neutral' } },
-  {
-    label: 'Neutral inverted',
-    idPrefix: 'vt-neutral-inverted',
-    inverted: true,
-    props: { visualType: 'neutral', color: 'inverted' },
-  },
-  { label: 'Success', idPrefix: 'vt-success', props: { color: 'success' } },
-  { label: 'Danger', idPrefix: 'vt-danger', props: { color: 'danger' } },
-  { label: 'Danger neutral', idPrefix: 'vt-danger-neutral', props: { color: 'danger', visualType: 'neutral' } },
+  { label: 'Primary', idPrefix: 'vt-primary', story: Primary },
+  { label: 'Primary inverted', idPrefix: 'vt-primary-inverted', inverted: true, story: PrimaryInverted },
+  { label: 'Secondary', idPrefix: 'vt-secondary', story: Secondary },
+  { label: 'Secondary inverted', idPrefix: 'vt-secondary-inverted', inverted: true, story: SecondaryInverted },
+  { label: 'Neutral', idPrefix: 'vt-neutral', story: Neutral },
+  { label: 'Neutral inverted', idPrefix: 'vt-neutral-inverted', inverted: true, story: NeutralInverted },
+  { label: 'Success', idPrefix: 'vt-success', story: Success },
+  { label: 'Danger', idPrefix: 'vt-danger', story: Danger },
+  { label: 'Danger neutral', idPrefix: 'vt-danger-neutral', story: DangerNeutral },
 ];
 
 /** Chromatic snapshot for Button: add every new visual variant here too. */
@@ -491,9 +476,9 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Button>Button</Button>
+        <VisualTestStory story={Default} />
       </VerticalSpacing>
-      {visualTestVariants.map(({ label, idPrefix, inverted, props }) =>
+      {visualTestVariants.map(({ label, idPrefix, inverted, story }) =>
         inverted ? (
           <Card key={idPrefix} background="brand-primary" borderless>
             <Card.Content>
@@ -501,24 +486,28 @@ export const VisualTest: Story = {
                 <Text modifiers="bold" color="white">
                   {label}
                 </Text>
-                <TemplateColumn array={buttonStateArray} titleColor="white" idPrefix={idPrefix} {...props} />
+                <VisualTestStory story={{ args: story.args }} component={TemplateColumn} props={{ idPrefix }} />
               </VerticalSpacing>
             </Card.Content>
           </Card>
         ) : (
           <VerticalSpacing key={idPrefix} size={0.5}>
             <Text modifiers="bold">{label}</Text>
-            <TemplateColumn array={buttonStateArray} idPrefix={idPrefix} {...props} />
+            <VisualTestStory story={{ args: story.args }} component={TemplateColumn} props={{ idPrefix }} />
           </VerticalSpacing>
         )
       )}
       <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Extra small icon only</Text>
+        <VisualTestStory story={ExtraSmallIconOnly} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
         <Text modifiers="bold">No style</Text>
-        <NoStyleTemplate>Button without styles</NoStyleTemplate>
+        <VisualTestStory story={{ render: NoStyleTemplate }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Full width</Text>
-        <Button fullWidth>Button</Button>
+        <VisualTestStory story={FullWidth} component={Button} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Responsive</Text>
@@ -526,11 +515,11 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Long text</Text>
-        <LongTextTemplate>This is a very long button text that should wrap into multiple lines</LongTextTemplate>
+        <VisualTestStory story={LongTextButtonThatWrapsIntoMultipleLines} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Visual type link</Text>
-        <VisualTypeLinkTemplate />
+        <VisualTestStory story={VisualTypeLink} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

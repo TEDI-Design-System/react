@@ -1,6 +1,7 @@
 import { Meta, StoryContext, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -142,12 +143,16 @@ export const VisualTest: Story = {
   render: () => (
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Size</Text>
-        <TemplateColumn property="size" color="primary" array={sizeArray} label="Loading..." />
+        <VisualTestStory story={Size} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Color</Text>
-        <TemplateColors property="color" array={[]} />
+        <VisualTestStory story={Color} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

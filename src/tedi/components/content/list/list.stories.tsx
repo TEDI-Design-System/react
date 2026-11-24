@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import List, { ListProps } from './list';
@@ -205,27 +206,27 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Template style="styled" element="ul" />
+        <VisualTestStory story={Default} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Unordered list</Text>
-        <TemplateUnorderedList style="styled" />
+        <VisualTestStory story={UnorderedList} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Ordered list</Text>
-        <TemplateOrderedList element="ol" style="styled" />
+        <VisualTestStory story={OrderedList} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Ordered list with start / value</Text>
-        <TemplateOrderedListWithStart style="styled" />
+        <VisualTestStory story={OrderedListWithStart} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Reversed ordered list</Text>
-        <TemplateReversedOrderedList style="styled" />
+        <VisualTestStory story={ReversedOrderedList} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">No style list</Text>
-        <TemplateNoStyleList style="none" />
+        <VisualTestStory story={NoStyleList} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

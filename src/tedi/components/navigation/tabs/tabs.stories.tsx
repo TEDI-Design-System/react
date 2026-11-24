@@ -205,6 +205,7 @@ export const States: StoryObj<TemplateStateProps> = {
 };
 
 export const Controlled: Story = {
+  parameters: { visualTest: false },
   render: () => {
     const [currentTab, setCurrentTab] = useState('tab-1');
 
@@ -449,6 +450,20 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With sub tabs</Text>
         <WithSubTabsTemplate idPrefix="vt-5-" />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for Tabs: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With sub tabs</Text>
+        <WithSubTabsTemplate idPrefix="vt-mobile-" />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

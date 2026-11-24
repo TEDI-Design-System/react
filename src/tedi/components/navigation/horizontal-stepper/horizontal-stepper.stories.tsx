@@ -304,6 +304,7 @@ export const Compact: Story = {
  * render as `completed`, future ones stay default.
  */
 export const ClickToNavigate: Story = {
+  parameters: { visualTest: false },
   render: () => {
     const Demo = () => {
       const [current, setCurrent] = useState(1);
@@ -325,49 +326,48 @@ export const ClickToNavigate: Story = {
   },
 };
 
+const ExternalNavigationTemplate = ({ ariaLabel = 'Protsessi sammud' }: { ariaLabel?: string }) => {
+  const [current, setCurrent] = useState(0);
+  return (
+    <VerticalSpacing size={1.5}>
+      <HorizontalStepper aria-label={ariaLabel} compact="lg">
+        {STEPS.map((label, index) => (
+          <HorizontalStepper.Item
+            key={label}
+            label={label}
+            completed={index < current}
+            selected={index === current}
+            disabled={index > current}
+            onSelect={() => setCurrent(index)}
+          />
+        ))}
+      </HorizontalStepper>
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <Button
+          visualType="secondary"
+          disabled={current === 0}
+          onClick={() => setCurrent((step) => Math.max(0, step - 1))}
+        >
+          Tagasi
+        </Button>
+        <Button
+          disabled={current === STEPS.length - 1}
+          onClick={() => setCurrent((step) => Math.min(STEPS.length - 1, step + 1))}
+        >
+          Edasi
+        </Button>
+      </div>
+    </VerticalSpacing>
+  );
+};
+
 /**
  * Step-by-step validation — the user advances with `Edasi` / `Tagasi`. Past steps
  * render as `completed` and stay clickable for back-navigation; future steps are
  * `disabled` so they can't be skipped from the header.
  */
 export const ExternalNavigation: Story = {
-  render: () => {
-    const Demo = () => {
-      const [current, setCurrent] = useState(0);
-      return (
-        <VerticalSpacing size={1.5}>
-          <HorizontalStepper aria-label="Protsessi sammud" compact="lg">
-            {STEPS.map((label, index) => (
-              <HorizontalStepper.Item
-                key={label}
-                label={label}
-                completed={index < current}
-                selected={index === current}
-                disabled={index > current}
-                onSelect={() => setCurrent(index)}
-              />
-            ))}
-          </HorizontalStepper>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Button
-              visualType="secondary"
-              disabled={current === 0}
-              onClick={() => setCurrent((step) => Math.max(0, step - 1))}
-            >
-              Tagasi
-            </Button>
-            <Button
-              disabled={current === STEPS.length - 1}
-              onClick={() => setCurrent((step) => Math.min(STEPS.length - 1, step + 1))}
-            >
-              Edasi
-            </Button>
-          </div>
-        </VerticalSpacing>
-      );
-    };
-    return <Demo />;
-  },
+  render: () => <ExternalNavigationTemplate />,
 };
 
 export const States: Story = {
@@ -415,12 +415,62 @@ export const VisualTest: Story = {
         <VisualTestStory story={Compact} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">External navigation</Text>
+        <ExternalNavigationTemplate ariaLabel="External navigation" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <StatesMatrix compact={false} />
+        <VisualTestStory story={States} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Compact states</Text>
-        <StatesMatrix compact labelPrefix="Compact: " />
+        <VisualTestStory story={CompactStates} props={{ labelPrefix: 'Compact: ' }} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic mobile snapshot for HorizontalStepper: add every variant that renders differently below its breakpoint here too. */
+export const VisualTestMobile: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] }, ...statesPseudo },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Second step</Text>
+        <VisualTestStory story={SecondStep} props={{ 'aria-label': 'Second step' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Third step</Text>
+        <VisualTestStory story={ThirdStep} props={{ 'aria-label': 'Third step' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With errors</Text>
+        <VisualTestStory story={WithErrors} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With descriptions</Text>
+        <VisualTestStory story={WithDescriptions} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Transparent background</Text>
+        <VisualTestStory story={TransparentBackground} props={{ 'aria-label': 'Transparent background' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">External navigation</Text>
+        <ExternalNavigationTemplate ariaLabel="External navigation" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <VisualTestStory story={States} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Compact states</Text>
+        <VisualTestStory story={CompactStates} props={{ labelPrefix: 'Compact: ' }} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

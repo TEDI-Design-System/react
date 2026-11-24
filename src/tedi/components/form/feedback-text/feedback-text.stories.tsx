@@ -1,9 +1,10 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import { FeedbackText, FeedbackTextProps } from './feedback-text';
+import { FeedbackText } from './feedback-text';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.65.83?node-id=9165-62054&m=dev" target="_blank">Figma ↗</a><br />
@@ -59,12 +60,12 @@ export const PositionRight: Story = {
   },
 };
 
-const visualTestVariants: { label: string; props: FeedbackTextProps }[] = [
-  { label: 'Helper', props: { text: 'I am a hint text' } },
-  { label: 'Error', props: { text: 'I am an error text', type: 'error' } },
-  { label: 'Valid', props: { text: 'I am a valid text', type: 'valid' } },
-  { label: 'Position left', props: { text: 'I am a hint text', position: 'left' } },
-  { label: 'Position right', props: { text: 'I am a valid text', type: 'valid', position: 'right' } },
+const visualTestVariants: { label: string; story: Story }[] = [
+  { label: 'Helper', story: Helper },
+  { label: 'Error', story: Error },
+  { label: 'Valid', story: Valid },
+  { label: 'Position left', story: PositionLeft },
+  { label: 'Position right', story: PositionRight },
 ];
 
 /** Chromatic snapshot for FeedbackText: add every new visual variant here too. */
@@ -73,13 +74,13 @@ export const VisualTest: Story = {
   parameters: { chromatic: { disableSnapshot: false } },
   render: () => (
     <VerticalSpacing>
-      {visualTestVariants.map(({ label, props }) => (
+      {visualTestVariants.map(({ label, story }) => (
         <Row key={label}>
           <Col lg={2} xs={12}>
             <Text modifiers="bold">{label}</Text>
           </Col>
           <Col>
-            <FeedbackText {...props} />
+            <VisualTestStory story={story} component={FeedbackText} />
           </Col>
         </Row>
       ))}

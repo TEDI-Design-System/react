@@ -243,43 +243,31 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <TextField id="textfield-vt-default" label="Label" />
+        <VisualTestStory story={Default} component={TextField} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Sizes</Text>
-        <TemplateColumn id="textfield-vt-size" label="Label" property="size" value="Text value" array={sizeArray} />
+        <VisualTestStory story={Sizes} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <TemplateColumnWithStates array={stateArray} label="Label" />
+        <VisualTestStory story={States} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With hint</Text>
-        <TextField
-          id="textfield-vt-hint"
-          label="Label"
-          helper={{ id: 'textfield-vt-hint-helper', text: 'Hint text', type: 'hint' }}
-        />
+        <VisualTestStory story={WithHint} component={TextField} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Password</Text>
-        <TextField id="textfield-vt-password" label="Label" input={{ type: 'password' }} value="123456789" />
+        <VisualTestStory story={Password} component={TextField} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Password with toggle</Text>
-        <TextField
-          id="textfield-vt-password-toggle"
-          label="Password"
-          value="SuperSecret123"
-          input={{ type: 'password', autoComplete: 'current-password' }}
-          icon="visibility"
-          onIconClick={() => undefined}
-          iconButtonProps={{ 'aria-label': 'Show password', 'aria-pressed': false }}
-        />
+        <VisualTestStory story={PasswordWithToggle} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Placeholder</Text>
-        <TextField id="textfield-vt-placeholder" label="Label" placeholder="Text value" />
+        <VisualTestStory story={Placeholder} component={TextField} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Clear button on interaction</Text>

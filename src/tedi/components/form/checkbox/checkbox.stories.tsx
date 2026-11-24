@@ -398,6 +398,8 @@ export const Controlled = () => {
   );
 };
 
+Controlled.parameters = { visualTest: false };
+
 /** `variant="card"` renders each checkbox as a card. `cardVariant` sets primary / secondary. */
 export const CardsDefault: StoryObj = {
   render: () => (
@@ -718,8 +720,8 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
   { label: 'Cards with description', content: <VisualTestStory story={CardsWithDescription} /> },
   { label: 'Cards with icons', content: <VisualTestStory story={CardsWithIcons} /> },
   { label: 'States', content: <States /> },
-  { label: 'Card states primary', content: renderCardStates('primary') },
-  { label: 'Card states secondary', content: renderCardStates('secondary') },
+  { label: 'Card states primary', content: <VisualTestStory story={CardStatesPrimary} /> },
+  { label: 'Card states secondary', content: <VisualTestStory story={CardStatesSecondary} /> },
   { label: 'Responsive variant', content: <VisualTestStory story={ResponsiveVariant} /> },
 ];
 

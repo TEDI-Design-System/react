@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Label, LabelProps } from './label';
@@ -103,14 +104,14 @@ export const DefaultSmallBold: Story = {
   },
 };
 
-const visualTestVariants: { label: string; props: Omit<LabelProps, 'children'> }[] = [
-  { label: 'Default', props: {} },
-  { label: 'Required field', props: { required: true } },
-  { label: 'Bold', props: { isBold: true } },
-  { label: 'Bold required field', props: { required: true, isBold: true } },
-  { label: 'Info button', props: { required: true, tooltip: 'Lisainfo' } },
-  { label: 'Small', props: { isSmall: true } },
-  { label: 'Small bold', props: { isBold: true, isSmall: true } },
+const visualTestVariants: { label: string; story: Story }[] = [
+  { label: 'Default', story: Default },
+  { label: 'Required field', story: Required },
+  { label: 'Bold', story: DefaultBold },
+  { label: 'Bold required field', story: RequiredBold },
+  { label: 'Info button', story: InfoButtonStory },
+  { label: 'Small', story: DefaultSmall },
+  { label: 'Small bold', story: DefaultSmallBold },
 ];
 
 /** Chromatic snapshot for Label: add every new visual variant here too. */
@@ -119,10 +120,10 @@ export const VisualTest: Story = {
   parameters: { chromatic: { disableSnapshot: false } },
   render: () => (
     <VerticalSpacing size={1}>
-      {visualTestVariants.map(({ label, props }) => (
+      {visualTestVariants.map(({ label, story }) => (
         <VerticalSpacing key={label} size={0.25}>
           <Text modifiers="bold">{label}</Text>
-          <Label {...props}>Toimeaine</Label>
+          <VisualTestStory story={story} />
         </VerticalSpacing>
       ))}
     </VerticalSpacing>

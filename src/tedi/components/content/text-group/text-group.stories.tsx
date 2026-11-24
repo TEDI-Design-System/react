@@ -537,24 +537,18 @@ export const WithList: Story = {
 };
 
 const visualTestBlocks: { label: string; content: ReactNode }[] = [
-  {
-    label: 'Default',
-    content: <TextGroup label="Ligipääsetavus" value={<Text>Arstile ja esindajale nähtav</Text>} />,
-  },
+  { label: 'Default', content: <VisualTestStory story={Default} component={TextGroup} /> },
   ...[
     { label: 'Position', story: PositionType },
     { label: 'Text weight', story: TextWeight },
     { label: 'Type', story: Types },
     { label: 'Has slot', story: HasSlot },
+    { label: 'Horizontal label length', story: HorizontalLabelLength },
+    { label: 'Long text values', story: LongTextValues },
+    { label: 'Custom label', story: CustomLabel },
+    { label: 'With list', story: WithList },
+    { label: 'Responsive', story: Responsive },
   ].map(({ label, story }) => ({ label, content: <VisualTestStory story={story} /> })),
-  {
-    label: 'Horizontal label length',
-    content: <MultipleTextGroupsTemplate {...(HorizontalLabelLength.args as TextGroupProps)} />,
-  },
-  { label: 'Long text values', content: <TemplateWithLayouts {...(LongTextValues.args as TextGroupProps)} /> },
-  { label: 'Custom label', content: <VisualTestStory story={CustomLabel} /> },
-  { label: 'With list', content: <VisualTestStory story={WithList} /> },
-  { label: 'Responsive', content: <VisualTestStory story={Responsive} /> },
 ];
 
 /** Chromatic snapshot for TextGroup: add every new visual variant here too. */

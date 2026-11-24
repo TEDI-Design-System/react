@@ -156,7 +156,7 @@ export const IconOnlyInverted: StoryObj<StatesArgs> = {
   globals: { backgrounds: { value: 'brand' } },
 };
 
-const visualTestProps: StatesArgs = { openText: 'Ava', closeText: 'Sulge', underline: true };
+const metaArgs = meta.args as StatesArgs;
 
 /** Chromatic snapshot for CollapseButton: add every new visual variant here too. */
 export const VisualTest: StoryObj<StatesArgs> = {
@@ -173,22 +173,15 @@ export const VisualTest: StoryObj<StatesArgs> = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <StatesTemplate {...visualTestProps} idPrefix="vt-states-" />
+        <StatesTemplate {...metaArgs} {...States.args} idPrefix="vt-states-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Icon only</Text>
-        <StatesTemplate {...visualTestProps} hideText aria-label="Näita detaile" idPrefix="vt-icon-only-" />
+        <StatesTemplate {...metaArgs} {...IconOnly.args} idPrefix="vt-icon-only-" />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Secondary button</Text>
-        <StatesTemplate
-          {...visualTestProps}
-          hideText
-          arrowType="secondary"
-          aria-label="Näita detaile"
-          hideSizes
-          idPrefix="vt-secondary-"
-        />
+        <StatesTemplate {...metaArgs} {...SecondaryButton.args} idPrefix="vt-secondary-" />
       </VerticalSpacing>
       <Card background="brand-primary" borderless>
         <Card.Content>
@@ -196,7 +189,7 @@ export const VisualTest: StoryObj<StatesArgs> = {
             <Text modifiers="bold" color="white">
               With text inverted
             </Text>
-            <StatesTemplate {...visualTestProps} inverted titleColor="white" idPrefix="vt-inverted-" />
+            <StatesTemplate {...metaArgs} {...WithTextInverted.args} idPrefix="vt-inverted-" />
           </VerticalSpacing>
         </Card.Content>
       </Card>
@@ -206,14 +199,7 @@ export const VisualTest: StoryObj<StatesArgs> = {
             <Text modifiers="bold" color="white">
               Icon only inverted
             </Text>
-            <StatesTemplate
-              {...visualTestProps}
-              hideText
-              inverted
-              titleColor="white"
-              aria-label="Näita detaile"
-              idPrefix="vt-icon-only-inverted-"
-            />
+            <StatesTemplate {...metaArgs} {...IconOnlyInverted.args} idPrefix="vt-icon-only-inverted-" />
           </VerticalSpacing>
         </Card.Content>
       </Card>

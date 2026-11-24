@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import HeadingWithIcon, { HeadingWithIconProps } from './heading-with-icon';
@@ -60,13 +61,11 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <HeadingWithIcon name="assignment_ind" headingColor="brand" iconColor="brand">
-          My family physician
-        </HeadingWithIcon>
+        <VisualTestStory story={Default} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Colors</Text>
-        <TemplateColors name="assignment_ind">My family physician</TemplateColors>
+        <VisualTestStory story={Colors} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

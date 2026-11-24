@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import classNames from 'classnames';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Heading } from '../typography/heading/heading';
@@ -301,35 +302,27 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Icon name="account_circle" />
+        <VisualTestStory story={Default} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Icon size</Text>
-        <TemplateColumn name="account_circle" property="size" color="primary" array={sizeArray} items={[]} />
+        <VisualTestStory story={Sizes} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Icon size inside background</Text>
-        <TemplateColumnWithMultipleVariants
-          name="info"
-          property="size"
-          array={[]}
-          items={[
-            { name: 'info', property: 'size', color: 'brand', background: 'brand-secondary', size: 16 },
-            { name: 'vaccines', property: 'size', color: 'brand', background: 'brand-secondary', size: 24 },
-          ]}
-        />
+        <VisualTestStory story={SizesWithBackground} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Icon colors</Text>
-        <TemplateRow name="account_circle" property="color" array={colorArray} size={48} items={[]} />
+        <VisualTestStory story={Colors} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Icon background colors</Text>
-        <TemplateColumnWithBackgroundCircleVarians name="" property="name" array={[]} items={[]} />
+        <VisualTestStory story={Backgrounds} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Used inside text</Text>
-        <UsedInsideTextTemplate name="account_circle" />
+        <VisualTestStory story={UsedInsideText} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

@@ -1,4 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
+import isChromatic from 'chromatic/isChromatic';
 import { useEffect, useState } from 'react';
 
 import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
@@ -250,8 +251,9 @@ export const Responsive: Story = {
  */
 export const Animated: Story = {
   render: function AnimatedStory() {
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(isChromatic() ? 40 : 0);
     useEffect(() => {
+      if (isChromatic()) return;
       const id = window.setInterval(() => {
         setValue((v) => (v >= 100 ? 0 : v + 5));
       }, 300);
@@ -270,53 +272,35 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <ProgressBar value={60} ariaLabel="Edenemisriba pealkiri" />
+        <VisualTestStory story={Default} component={ProgressBar} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Sizes</Text>
-        <MatrixTable rows={sizeRows} />
+        <VisualTestStory story={Sizes} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Position</Text>
-        <MatrixTable rows={positionRows} />
+        <VisualTestStory story={Position} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With label</Text>
-        <ProgressBar
-          value={40}
-          label="Progress"
-          required
-          valuePosition="bottom"
-          helper={{ text: 'Üleslaadimine', type: 'hint' }}
-        />
-        <ProgressBar
-          value={40}
-          label="Küsitluses osalenutest olid vanuses 15-18"
-          labelPosition="top"
-          md={{ labelPosition: 'horizontal' }}
-        />
+        <VisualTestStory story={WithLabel} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Regular</Text>
-        <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" />
-        <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valueLabel="1 / 5" />
-        <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valuePosition="bottom" />
+        <VisualTestStory story={Regular} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With hint</Text>
-        <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" helper={HINT} />
+        <VisualTestStory story={WithHint} component={ProgressBar} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With error</Text>
-        <ProgressBar
-          value={40}
-          ariaLabel="Edenemisriba pealkiri"
-          helper={{ text: 'Üleslaadimine ebaõnnestus, fail on liiga suur', type: 'error' }}
-        />
+        <VisualTestStory story={WithError} component={ProgressBar} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Value hidden</Text>
-        <ProgressBar value={60} ariaLabel="Edenemisriba pealkiri" showValue={false} />
+        <VisualTestStory story={ValueHidden} component={ProgressBar} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Responsive</Text>
@@ -332,6 +316,14 @@ export const VisualTestMobile: Story = {
   parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
   render: () => (
     <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Position</Text>
+        <VisualTestStory story={Position} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With label</Text>
+        <VisualTestStory story={WithLabel} />
+      </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Responsive</Text>
         <VisualTestStory story={Responsive} component={ProgressBar} />

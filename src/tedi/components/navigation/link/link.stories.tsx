@@ -357,20 +357,22 @@ export const LinkIconFlexed: Story = {
   ),
 };
 
-const visualTestVariants: { label: string; idPrefix: string; inverted?: boolean; props: Partial<LinkProps<'a'>> }[] = [
-  { label: 'Default underlined', idPrefix: 'vt-underlined', props: {} },
-  { label: 'Default no underline', idPrefix: 'vt-no-underline', props: { underline: false } },
-  { label: 'Inverted underline', idPrefix: 'vt-inverted-underline', inverted: true, props: { color: 'inverted' } },
+const withIdPrefix = (story: StoryObj<TemplateMultipleProps>, idPrefix: string) => ({
+  ...story,
+  args: { ...story.args, idPrefix },
+});
+
+const visualTestVariants: { label: string; inverted?: boolean; story: StoryObj<TemplateMultipleProps> }[] = [
+  { label: 'Default underlined', story: withIdPrefix(DefaultUnderlined, 'vt-underlined') },
+  { label: 'Default no underline', story: withIdPrefix(DefaultNoUnderline, 'vt-no-underline') },
+  { label: 'Inverted underline', inverted: true, story: withIdPrefix(InvertedUnderline, 'vt-inverted-underline') },
   {
     label: 'Inverted no underline',
-    idPrefix: 'vt-inverted-no-underline',
     inverted: true,
-    props: { color: 'inverted', underline: false },
+    story: withIdPrefix(InvertedNoUnderline, 'vt-inverted-no-underline'),
   },
-  { label: 'As primary button', idPrefix: 'vt-primary-button', props: { visualType: 'primary', underline: false } },
+  { label: 'As primary button', story: withIdPrefix(AsPrimaryButton, 'vt-primary-button') },
 ];
-
-const longText = 'This is a very long link text that should wrap into multiple lines';
 
 /** Chromatic snapshot for Link: add every new visual variant here too. */
 export const VisualTest: Story = {
@@ -387,32 +389,32 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Link href="#">Link</Link>
+        <VisualTestStory story={Default} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Sizes</Text>
-        <SizeTemplate />
+        <VisualTestStory story={Sizes} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Colors</Text>
-        <ColorTemplate />
+        <VisualTestStory story={Colors} />
       </VerticalSpacing>
-      {visualTestVariants.map(({ label, idPrefix, inverted, props }) =>
+      {visualTestVariants.map(({ label, inverted, story }) =>
         inverted ? (
-          <Card key={idPrefix} background="brand-primary" borderless>
+          <Card key={label} background="brand-primary" borderless>
             <Card.Content>
               <VerticalSpacing size={0.5}>
                 <Text modifiers="bold" color="white">
                   {label}
                 </Text>
-                <TemplateColumn array={linkStateArray} titleColor="white" idPrefix={idPrefix} {...props} />
+                <VisualTestStory story={story} />
               </VerticalSpacing>
             </Card.Content>
           </Card>
         ) : (
-          <VerticalSpacing key={idPrefix} size={0.5}>
+          <VerticalSpacing key={label} size={0.5}>
             <Text modifiers="bold">{label}</Text>
-            <TemplateColumn array={linkStateArray} idPrefix={idPrefix} {...props} />
+            <VisualTestStory story={story} />
           </VerticalSpacing>
         )
       )}
@@ -422,41 +424,19 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">No style link</Text>
-        <Link noStyle href="https://www.tehik.ee/" target="_blank">
-          <img width={200} src="tehik_logo.png" alt="tehik.ee" />
-        </Link>
+        <VisualTestStory story={NoStyleLink} component={Link} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Full width</Text>
-        <Link fullWidth href="#" visualType="primary" underline={false}>
-          Link that stretches
-        </Link>
+        <VisualTestStory story={FullWidth} component={Link} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Long text icon inline</Text>
-        <Row>
-          <Col md={4}>
-            <Link iconLeft="notifications">{longText}</Link>
-          </Col>
-          <Col md={4}>
-            <Link iconRight="north_east">{longText}</Link>
-          </Col>
-        </Row>
+        <VisualTestStory story={LongTextIconInline} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Link icon flexed</Text>
-        <Row>
-          <Col md={4}>
-            <Link iconLeft="notifications" iconStandalone>
-              {longText}
-            </Link>
-          </Col>
-          <Col md={4}>
-            <Link iconRight="north_east" iconStandalone>
-              {longText}
-            </Link>
-          </Col>
-        </Row>
+        <VisualTestStory story={LinkIconFlexed} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

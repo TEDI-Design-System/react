@@ -101,11 +101,11 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Template {...(Default.args as EllipsisProps)} />
+        <VisualTestStory story={Default} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Leading start</Text>
-        <Template {...(LeadingStart.args as EllipsisProps)} />
+        <VisualTestStory story={LeadingStart} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Responsive</Text>

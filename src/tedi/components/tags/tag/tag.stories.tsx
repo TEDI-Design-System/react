@@ -127,22 +127,20 @@ export const VisualTest: Story = {
   render: () => (
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Primary</Text>
-        <ColorTemplate color="primary" isLoading onClose={() => undefined}>
-          Tag
-        </ColorTemplate>
+        <VisualTestStory story={Primary} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Secondary</Text>
-        <ColorTemplate color="secondary" isLoading onClose={() => undefined}>
-          Tag
-        </ColorTemplate>
+        <VisualTestStory story={Secondary} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Danger</Text>
-        <ColorTemplate color="danger" onClose={() => undefined}>
-          Tag
-        </ColorTemplate>
+        <VisualTestStory story={Danger} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Ellipsis</Text>

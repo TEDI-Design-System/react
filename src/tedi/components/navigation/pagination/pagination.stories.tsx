@@ -109,6 +109,7 @@ export const WithoutDropdown: Story = {
  * Controlled mode — the consumer owns `page` state explicitly.
  */
 export const ControlledPage: Story = {
+  parameters: { visualTest: false },
   render: function ControlledPage() {
     const [page, setPage] = useState(3);
     return <Pagination pageCount={10} page={page} onPageChange={setPage} />;
@@ -181,6 +182,43 @@ export const Transparent: Story = {
   ],
 };
 
+const TopBottomSplitTemplate = ({ ariaLabels }: { ariaLabels?: { top: string; bottom: string } }) => {
+  const [page, setPage] = useState(3);
+  const [pageSize, setPageSize] = useState(10);
+  const sharedProps = {
+    pageCount: Math.ceil(97 / pageSize),
+    page,
+    onPageChange: setPage,
+    totalItems: 97,
+    pageSize,
+    pageSizeOptions: [10, 25, 50, 100],
+    onPageSizeChange: (next: number) => {
+      setPageSize(next);
+      setPage(1);
+    },
+  };
+  return (
+    <>
+      <Pagination
+        {...sharedProps}
+        hidePager
+        borders="bottom"
+        labels={ariaLabels ? { ariaLabel: ariaLabels.top } : undefined}
+      />
+      <div style={{ padding: '1.5rem 0', color: 'var(--general-text-tertiary)', textAlign: 'center' }}>
+        — table content goes here —
+      </div>
+      <Pagination
+        {...sharedProps}
+        hideResults
+        hidePageSize
+        borders="top"
+        labels={ariaLabels ? { ariaLabel: ariaLabels.bottom } : undefined}
+      />
+    </>
+  );
+};
+
 /**
  * Use the per-slot hide toggles to render different parts of the pagination
  * above and below a table. Top row shows results + page-size; bottom row shows
@@ -188,31 +226,7 @@ export const Transparent: Story = {
  * pager stays visually anchored when content sits beneath it.
  */
 export const TopBottomSplit: Story = {
-  render: function TopBottomSplit() {
-    const [page, setPage] = useState(3);
-    const [pageSize, setPageSize] = useState(10);
-    const sharedProps = {
-      pageCount: Math.ceil(97 / pageSize),
-      page,
-      onPageChange: setPage,
-      totalItems: 97,
-      pageSize,
-      pageSizeOptions: [10, 25, 50, 100],
-      onPageSizeChange: (next: number) => {
-        setPageSize(next);
-        setPage(1);
-      },
-    };
-    return (
-      <>
-        <Pagination {...sharedProps} hidePager borders="bottom" />
-        <div style={{ padding: '1.5rem 0', color: 'var(--general-text-tertiary)', textAlign: 'center' }}>
-          — table content goes here —
-        </div>
-        <Pagination {...sharedProps} hideResults hidePageSize borders="top" />
-      </>
-    );
-  },
+  render: () => <TopBottomSplitTemplate />,
 };
 
 /**
@@ -467,24 +481,11 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">All properties shown</Text>
-        <Pagination
-          pageCount={10}
-          defaultPage={3}
-          totalItems={97}
-          pageSize={10}
-          pageSizeOptions={[10, 25, 50, 100]}
-          labels={{ ariaLabel: 'All properties shown' }}
-        />
+        <VisualTestStory story={AllPropertiesShown} props={{ labels: { ariaLabel: 'All properties shown' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Without results number</Text>
-        <Pagination
-          pageCount={10}
-          defaultPage={3}
-          pageSize={10}
-          pageSizeOptions={[10, 25, 50, 100]}
-          labels={{ ariaLabel: 'Without results number' }}
-        />
+        <VisualTestStory story={WithoutResultsNumber} props={{ labels: { ariaLabel: 'Without results number' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Without dropdown</Text>
@@ -536,37 +537,11 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Top bottom split</Text>
-        <Pagination
-          pageCount={10}
-          defaultPage={3}
-          totalItems={97}
-          pageSize={10}
-          pageSizeOptions={[10, 25, 50, 100]}
-          hidePager
-          borders="bottom"
-          labels={{ ariaLabel: 'Top bottom split, top' }}
-        />
-        <Text color="tertiary">Table content goes here</Text>
-        <Pagination
-          pageCount={10}
-          defaultPage={3}
-          totalItems={97}
-          pageSize={10}
-          pageSizeOptions={[10, 25, 50, 100]}
-          hideResults
-          hidePageSize
-          borders="top"
-          labels={{ ariaLabel: 'Top bottom split, bottom' }}
-        />
+        <TopBottomSplitTemplate ariaLabels={{ top: 'Top bottom split, top', bottom: 'Top bottom split, bottom' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Disabled boundary arrows</Text>
-        <Pagination
-          pageCount={5}
-          defaultPage={1}
-          showPrevNextButtons
-          labels={{ ariaLabel: 'Disabled boundary arrows' }}
-        />
+        <VisualTestStory story={DisabledBoundaryArrows} props={{ labels: { ariaLabel: 'Disabled boundary arrows' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Arrows with labels</Text>
@@ -586,62 +561,11 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Arrows primary variant</Text>
-        <Pagination
-          pageCount={10}
-          defaultPage={3}
-          arrowVariant="default"
-          showPrevNextButtons
-          md={{ arrowVariant: 'primary' }}
-          labels={{ ariaLabel: 'Arrows primary variant' }}
-        />
+        <VisualTestStory story={ArrowsPrimaryVariant} props={{ labels: { ariaLabel: 'Arrows primary variant' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Borders: top</Text>
-        <Pagination
-          pageCount={10}
-          defaultPage={3}
-          totalItems={97}
-          pageSize={10}
-          pageSizeOptions={[10, 25, 50]}
-          borders="top"
-          labels={{ ariaLabel: 'Pagination (borders: top)' }}
-        />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Borders: bottom</Text>
-        <Pagination
-          pageCount={10}
-          defaultPage={3}
-          totalItems={97}
-          pageSize={10}
-          pageSizeOptions={[10, 25, 50]}
-          borders="bottom"
-          labels={{ ariaLabel: 'Pagination (borders: bottom)' }}
-        />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Borders: both</Text>
-        <Pagination
-          pageCount={10}
-          defaultPage={3}
-          totalItems={97}
-          pageSize={10}
-          pageSizeOptions={[10, 25, 50]}
-          borders="both"
-          labels={{ ariaLabel: 'Pagination (borders: both)' }}
-        />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Borders: none</Text>
-        <Pagination
-          pageCount={10}
-          defaultPage={3}
-          totalItems={97}
-          pageSize={10}
-          pageSizeOptions={[10, 25, 50]}
-          borders="none"
-          labels={{ ariaLabel: 'Pagination (borders: none)' }}
-        />
+        <Text modifiers="bold">Borders</Text>
+        <VisualTestStory story={Borders} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Custom labels</Text>
@@ -653,14 +577,7 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Show all page size</Text>
-        <Pagination
-          pageCount={10}
-          defaultPage={1}
-          totalItems={97}
-          pageSize={10}
-          pageSizeOptions={[10, 25, 50, { value: 97, label: 'Show all' }]}
-          labels={{ ariaLabel: 'Show all page size' }}
-        />
+        <VisualTestStory story={ShowAllPageSize} props={{ labels: { ariaLabel: 'Show all page size' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Responsive visibility</Text>

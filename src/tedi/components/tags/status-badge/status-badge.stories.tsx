@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { Fragment } from 'react/jsx-runtime';
 
+import { VisualTestStory, type VisualTestStoryInput } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -201,36 +202,26 @@ export const WithTooltip: StoryFn<StatusBadgeProps> = () => {
   );
 };
 
+const visualTestStories: { label: string; story: VisualTestStoryInput }[] = [
+  { label: 'Default', story: Default },
+  { label: 'Sizes', story: Sizes },
+  { label: 'Colors', story: Colors },
+  { label: 'Status indicator', story: StatusIndicator },
+  { label: 'With tooltip', story: { render: WithTooltip } },
+];
+
 /** Chromatic snapshot for StatusBadge: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: { chromatic: { disableSnapshot: false } },
   render: () => (
     <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Default</Text>
-        <StatusBadge color="neutral" variant="filled">
-          Text
-        </StatusBadge>
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Sizes</Text>
-        <TemplateColumn array={sizeArray} color="neutral">
-          Draft
-        </TemplateColumn>
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Colors</Text>
-        <TemplateAllCombos />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Status indicator</Text>
-        <TemplateStatusGrid color="neutral" />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">With tooltip</Text>
-        <WithTooltip />
-      </VerticalSpacing>
+      {visualTestStories.map(({ label, story }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          <VisualTestStory story={story} />
+        </VerticalSpacing>
+      ))}
     </VerticalSpacing>
   ),
 };

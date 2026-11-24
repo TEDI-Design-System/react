@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -187,55 +188,39 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <FloatingButton position="static">Scroll up</FloatingButton>
+        <VisualTestStory story={Default} component={FloatingButton} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Primary horizontal</Text>
-        <TemplateColumn
-          array={buttonStateArray}
-          axis="horizontal"
-          visualType="primary"
-          position="static"
-          idPrefix="vt-primary-horizontal-"
-        >
-          Scroll up
-        </TemplateColumn>
+        <VisualTestStory
+          story={{ args: PrimaryHorizontal.args }}
+          component={TemplateColumn}
+          props={{ idPrefix: 'vt-primary-horizontal-' }}
+        />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Primary vertical</Text>
-        <TemplateColumn
-          array={buttonStateArray}
-          axis="vertical"
-          visualType="primary"
-          position="static"
-          idPrefix="vt-primary-vertical-"
-        >
-          Scroll up
-        </TemplateColumn>
+        <VisualTestStory
+          story={{ args: PrimaryVertical.args }}
+          component={TemplateColumn}
+          props={{ idPrefix: 'vt-primary-vertical-' }}
+        />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Secondary horizontal</Text>
-        <TemplateColumn
-          array={buttonStateArray}
-          axis="horizontal"
-          visualType="secondary"
-          position="static"
-          idPrefix="vt-secondary-horizontal-"
-        >
-          Scroll up
-        </TemplateColumn>
+        <VisualTestStory
+          story={{ args: SecondaryHorizontal.args }}
+          component={TemplateColumn}
+          props={{ idPrefix: 'vt-secondary-horizontal-' }}
+        />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Secondary vertical</Text>
-        <TemplateColumn
-          array={buttonStateArray}
-          axis="vertical"
-          visualType="secondary"
-          position="static"
-          idPrefix="vt-secondary-vertical-"
-        >
-          Scroll up
-        </TemplateColumn>
+        <VisualTestStory
+          story={{ args: SecondaryVertical.args }}
+          component={TemplateColumn}
+          props={{ idPrefix: 'vt-secondary-vertical-' }}
+        />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Card } from '../../content/card';
 import { Label } from '../../content/label/label';
@@ -194,11 +195,11 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <InfoButton aria-label="Rohkem infot" />
+        <VisualTestStory story={{ args: { ...meta.args, ...Default.args } }} component={InfoButton} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <TemplateColumn array={buttonStateArray} idPrefix="vt-states-" />
+        <VisualTestStory story={{ args: States.args }} component={TemplateColumn} props={{ idPrefix: 'vt-states-' }} />
       </VerticalSpacing>
       <Card background="brand-primary" borderless>
         <Card.Content>
@@ -206,13 +207,17 @@ export const VisualTest: Story = {
             <Text modifiers="bold" color="white">
               Inverted
             </Text>
-            <TemplateColumn array={buttonStateArray} color="inverted" idPrefix="vt-inverted-" />
+            <VisualTestStory
+              story={{ args: Inverted.args }}
+              component={TemplateColumn}
+              props={{ idPrefix: 'vt-inverted-' }}
+            />
           </VerticalSpacing>
         </Card.Content>
       </Card>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Usage with tooltip and popover</Text>
-        <UsageTemplate />
+        <VisualTestStory story={UsageWithTooltipAndPopover} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

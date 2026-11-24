@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Card, CardContent } from '../../content/card';
@@ -153,74 +154,19 @@ export const DifferentIconColor: Story = {
   },
 };
 
-const visualTestVariants: { label: string; props: EmptyStateProps }[] = [
-  { label: 'Default', props: { children: 'Andmed puuduvad' } },
-  {
-    label: 'With primary action',
-    props: {
-      children: 'Andmed puuduvad',
-      actions: (
-        <Button type="button" iconLeft="add">
-          Loo uus
-        </Button>
-      ),
-    },
-  },
-  {
-    label: 'With secondary action',
-    props: {
-      children: 'Andmed puuduvad',
-      actions: (
-        <Button type="button" visualType="secondary" iconLeft="add">
-          Loo uus
-        </Button>
-      ),
-    },
-  },
-  {
-    label: 'With link',
-    props: {
-      children: 'Andmed puuduvad',
-      actions: (
-        <Link href="#" iconRight="arrow_forward">
-          Loe rohkem
-        </Link>
-      ),
-    },
-  },
-  {
-    label: 'With heading',
-    props: {
-      icon: 'event_busy',
-      heading: 'Broneeri aeg',
-      children: 'Andmed puuduvad',
-      actions: <Button type="button">Vali aeg</Button>,
-    },
-  },
-  { label: 'Minimal', props: { icon: null, children: 'Andmed puuduvad' } },
-  {
-    label: 'Small padding',
-    props: {
-      children: 'Andmed puuduvad',
-      size: 'small',
-      actions: (
-        <>
-          <Button type="button" iconLeft="add">
-            Loo uus
-          </Button>
-          <Button type="button" visualType="secondary" iconRight="arrow_forward">
-            Loe rohkem
-          </Button>
-        </>
-      ),
-    },
-  },
-  { label: 'Separate', props: { children: 'Andmed puuduvad', type: 'separate' } },
-  { label: 'Custom icon', props: { children: 'Ostukorvis pole tooteid', icon: { name: 'shopping_cart_off' } } },
-  {
-    label: 'Different icon color',
-    props: { children: 'Andmed puuduvad', icon: { name: 'spa', color: 'tertiary' } },
-  },
+const visualTestVariants: { label: string; story: Story }[] = [
+  { label: 'Default', story: Default },
+  { label: 'With primary action', story: WithPrimaryAction },
+  { label: 'With secondary action', story: WithSecondaryAction },
+  { label: 'With link', story: WithLink },
+  { label: 'With heading', story: WithHeading },
+  { label: 'Minimal', story: Minimal },
+  { label: 'Small padding', story: SmallPadding },
+  { label: 'Separate', story: Separate },
+  { label: 'Attached to component', story: AttachedToComponent },
+  { label: 'Inside component', story: InsideComponent },
+  { label: 'Custom icon', story: CustomIcon },
+  { label: 'Different icon color', story: DifferentIconColor },
 ];
 
 /** Chromatic snapshot for EmptyState: add every new visual variant here too. */
@@ -229,20 +175,12 @@ export const VisualTest: Story = {
   parameters: { chromatic: { disableSnapshot: false } },
   render: () => (
     <VerticalSpacing size={2}>
-      {visualTestVariants.map(({ label, props }) => (
+      {visualTestVariants.map(({ label, story }) => (
         <VerticalSpacing key={label} size={0.5}>
           <Text modifiers="bold">{label}</Text>
-          <EmptyState {...props} />
+          <VisualTestStory story={story} component={EmptyState} />
         </VerticalSpacing>
       ))}
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Attached to component</Text>
-        <AttachedToComponentTemplate />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Inside component</Text>
-        <InsideComponentTemplate />
-      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

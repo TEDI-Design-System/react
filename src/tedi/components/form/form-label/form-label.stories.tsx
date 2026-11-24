@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Label, LabelModifierProps } from '../../content/label/label';
 import { Col, Row } from '../../layout/grid';
@@ -137,19 +138,19 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <FormLabel id="input-id-vt-1" label="Label of input" />
+        <VisualTestStory story={Default} component={FormLabel} props={{ id: 'input-id-vt-1' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Size</Text>
-        <SizeTemplate />
+        <VisualTestStory story={Size} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Structure</Text>
-        <StructureTemplate />
+        <VisualTestStory story={Structure} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Label wrapping</Text>
-        <WrappingTemplate />
+        <VisualTestStory story={LabelWrapping} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),
@@ -163,7 +164,7 @@ export const VisualTestMobile: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Label wrapping</Text>
-        <WrappingTemplate />
+        <VisualTestStory story={LabelWrapping} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

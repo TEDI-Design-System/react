@@ -284,31 +284,35 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Textarea id="textarea-vt-default" label="Label" />
+        <VisualTestStory story={Default} component={Textarea} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Sizes</Text>
-        <TemplateSizes id="textarea-vt-sizes" label="Label" />
+        <VisualTestStory story={Sizes} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <TemplateColumnWithStates array={stateArray} label="Label" />
+        <VisualTestStory story={States} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With hint</Text>
-        <Textarea id="textarea-vt-hint" label="Label" helper={{ text: 'Hint text' }} />
+        <VisualTestStory story={WithHint} component={Textarea} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Hint text and character count</Text>
-        <Textarea id="textarea-vt-hint-and-count" label="Label" characterLimit={400} helper={[{ text: 'Hint text' }]} />
+        <VisualTestStory story={HintTextAndCharacterCount} component={Textarea} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Only character count</Text>
-        <Textarea id="textarea-vt-only-count" label="Label" characterLimit={400} />
+        <VisualTestStory story={OnlyCharacterCount} component={Textarea} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Text value</Text>
-        <Textarea id="textarea-vt-text-value" label="Label" defaultValue="Text value" />
+        <VisualTestStory story={TextValue} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default value</Text>
+        <VisualTestStory story={DefaultValue} component={Textarea} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Clear button on interaction</Text>
@@ -316,11 +320,11 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Placeholder</Text>
-        <Textarea id="textarea-vt-placeholder" label="Label" placeholder="Text value" />
+        <VisualTestStory story={Placeholder} component={Textarea} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Height examples</Text>
-        <TemplateHeights />
+        <VisualTestStory story={HeightExamples} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

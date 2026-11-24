@@ -804,6 +804,7 @@ export const Customized: StoryObj = {
 };
 
 export const AccordionBehavior: StoryObj = {
+  parameters: { visualTest: false },
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-16)' }}>
       <Heading element="h4" modifiers="h4">
@@ -961,6 +962,7 @@ hasn't met yet (incomplete prerequisites, missing permissions, etc.).
 
 export const HashDeepLinking: StoryObj = {
   parameters: {
+    visualTest: false,
     docs: {
       description: {
         story: `
@@ -1017,6 +1019,7 @@ is a no-op for items relying on the auto-generated React id.
 
 export const SemanticHeadings: StoryObj = {
   parameters: {
+    visualTest: false,
     docs: {
       description: {
         story: `

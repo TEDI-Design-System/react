@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
@@ -179,6 +180,7 @@ export const FullWidth: Story = {
 };
 
 export const Controlled: Story = {
+  parameters: { visualTest: false },
   args: {
     step: 1,
     max: 10,
@@ -222,14 +224,6 @@ export const Controlled: Story = {
   },
 };
 
-const visualTestStateArgs: Omit<NumberFieldProps, 'id'> = {
-  step: 1,
-  max: 10,
-  min: -10,
-  label: 'Label',
-  defaultValue: 1,
-};
-
 /** Chromatic snapshot for NumberField: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
@@ -238,76 +232,31 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <NumberField id="numberfield-vt-default" label="Label" defaultValue={1} step={1} max={10} min={0} />
+        <VisualTestStory story={Default} component={NumberField} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Sizes</Text>
-        <TemplateSizes id="numberfield-vt-sizes" label="Label" defaultValue={1} step={1} max={10} min={0} />
+        <VisualTestStory story={Sizes} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <VerticalSpacing>
-          <Row>
-            <Col lg={2} md={12} className="flex align-items-center gap-3">
-              <Text modifiers="bold">Default</Text>
-            </Col>
-            <Col>
-              <NumberField {...visualTestStateArgs} id="numberfield-vt-state-default" />
-            </Col>
-          </Row>
-          <Row>
-            <Col lg={2} md={12} className="flex align-items-center gap-3">
-              <Text modifiers="bold">Min value</Text>
-            </Col>
-            <Col>
-              <NumberField {...visualTestStateArgs} id="numberfield-vt-state-min" defaultValue={1} min={1} />
-            </Col>
-          </Row>
-          <Row>
-            <Col lg={2} md={12} className="flex align-items-center gap-3">
-              <Text modifiers="bold">Max value</Text>
-            </Col>
-            <Col>
-              <NumberField {...visualTestStateArgs} id="numberfield-vt-state-max" defaultValue={1} max={1} />
-            </Col>
-          </Row>
-          <Row>
-            <Col lg={2} md={12} className="flex align-items-center gap-3">
-              <Text modifiers="bold">Disabled</Text>
-            </Col>
-            <Col>
-              <NumberField {...visualTestStateArgs} id="numberfield-vt-state-disabled" defaultValue={1} disabled />
-            </Col>
-          </Row>
-          <Row>
-            <Col lg={2} md={12} className="flex align-items-center gap-3">
-              <Text modifiers="bold">Error</Text>
-            </Col>
-            <Col>
-              <NumberField
-                {...visualTestStateArgs}
-                id="numberfield-vt-state-error"
-                helper={{ id: 'numberfield-vt-state-error-helper', text: 'Feedback text', type: 'error' }}
-              />
-            </Col>
-          </Row>
-        </VerticalSpacing>
+        <VisualTestStory story={States} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With hint</Text>
-        <NumberField id="numberfield-vt-hint" label="Label" helper={{ text: 'Hint text', type: 'hint' }} />
+        <VisualTestStory story={WithHint} component={NumberField} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Decimal</Text>
-        <NumberField id="numberfield-vt-decimal" label="Label" defaultValue={1.5} step={0.25} max={3} min={-3} />
+        <VisualTestStory story={Decimal} component={NumberField} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With unit</Text>
-        <NumberField id="numberfield-vt-unit" label="Label" defaultValue={2} step={1} max={5} min={-5} suffix="unit" />
+        <VisualTestStory story={WithUnit} component={NumberField} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Full width</Text>
-        <NumberField id="numberfield-vt-full-width" label="Label" defaultValue={2} step={1} suffix="unit" fullWidth />
+        <VisualTestStory story={FullWidth} component={NumberField} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

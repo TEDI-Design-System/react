@@ -107,6 +107,7 @@ export const Short: Story = {
 };
 
 export const CustomAriaLabel: Story = {
+  parameters: { visualTest: false },
   render: Template,
   args: {
     ariaLabel: 'Site path',

@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, ReactNode } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
@@ -458,31 +459,31 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <DefaultTemplate />
+        <VisualTestStory story={Default} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Card rows</Text>
-        <CardRowsTemplate />
+        <VisualTestStory story={CardRows} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Card shortcut</Text>
-        <CardShortcutTemplate />
+        <VisualTestStory story={CardShortcut} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With icon card</Text>
-        <WithIconCardTemplate />
+        <VisualTestStory story={WithIconCard} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <StatesTemplate />
+        <VisualTestStory story={States} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">As link</Text>
-        <AsLinkTemplate />
+        <VisualTestStory story={AsLink} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Complex card</Text>
-        <ComplexCardTemplate />
+        <VisualTestStory story={ComplexCard} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),
