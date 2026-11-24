@@ -49,6 +49,24 @@ export const Default: Story = {
   ),
 };
 
+/**
+ * `mode="css"` always renders the content and hides it with CSS, so a server-rendered page is right at every
+ * width. The hidden content stays in the DOM, so keep fields and ids out of it.
+ */
+export const CssMode: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <Description>
+        The box below is wrapped in HideAt md with the css mode. Resize the viewport to see it disappear at md and
+        above.
+      </Description>
+      <HideAt md mode="css">
+        <Box>This content is hidden at md and above, with CSS.</Box>
+      </HideAt>
+    </div>
+  ),
+};
+
 export const MultipleBreakpoints: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

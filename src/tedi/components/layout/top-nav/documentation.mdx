@@ -155,7 +155,8 @@ can stay "selected" while its panel is closed).
 
 ## Responsive behavior & mobile drawer
 
-Below `mobileBreakpoint` the bar collapses into the shared `MobileNav` drawer.
+The bar is always rendered and hidden with CSS below `mobileBreakpoint`, where the shared `MobileNav`
+drawer takes over, so server-rendered pages show the bar at every desktop width without JavaScript.
 All top-level items become drawer entries. Any `submenu` is converted to drill-down
 `subItemGroups`, so group structure and sub-links are preserved.
 

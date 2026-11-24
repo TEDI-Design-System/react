@@ -1,0 +1,14 @@
+@use '../../../styles/breakpoint-classes';
+
+.tedi-hide-at {
+  display: contents;
+}
+
+// `xs` starts at 0, so hiding at `xs` and above hides at every width.
+.tedi-hide-at-from-xs {
+  display: none;
+}
+
+@include breakpoint-classes.from-modifiers('.tedi-hide-at') {
+  display: none;
+}
