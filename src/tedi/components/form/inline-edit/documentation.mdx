@@ -116,6 +116,34 @@ makes a selection rather than waiting for blur. A multi-select `Select` or `Chec
 </InlineEdit>
 ```
 
+## Controlling the edit mode
+
+Pass `editing` to decide yourself when the editor is open. `onEditStart` reports that the user opened it, `onChange`
+that they committed, and `onEditCancel` that they cancelled; update `editing` from those. Opening or closing it from
+your own code calls none of them, and the draft starts from the committed value.
+
+```tsx
+const [editing, setEditing] = useState(false);
+
+<InlineEdit<string>
+  label="Nimi"
+  value={name}
+  editing={editing}
+  onEditStart={() => setEditing(true)}
+  onEditCancel={() => setEditing(false)}
+  onChange={(next) => {
+    setName(next);
+    setEditing(false);
+  }}
+>
+  {({ value, onChange }) => <TextField id="name" label="Nimi" hideLabel value={value} onChange={onChange} />}
+</InlineEdit>;
+```
+
+`closeOnEnter`, `closeOnEscape` and `closeOnBlur` turn off committing on Enter, cancelling on Escape and committing
+when focus leaves the editor. `useInlineEdit` takes the same `editing`, `defaultEditing`, `onEditStart` and
+`onEditCancel` options.
+
 ## `useInlineEdit` hook
 
 When you need full control of the markup, use the headless `useInlineEdit` hook instead of the `InlineEdit` wrapper. It

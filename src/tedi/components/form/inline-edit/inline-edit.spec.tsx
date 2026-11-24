@@ -199,6 +199,149 @@ describe('InlineEdit', () => {
     expect(document.getElementById('row')).toHaveTextContent('John Mets');
   });
 
+  describe('edit lifecycle callbacks', () => {
+    it('calls onEditStart when the user opens the editor and onEditCancel when they cancel', async () => {
+      const onEditStart = jest.fn();
+      const onEditCancel = jest.fn();
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(<TextEditor onEditStart={onEditStart} onEditCancel={onEditCancel} onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      expect(onEditStart).toHaveBeenCalledTimes(1);
+
+      await user.keyboard('{Escape}');
+      expect(onEditCancel).toHaveBeenCalledTimes(1);
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('does not call onEditCancel when the edit is committed', async () => {
+      const onEditCancel = jest.fn();
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(<TextEditor onEditCancel={onEditCancel} onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      await user.keyboard('{Enter}');
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onEditCancel).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('controlled editing', () => {
+    const Controlled = (props: { onEditStart?: () => void; onEditCancel?: () => void; initial?: boolean }) => {
+      const [editing, setEditing] = useState(props.initial ?? false);
+      const [value, setValue] = useState('Mari');
+      return (
+        <InlineEdit<string>
+          label="Name"
+          value={value}
+          editing={editing}
+          onEditStart={() => {
+            setEditing(true);
+            props.onEditStart?.();
+          }}
+          onEditCancel={() => {
+            setEditing(false);
+            props.onEditCancel?.();
+          }}
+          onChange={(next) => {
+            setValue(next);
+            setEditing(false);
+          }}
+          renderValue={(v) => v}
+        >
+          {({ value: draft, onChange }) => (
+            <TextField id="ctl" label="Name" hideLabel value={draft} onChange={onChange} />
+          )}
+        </InlineEdit>
+      );
+    };
+
+    it('opens and closes through the parent state', async () => {
+      const onEditStart = jest.fn();
+      const onEditCancel = jest.fn();
+      const user = userEvent.setup();
+      render(<Controlled onEditStart={onEditStart} onEditCancel={onEditCancel} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      expect(onEditStart).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('textbox')).toHaveValue('Mari');
+
+      await user.keyboard('{Escape}');
+      expect(onEditCancel).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
+
+    it('stays in the mode the parent sets, whatever the user does', async () => {
+      const user = userEvent.setup();
+      render(
+        <InlineEdit<string> label="Name" value="Mari" editing renderValue={(v) => v}>
+          {({ value, onChange }) => <TextField id="fixed" label="Name" hideLabel value={value} onChange={onChange} />}
+        </InlineEdit>
+      );
+
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+
+    it('starts the draft from the committed value when the parent opens the editor', () => {
+      const { rerender } = render(
+        <InlineEdit<string> label="Name" value="Mari" editing={false} renderValue={(v) => v}>
+          {({ value, onChange }) => <TextField id="out" label="Name" hideLabel value={value} onChange={onChange} />}
+        </InlineEdit>
+      );
+
+      rerender(
+        <InlineEdit<string> label="Name" value="Mari" editing renderValue={(v) => v}>
+          {({ value, onChange }) => <TextField id="out" label="Name" hideLabel value={value} onChange={onChange} />}
+        </InlineEdit>
+      );
+
+      expect(screen.getByRole('textbox')).toHaveValue('Mari');
+    });
+  });
+
+  describe('closeOnEnter, closeOnEscape and closeOnBlur', () => {
+    it('does not commit on Enter with closeOnEnter off', async () => {
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(<TextEditor closeOnEnter={false} onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      await user.keyboard('{Enter}');
+
+      expect(onChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+
+    it('does not cancel on Escape with closeOnEscape off', async () => {
+      const onEditCancel = jest.fn();
+      const user = userEvent.setup();
+      render(<TextEditor closeOnEscape={false} onEditCancel={onEditCancel} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      await user.keyboard('{Escape}');
+
+      expect(onEditCancel).not.toHaveBeenCalled();
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+
+    it('does not commit when focus leaves with closeOnBlur off', async () => {
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(<TextEditor outside closeOnBlur={false} onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      await user.click(screen.getByRole('button', { name: 'outside' }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+
+      expect(onChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+  });
+
   describe('Escape in a select editor', () => {
     const options: ISelectOption[] = [
       { value: 'ee', label: 'Eesti' },

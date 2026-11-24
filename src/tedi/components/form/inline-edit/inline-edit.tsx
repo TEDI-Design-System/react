@@ -13,8 +13,14 @@ export interface UseInlineEditOptions<T> {
   defaultValue?: T;
   /** Called with the draft when an edit is committed. */
   onChange?: (value: T) => void;
+  /** Controlled edit mode. Update it from `onEditStart`, `onChange` and `onEditCancel`. */
+  editing?: boolean;
   /** Starts in edit mode. An editor that starts open does not take focus. @default false */
   defaultEditing?: boolean;
+  /** Called when the user enters edit mode. */
+  onEditStart?: () => void;
+  /** Called when the user cancels the edit. */
+  onEditCancel?: () => void;
 }
 
 export type InlineEditSize = 'default' | 'small';
@@ -50,13 +56,26 @@ export function useInlineEdit<T>({
   value,
   defaultValue,
   onChange,
+  editing,
   defaultEditing = false,
+  onEditStart,
+  onEditCancel,
 }: UseInlineEditOptions<T>): UseInlineEditResult<T> {
   const isControlled = value !== undefined;
   const [innerValue, setInnerValue] = React.useState<T>((value ?? defaultValue) as T);
   const committedValue = (isControlled ? value : innerValue) as T;
 
-  const [isEditing, setIsEditing] = React.useState(defaultEditing);
+  const isEditingControlled = editing !== undefined;
+  const [innerEditing, setInnerEditing] = React.useState(defaultEditing);
+  const isEditing = isEditingControlled ? editing : innerEditing;
+
+  const setIsEditing = React.useCallback(
+    (next: boolean) => {
+      if (!isEditingControlled) setInnerEditing(next);
+    },
+    [isEditingControlled]
+  );
+
   const [draft, setDraftState] = React.useState<T>(committedValue);
   const draftRef = React.useRef<T>(draft);
 
@@ -68,16 +87,27 @@ export function useInlineEdit<T>({
   const edit = React.useCallback(() => {
     setDraft(committedValue);
     setIsEditing(true);
-  }, [committedValue, setDraft]);
+    onEditStart?.();
+  }, [committedValue, setDraft, setIsEditing, onEditStart]);
 
-  const cancel = React.useCallback(() => setIsEditing(false), []);
+  const cancel = React.useCallback(() => {
+    setIsEditing(false);
+    onEditCancel?.();
+  }, [setIsEditing, onEditCancel]);
 
   const commit = React.useCallback(() => {
     const next = draftRef.current;
     if (!isControlled) setInnerValue(next);
     onChange?.(next);
     setIsEditing(false);
-  }, [isControlled, onChange]);
+  }, [isControlled, onChange, setIsEditing]);
+
+  // Edit mode entered from outside (controlled `editing`) still starts from the committed value.
+  const wasEditing = React.useRef(isEditing);
+  React.useEffect(() => {
+    if (isEditing && !wasEditing.current) setDraft(committedValue);
+    wasEditing.current = isEditing;
+  }, [isEditing, committedValue, setDraft]);
 
   return { isEditing, edit, commit, cancel, committedValue, value: draft, onChange: setDraft };
 }
@@ -118,6 +148,21 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    */
   fitContent?: boolean;
   /**
+   * Commits on Enter; turn it off when the editor uses Enter itself. A textarea, menu or button already keeps its Enter.
+   * @default true
+   */
+  closeOnEnter?: boolean;
+  /**
+   * Cancels on Escape.
+   * @default true
+   */
+  closeOnEscape?: boolean;
+  /**
+   * Commits when focus leaves the editor or the menus it opens.
+   * @default true
+   */
+  closeOnBlur?: boolean;
+  /**
    * Text size and row spacing of the read trigger and editor.
    * @default default
    */
@@ -152,6 +197,9 @@ export function InlineEdit<T>({
   invalid = false,
   helper,
   fitContent = false,
+  closeOnEnter = true,
+  closeOnEscape = true,
+  closeOnBlur = true,
   size = 'default',
   editIconPosition = 'end',
   id,
@@ -278,6 +326,7 @@ export function InlineEdit<T>({
         onKeyDown={(event) => {
           if (event.nativeEvent.isComposing) return;
           if (event.key === 'Escape') {
+            if (!closeOnEscape) return;
             event.stopPropagation();
             // The first Escape closes an open menu or popover; the next one cancels.
             if ((event.target as HTMLElement).closest('[aria-expanded="true"]')) return;
@@ -287,6 +336,7 @@ export function InlineEdit<T>({
           }
 
           if (event.key === 'Enter' && !event.shiftKey) {
+            if (!closeOnEnter) return;
             const target = event.target as HTMLElement;
             const isMultiline = target.tagName === 'TEXTAREA';
             const isWidgetInput = !!target.closest('[role="combobox"], [role="listbox"]');
@@ -297,6 +347,7 @@ export function InlineEdit<T>({
           }
         }}
         onBlur={() => {
+          if (!closeOnBlur) return;
           window.setTimeout(() => {
             if (!editorRef.current) return;
             const active = document.activeElement;

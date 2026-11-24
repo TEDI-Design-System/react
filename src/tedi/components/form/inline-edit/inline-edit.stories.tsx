@@ -226,10 +226,40 @@ const meta: Meta<typeof InlineEdit> = {
         'Sizes the row to its value instead of filling its container, so the row changes width when the editor opens.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
+    editing: {
+      control: false,
+      description: 'Controlled edit mode; update it from `onEditStart`, `onChange` and `onEditCancel`.',
+      table: { type: { summary: 'boolean' } },
+    },
     defaultEditing: {
       control: false,
       description: 'Starts in edit mode. An editor that starts open does not take focus.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
+    onEditStart: {
+      control: false,
+      description: 'Called when the user enters edit mode.',
+      table: { type: { summary: '() => void' } },
+    },
+    onEditCancel: {
+      control: false,
+      description: 'Called when the user cancels the edit.',
+      table: { type: { summary: '() => void' } },
+    },
+    closeOnEnter: {
+      control: 'boolean',
+      description: 'Commits on Enter; turn it off when the editor uses Enter itself.',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'true' } },
+    },
+    closeOnEscape: {
+      control: 'boolean',
+      description: 'Cancels on Escape.',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'true' } },
+    },
+    closeOnBlur: {
+      control: 'boolean',
+      description: 'Commits when focus leaves the editor or the menus it opens.',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'true' } },
     },
     value: {
       control: false,
@@ -279,6 +309,9 @@ export const Default: Story = {
     readOnly: false,
     disabled: false,
     fitContent: false,
+    closeOnEnter: true,
+    closeOnEscape: true,
+    closeOnBlur: true,
   },
   render: function DefaultField(args) {
     const [value, setValue] = useState('Mari Maasikas');
@@ -292,6 +325,9 @@ export const Default: Story = {
           readOnly={args.readOnly}
           disabled={args.disabled}
           fitContent={args.fitContent}
+          closeOnEnter={args.closeOnEnter}
+          closeOnEscape={args.closeOnEscape}
+          closeOnBlur={args.closeOnBlur}
           value={value}
           onChange={setValue}
           renderValue={(v) => v}
