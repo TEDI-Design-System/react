@@ -1,3 +1,10 @@
+# [21.0.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.24...react-21.0.0-rc.25) (2026-11-24)
+
+
+### Bug Fixes
+
+* **calendar:** Shorten Day Labels [#1131](https://github.com/TEDI-Design-System/react/issues/1131) ([#1143](https://github.com/TEDI-Design-System/react/issues/1143)) ([68c8b11](https://github.com/TEDI-Design-System/react/commit/68c8b1144210a369b93ad8f31803f4a7351cfe6c))
+
 # [21.0.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.23...react-21.0.0-rc.24) (2026-11-20)
 
 
