@@ -84,6 +84,27 @@ describe('InlineEdit', () => {
       expect(document.getElementById('field-helper')).toHaveTextContent('Vigane väärtus');
     });
 
+    it('links every message of a list of helper texts to the editor control', async () => {
+      const user = userEvent.setup();
+      render(
+        <TextEditor
+          id="field"
+          helper={[
+            { text: 'Esimene teade', type: 'hint' },
+            { text: 'Teine teade', type: 'error' },
+          ]}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveAttribute('aria-describedby', 'field-helper-0 field-helper-1');
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      expect(document.getElementById('field-helper-0')).toHaveTextContent('Esimene teade');
+      expect(document.getElementById('field-helper-1')).toHaveTextContent('Teine teade');
+    });
+
     it('keeps description ids the control already has', async () => {
       const user = userEvent.setup();
       render(
