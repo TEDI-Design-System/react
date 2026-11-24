@@ -2,7 +2,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import NextLink from 'next/link';
 import { ElementType, forwardRef } from 'react';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text, TextProps } from '../../base/typography/text/text';
 import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
@@ -378,7 +378,7 @@ const visualTestVariants: { label: string; inverted?: boolean; story: StoryObj<T
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     pseudo: {
       hover: '[id^="vt-"][id*="-Hover-"]',
       active: '[id^="vt-"][id*="-Active-"]',

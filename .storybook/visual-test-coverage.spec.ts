@@ -2,16 +2,15 @@ import { readdirSync, readFileSync } from 'fs';
 import { join, relative } from 'path';
 
 /**
- * Fails when a docs story in a stories file with a `VisualTest` is not rendered by `VisualTest` /
- * `VisualTestMobile`, so a new story can't silently miss Chromatic. A story passes when the
- * composites (or a non-story helper they use) reference it by name, or call a template that only
- * this story uses. Stories with their own snapshot (`disableSnapshot: false`), hidden stories
+ * Fails when a docs story in a stories file with a `VisualTest` is not rendered by `VisualTest`, so a
+ * new story can't silently miss Chromatic. A story passes when the composite (or a non-story helper
+ * it uses) references it by name, or calls a template that only this story uses. Stories with their own snapshot (`disableSnapshot: false`), hidden stories
  * (`!dev`) and stories marked `parameters: { visualTest: false }` are skipped.
  */
 
 const ROOT = join(__dirname, '..');
 const STORIES_DIR = join(ROOT, 'src/tedi');
-const COMPOSITES = ['VisualTest', 'VisualTestMobile'];
+const COMPOSITES = ['VisualTest'];
 
 const DECLARATION = /^(?:export\s+)?(?:const|let|function|class)\s+([A-Za-z_$][\w$]*)/;
 const IDENTIFIER = /[A-Za-z_$][\w$]*/g;
@@ -58,6 +57,13 @@ const declarations = (source: string): Declaration[] => {
 
 const identifiers = (text: string) => new Set(text.match(IDENTIFIER) ?? []);
 
+/**
+ * Whether `text` uses the story as a value (`story: X`, `X.args`, `{...X}`, `onBrand(X)`, `X as StoryObj`), not
+ * just its name as text: `"Default"` in a string or `>Default<` in markup doesn't count.
+ */
+const referencesStory = (text: string, name: string): boolean =>
+  new RegExp(`(?<![\\w$"'>-])${name}(?=\\s*[.,)}\\]]|\\s+as\\b)`).test(text);
+
 /** Stories that need a `VisualTest` block but have none. */
 const missingStories = (source: string): string[] => {
   const decls = declarations(source);
@@ -99,9 +105,15 @@ const missingStories = (source: string): string[] => {
         !/visualTest:\s*false/.test(story.body) &&
         !/["']!dev["']/.test(story.body)
     )
-    .filter((story) => !reachedIds.has(story.name) && !ownTemplate(story))
+    .filter((story) => !referencesStory(reached, story.name) && !ownTemplate(story))
     .map((story) => story.name);
 };
+
+/** The `VisualTest` declaration's parameters use the shared widths. */
+const usesBothWidths = (source: string): boolean =>
+  declarations(source).some(
+    (decl) => decl.name === 'VisualTest' && /viewports:\s*VISUAL_TEST_VIEWPORTS\b/.test(decl.body)
+  );
 
 describe('VisualTest coverage', () => {
   const files = storyFiles().filter((file) => /^export const VisualTest\b/m.test(readFileSync(file, 'utf8')));
@@ -114,6 +126,13 @@ describe('VisualTest coverage', () => {
     '%s renders every docs story in VisualTest',
     (_name, file) => {
       expect(missingStories(readFileSync(file, 'utf8'))).toEqual([]);
+    }
+  );
+
+  it.each(files.map((file) => [relative(ROOT, file), file]))(
+    '%s snapshots VisualTest at both widths',
+    (_name, file) => {
+      expect(usesBothWidths(readFileSync(file, 'utf8'))).toBe(true);
     }
   );
 });

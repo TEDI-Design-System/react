@@ -6,7 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
@@ -1097,7 +1097,7 @@ const visualTestStories: { label: string; story: StoryObj }[] = [
 export const VisualTest: StoryObj = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     a11y: {
       config: {
         rules: [{ id: 'landmark-unique', enabled: false }],
@@ -1112,24 +1112,6 @@ export const VisualTest: StoryObj = {
           <VisualTestStory story={story} />
         </VerticalSpacing>
       ))}
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for Accordion: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: StoryObj = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Customized</Text>
-        <VisualTestStory story={Customized} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Action types</Text>
-        <VisualTestStory story={ActionTypes} />
-      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

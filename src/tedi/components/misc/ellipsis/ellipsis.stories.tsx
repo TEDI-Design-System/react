@@ -1,6 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Popover from '../../overlays/popover/popover';
@@ -96,7 +96,7 @@ export const ResponsiveWithCustomPopover: Story = {
 /** Chromatic snapshot for Ellipsis: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
   render: () => (
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
@@ -107,24 +107,6 @@ export const VisualTest: Story = {
         <Text modifiers="bold">Leading start</Text>
         <VisualTestStory story={LeadingStart} />
       </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Responsive</Text>
-        <VisualTestStory story={ResponsiveExample} component={Ellipsis} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Responsive with custom popover</Text>
-        <VisualTestStory story={ResponsiveWithCustomPopover} component={Ellipsis} />
-      </VerticalSpacing>
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for Ellipsis: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Responsive</Text>
         <VisualTestStory story={ResponsiveExample} component={Ellipsis} />

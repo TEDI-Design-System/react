@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactNode } from 'react';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Collapse } from '../../content/collapse/collapse';
@@ -449,7 +449,7 @@ const visualTestStories: { label: string; story: Story }[] = [
 /** Chromatic snapshot for Timeline: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
   render: () => (
     <VerticalSpacing size={2}>
       {visualTestStories.map(({ label, story }) => (
@@ -458,24 +458,6 @@ export const VisualTest: Story = {
           <VisualTestStory story={story} component={Timeline} />
         </VerticalSpacing>
       ))}
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for Timeline: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Position</Text>
-        <VisualTestStory story={Position} component={Timeline} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Timeline card</Text>
-        <VisualTestStory story={TimelineCard} component={Timeline} />
-      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

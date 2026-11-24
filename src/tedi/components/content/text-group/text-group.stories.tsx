@@ -1,7 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { ReactNode } from 'react';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import InfoButton from '../../buttons/info-button/info-button';
@@ -554,7 +554,7 @@ const visualTestBlocks: { label: string; content: ReactNode }[] = [
 /** Chromatic snapshot for TextGroup: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
   render: () => (
     <VerticalSpacing size={2}>
       {visualTestBlocks.map(({ label, content }) => (
@@ -563,20 +563,6 @@ export const VisualTest: Story = {
           {content}
         </VerticalSpacing>
       ))}
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for TextGroup: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Responsive</Text>
-        <VisualTestStory story={Responsive} />
-      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

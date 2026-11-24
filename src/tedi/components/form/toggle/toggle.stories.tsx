@@ -1,6 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text, TextProps } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -317,7 +317,7 @@ const visualTestPseudoIds = (state: string) =>
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     pseudo: {
       hover: visualTestPseudoIds('Hover'),
       active: visualTestPseudoIds('Active'),
@@ -332,24 +332,24 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Size</Text>
-        <TemplateColumn {...(Size.args as TemplateMultipleProps)} idPrefix="toggle-vt-size-" />
+        <VisualTestStory story={{ ...Size, args: { ...Size.args, idPrefix: 'toggle-vt-size-' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Type</Text>
-        <Type />
+        <VisualTestStory story={{ render: Type }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Label position</Text>
-        <LabelPosition />
+        <VisualTestStory story={{ render: LabelPosition }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <States />
+        <VisualTestStory story={{ render: States }} />
       </VerticalSpacing>
       {visualTestStateVariants.map(({ label, idPrefix, story }) => (
         <VerticalSpacing size={0.5} key={idPrefix}>
           <Text modifiers="bold">{label}</Text>
-          <TemplateStates {...(story.args as TemplateMultipleProps)} idPrefix={idPrefix} />
+          <VisualTestStory story={{ ...story, args: { ...story.args, idPrefix } }} />
         </VerticalSpacing>
       ))}
       <VerticalSpacing size={0.5}>

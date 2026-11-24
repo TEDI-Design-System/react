@@ -6,7 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Col, ColProps, Row } from '../../layout/grid';
@@ -578,9 +578,9 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
   { label: 'Radio row', content: <VisualTestStory story={RadioRow} component={ChoiceGroup} /> },
   { label: 'Checkbox', content: <VisualTestStory story={Checkbox} component={ChoiceGroup} /> },
   { label: 'Checkbox row', content: <VisualTestStory story={CheckboxRow} component={ChoiceGroup} /> },
-  { label: 'Radio card segmented', content: <RadioCardSegmented /> },
-  { label: 'Radio card separated', content: <RadioCardSeparated /> },
-  { label: 'Checkbox card', content: <CheckboxCard /> },
+  { label: 'Radio card segmented', content: <VisualTestStory story={{ render: RadioCardSegmented }} /> },
+  { label: 'Radio card separated', content: <VisualTestStory story={{ render: RadioCardSeparated }} /> },
+  { label: 'Checkbox card', content: <VisualTestStory story={{ render: CheckboxCard }} /> },
   { label: 'Radio card with icon', content: <VisualTestStory story={RadioCardWithIcon} component={ChoiceGroup} /> },
   {
     label: 'Checkbox card with icon',
@@ -620,7 +620,7 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
 /** Chromatic snapshot for ChoiceGroup: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
   render: () => (
     <VerticalSpacing size={2}>
       {visualTestBlocks.map(({ label, content }) => (
@@ -629,20 +629,6 @@ export const VisualTest: Story = {
           {content}
         </VerticalSpacing>
       ))}
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for ChoiceGroup: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Responsive</Text>
-        <VisualTestStory story={Responsive} component={ChoiceGroup} />
-      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

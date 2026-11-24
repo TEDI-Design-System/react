@@ -1,6 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
@@ -157,7 +157,7 @@ export const ColorInverted: Story = {
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     pseudo: {
       hover: ['.hover', '#vt-states-Hover', '#vt-brand-Hover', '#vt-inverted-Hover'],
       active: ['#vt-states-Active', '#vt-brand-Active', '#vt-inverted-Active'],
@@ -180,11 +180,11 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <StatesTemplate {...States.args} idPrefix="vt-states-" />
+        <VisualTestStory story={{ ...States, args: { ...States.args, idPrefix: 'vt-states-' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Color brand</Text>
-        <StatesTemplate {...ColorBrand.args} idPrefix="vt-brand-" />
+        <VisualTestStory story={{ ...ColorBrand, args: { ...ColorBrand.args, idPrefix: 'vt-brand-' } }} />
       </VerticalSpacing>
       <Card background="brand-primary" borderless>
         <Card.Content>
@@ -192,7 +192,7 @@ export const VisualTest: Story = {
             <Text modifiers="bold" color="white">
               Color inverted
             </Text>
-            <StatesTemplate {...ColorInverted.args} idPrefix="vt-inverted-" />
+            <VisualTestStory story={{ ...ColorInverted, args: { ...ColorInverted.args, idPrefix: 'vt-inverted-' } }} />
           </VerticalSpacing>
         </Card.Content>
       </Card>

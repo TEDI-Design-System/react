@@ -1,6 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
-import { VisualTestStory } from '../../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../../.storybook/visual-test-story';
 import { Col, Row } from '../../../layout/grid';
 import { VerticalSpacing } from '../../../layout/vertical-spacing';
 import { HeadingModifiers, Text } from '../text/text';
@@ -136,7 +136,7 @@ export const SemanticHeadings: Story = {
 /** Chromatic snapshot for Heading: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
   render: () => (
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>

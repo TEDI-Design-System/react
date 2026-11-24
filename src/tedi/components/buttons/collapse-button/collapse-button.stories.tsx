@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useArgs } from 'storybook/preview-api';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text, TextProps } from '../../base/typography/text/text';
 import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
@@ -162,7 +163,7 @@ const metaArgs = meta.args as StatesArgs;
 export const VisualTest: StoryObj<StatesArgs> = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     pseudo: {
       hover: '[id^="vt-"][id*="-Hover-"]',
       active: '[id^="vt-"][id*="-Active-"]',
@@ -172,16 +173,22 @@ export const VisualTest: StoryObj<StatesArgs> = {
   render: () => (
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={{ args: { ...meta.args, ...Default.args } }} component={CollapseButton} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <StatesTemplate {...metaArgs} {...States.args} idPrefix="vt-states-" />
+        <VisualTestStory story={{ ...States, args: { ...metaArgs, ...States.args, idPrefix: 'vt-states-' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Icon only</Text>
-        <StatesTemplate {...metaArgs} {...IconOnly.args} idPrefix="vt-icon-only-" />
+        <VisualTestStory story={{ ...IconOnly, args: { ...metaArgs, ...IconOnly.args, idPrefix: 'vt-icon-only-' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Secondary button</Text>
-        <StatesTemplate {...metaArgs} {...SecondaryButton.args} idPrefix="vt-secondary-" />
+        <VisualTestStory
+          story={{ ...SecondaryButton, args: { ...metaArgs, ...SecondaryButton.args, idPrefix: 'vt-secondary-' } }}
+        />
       </VerticalSpacing>
       <Card background="brand-primary" borderless>
         <Card.Content>
@@ -189,7 +196,9 @@ export const VisualTest: StoryObj<StatesArgs> = {
             <Text modifiers="bold" color="white">
               With text inverted
             </Text>
-            <StatesTemplate {...metaArgs} {...WithTextInverted.args} idPrefix="vt-inverted-" />
+            <VisualTestStory
+              story={{ ...WithTextInverted, args: { ...metaArgs, ...WithTextInverted.args, idPrefix: 'vt-inverted-' } }}
+            />
           </VerticalSpacing>
         </Card.Content>
       </Card>
@@ -199,7 +208,12 @@ export const VisualTest: StoryObj<StatesArgs> = {
             <Text modifiers="bold" color="white">
               Icon only inverted
             </Text>
-            <StatesTemplate {...metaArgs} {...IconOnlyInverted.args} idPrefix="vt-icon-only-inverted-" />
+            <VisualTestStory
+              story={{
+                ...IconOnlyInverted,
+                args: { ...metaArgs, ...IconOnlyInverted.args, idPrefix: 'vt-icon-only-inverted-' },
+              }}
+            />
           </VerticalSpacing>
         </Card.Content>
       </Card>

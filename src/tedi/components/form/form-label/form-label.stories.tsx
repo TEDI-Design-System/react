@@ -1,6 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Label, LabelModifierProps } from '../../content/label/label';
 import { Col, Row } from '../../layout/grid';
@@ -133,7 +133,7 @@ export const LabelWrapping = {
 /** Chromatic snapshot for FormLabel: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
   render: () => (
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
@@ -148,20 +148,6 @@ export const VisualTest: Story = {
         <Text modifiers="bold">Structure</Text>
         <VisualTestStory story={Structure} />
       </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Label wrapping</Text>
-        <VisualTestStory story={LabelWrapping} />
-      </VerticalSpacing>
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for FormLabel: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Label wrapping</Text>
         <VisualTestStory story={LabelWrapping} />

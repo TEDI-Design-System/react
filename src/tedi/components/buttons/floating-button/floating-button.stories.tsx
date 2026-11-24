@@ -1,6 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -177,7 +177,7 @@ export const SecondaryVertical: StoryObj<TemplateMultipleProps> = {
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     pseudo: {
       hover: '[id^="vt-"][id*="-Hover-"]',
       active: '[id^="vt-"][id*="-Active-"]',
@@ -193,33 +193,28 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Primary horizontal</Text>
         <VisualTestStory
-          story={{ args: PrimaryHorizontal.args }}
-          component={TemplateColumn}
-          props={{ idPrefix: 'vt-primary-horizontal-' }}
+          story={{ ...PrimaryHorizontal, args: { ...PrimaryHorizontal.args, idPrefix: 'vt-primary-horizontal-' } }}
         />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Primary vertical</Text>
         <VisualTestStory
-          story={{ args: PrimaryVertical.args }}
-          component={TemplateColumn}
-          props={{ idPrefix: 'vt-primary-vertical-' }}
+          story={{ ...PrimaryVertical, args: { ...PrimaryVertical.args, idPrefix: 'vt-primary-vertical-' } }}
         />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Secondary horizontal</Text>
         <VisualTestStory
-          story={{ args: SecondaryHorizontal.args }}
-          component={TemplateColumn}
-          props={{ idPrefix: 'vt-secondary-horizontal-' }}
+          story={{
+            ...SecondaryHorizontal,
+            args: { ...SecondaryHorizontal.args, idPrefix: 'vt-secondary-horizontal-' },
+          }}
         />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Secondary vertical</Text>
         <VisualTestStory
-          story={{ args: SecondaryVertical.args }}
-          component={TemplateColumn}
-          props={{ idPrefix: 'vt-secondary-vertical-' }}
+          story={{ ...SecondaryVertical, args: { ...SecondaryVertical.args, idPrefix: 'vt-secondary-vertical-' } }}
         />
       </VerticalSpacing>
     </VerticalSpacing>

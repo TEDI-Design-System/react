@@ -1,6 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Card } from '../../content/card';
 import { Label } from '../../content/label/label';
@@ -184,7 +184,7 @@ export const UsageWithTooltipAndPopover: Story = {
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     pseudo: {
       hover: ['#vt-states-Hover', '#vt-inverted-Hover'],
       active: ['#vt-states-Active', '#vt-inverted-Active'],
@@ -199,7 +199,7 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
-        <VisualTestStory story={{ args: States.args }} component={TemplateColumn} props={{ idPrefix: 'vt-states-' }} />
+        <VisualTestStory story={{ ...States, args: { ...States.args, idPrefix: 'vt-states-' } }} />
       </VerticalSpacing>
       <Card background="brand-primary" borderless>
         <Card.Content>
@@ -207,11 +207,7 @@ export const VisualTest: Story = {
             <Text modifiers="bold" color="white">
               Inverted
             </Text>
-            <VisualTestStory
-              story={{ args: Inverted.args }}
-              component={TemplateColumn}
-              props={{ idPrefix: 'vt-inverted-' }}
-            />
+            <VisualTestStory story={{ ...Inverted, args: { ...Inverted.args, idPrefix: 'vt-inverted-' } }} />
           </VerticalSpacing>
         </Card.Content>
       </Card>

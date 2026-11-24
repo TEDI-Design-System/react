@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Card } from '../../content/card';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -464,7 +464,7 @@ export const ShowAllPageSize: Story = {
 /** Chromatic snapshot for Pagination: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
   render: () => (
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
@@ -578,28 +578,6 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Show all page size</Text>
         <VisualTestStory story={ShowAllPageSize} props={{ labels: { ariaLabel: 'Show all page size' } }} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Responsive visibility</Text>
-        <VisualTestStory
-          story={ResponsiveVisibility}
-          component={Pagination}
-          props={{ labels: { ariaLabel: 'Responsive visibility' } }}
-        />
-      </VerticalSpacing>
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for Pagination: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Arrows primary variant</Text>
-        <VisualTestStory story={ArrowsPrimaryVariant} props={{ labels: { ariaLabel: 'Arrows primary variant' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Responsive visibility</Text>

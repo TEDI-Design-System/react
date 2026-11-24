@@ -1,7 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -410,7 +410,7 @@ export const WithSubTabs: Story = {
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     a11y: {
       config: {
         rules: [
@@ -429,15 +429,15 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <DefaultTemplate idPrefix="vt-1-" />
+        <VisualTestStory story={Default} props={{ idPrefix: 'vt-1-' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With icons</Text>
-        <WithIconsTemplate idPrefix="vt-2-" />
+        <VisualTestStory story={WithIcons} props={{ idPrefix: 'vt-2-' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With status badge</Text>
-        <WithStatusBadgeTemplate idPrefix="vt-3-" />
+        <VisualTestStory story={WithStatusBadge} props={{ idPrefix: 'vt-3-' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
@@ -445,25 +445,11 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With disabled tab</Text>
-        <WithDisabledTabTemplate idPrefix="vt-4-" />
+        <VisualTestStory story={WithDisabledTab} props={{ idPrefix: 'vt-4-' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With sub tabs</Text>
-        <WithSubTabsTemplate idPrefix="vt-5-" />
-      </VerticalSpacing>
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for Tabs: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">With sub tabs</Text>
-        <WithSubTabsTemplate idPrefix="vt-mobile-" />
+        <VisualTestStory story={WithSubTabs} props={{ idPrefix: 'vt-5-' }} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

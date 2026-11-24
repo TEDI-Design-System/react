@@ -1,7 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -298,7 +298,7 @@ export const Stretched: Story = {
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     pseudo: {
       hover: ['#Hover-primary', '#Hover-secondary'],
       active: ['#Active-primary', '#Active-secondary'],
@@ -309,23 +309,23 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Template {...Default.args} idPrefix="vt-default-" />
+        <VisualTestStory story={{ ...Default, args: { ...Default.args, idPrefix: 'vt-default-' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Sizes</Text>
-        <TemplateSizes {...(Sizes.args as TemplateMultipleProps)} idPrefix="vt-sizes-" />
+        <VisualTestStory story={{ ...Sizes, args: { ...Sizes.args, idPrefix: 'vt-sizes-' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Types</Text>
-        <TemplateTypes {...Types.args} idPrefix="vt-types-" />
+        <VisualTestStory story={{ ...Types, args: { ...Types.args, idPrefix: 'vt-types-' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With icon</Text>
-        <TemplateWithIcons {...WithIcon.args} idPrefix="vt-with-icon-" />
+        <VisualTestStory story={{ ...WithIcon, args: { ...WithIcon.args, idPrefix: 'vt-with-icon-' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Icon only</Text>
-        <TemplateIconOnly {...IconOnly.args} idPrefix="vt-icon-only-" />
+        <VisualTestStory story={{ ...IconOnly, args: { ...IconOnly.args, idPrefix: 'vt-icon-only-' } }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Primary states</Text>
@@ -337,41 +337,13 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Different width buttons</Text>
-        <DifferentWidthTemplate {...DifferentWidthButtons.args} idPrefix="vt-different-width-" />
+        <VisualTestStory
+          story={{ ...DifferentWidthButtons, args: { ...DifferentWidthButtons.args, idPrefix: 'vt-different-width-' } }}
+        />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Stretched</Text>
-        <Template {...Stretched.args} idPrefix="vt-stretched-" />
-      </VerticalSpacing>
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for ButtonGroup: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Default</Text>
-        <Template {...Default.args} idPrefix="vt-mobile-default-" />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Sizes</Text>
-        <TemplateSizes {...(Sizes.args as TemplateMultipleProps)} idPrefix="vt-mobile-sizes-" />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">With icon</Text>
-        <TemplateWithIcons {...WithIcon.args} idPrefix="vt-mobile-with-icon-" />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Different width buttons</Text>
-        <DifferentWidthTemplate {...DifferentWidthButtons.args} idPrefix="vt-mobile-different-width-" />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Stretched</Text>
-        <Template {...Stretched.args} idPrefix="vt-mobile-stretched-" />
+        <VisualTestStory story={{ ...Stretched, args: { ...Stretched.args, idPrefix: 'vt-stretched-' } }} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

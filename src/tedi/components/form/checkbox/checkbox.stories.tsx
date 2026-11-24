@@ -1,7 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -710,7 +710,7 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
   { label: 'Hidden label', content: <VisualTestStory story={HiddenLabel as StoryObj} /> },
   { label: 'With helper', content: <VisualTestStory story={WithHelper as StoryObj} /> },
   { label: 'With tooltip', content: <VisualTestStory story={WithTooltip as StoryObj} /> },
-  { label: 'With long title', content: <WithLongTitle /> },
+  { label: 'With long title', content: <VisualTestStory story={{ render: WithLongTitle }} /> },
   { label: 'Group', content: <VisualTestStory story={Group} /> },
   { label: 'Group required', content: <VisualTestStory story={GroupRequired} /> },
   { label: 'Group invalid', content: <VisualTestStory story={GroupInvalid} /> },
@@ -719,7 +719,7 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
   { label: 'Cards with label', content: <VisualTestStory story={CardsWithLabel} /> },
   { label: 'Cards with description', content: <VisualTestStory story={CardsWithDescription} /> },
   { label: 'Cards with icons', content: <VisualTestStory story={CardsWithIcons} /> },
-  { label: 'States', content: <States /> },
+  { label: 'States', content: <VisualTestStory story={{ render: States }} /> },
   { label: 'Card states primary', content: <VisualTestStory story={CardStatesPrimary} /> },
   { label: 'Card states secondary', content: <VisualTestStory story={CardStatesSecondary} /> },
   { label: 'Responsive variant', content: <VisualTestStory story={ResponsiveVariant} /> },
@@ -729,7 +729,7 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
 export const VisualTest: StoryObj = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     pseudo: {
       hover: [...cardStatesPseudo('primary').hover, ...cardStatesPseudo('secondary').hover],
       active: [
@@ -752,32 +752,6 @@ export const VisualTest: StoryObj = {
           {content}
         </VerticalSpacing>
       ))}
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for Checkbox: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: StoryObj = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Responsive variant</Text>
-        <VisualTestStory story={ResponsiveVariant} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Group</Text>
-        <VisualTestStory story={Group} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Cards with description</Text>
-        <VisualTestStory story={CardsWithDescription} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Cards with icons</Text>
-        <VisualTestStory story={CardsWithIcons} />
-      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -373,7 +373,7 @@ export const Responsive: Story = {
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     pseudo: { hover: ['.vs-hover a', '.vs-hover button'] },
     a11y: {
       config: {
@@ -408,26 +408,12 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Compact</Text>
-        <CompactTemplate ariaLabel="Hindamise edenemine, kompaktne" />
+        <VisualTestStory story={Compact} props={{ ariaLabel: 'Hindamise edenemine, kompaktne' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>
         <VisualTestStory story={States} />
       </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Responsive</Text>
-        <VisualTestStory story={Responsive} />
-      </VerticalSpacing>
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for VerticalStepper: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Responsive</Text>
         <VisualTestStory story={Responsive} />

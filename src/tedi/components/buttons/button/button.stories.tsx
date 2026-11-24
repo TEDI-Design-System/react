@@ -1,7 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { ElementType } from 'react';
 
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text, TextProps } from '../../base/typography/text/text';
 import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
@@ -466,7 +466,7 @@ const visualTestVariants: {
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     pseudo: {
       hover: '[id^="vt-"][id*="-Hover-"]',
       active: '[id^="vt-"][id*="-Active-"]',
@@ -486,14 +486,14 @@ export const VisualTest: Story = {
                 <Text modifiers="bold" color="white">
                   {label}
                 </Text>
-                <VisualTestStory story={{ args: story.args }} component={TemplateColumn} props={{ idPrefix }} />
+                <VisualTestStory story={{ ...story, args: { ...story.args, idPrefix } }} />
               </VerticalSpacing>
             </Card.Content>
           </Card>
         ) : (
           <VerticalSpacing key={idPrefix} size={0.5}>
             <Text modifiers="bold">{label}</Text>
-            <VisualTestStory story={{ args: story.args }} component={TemplateColumn} props={{ idPrefix }} />
+            <VisualTestStory story={{ ...story, args: { ...story.args, idPrefix } }} />
           </VerticalSpacing>
         )
       )}
@@ -520,20 +520,6 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Visual type link</Text>
         <VisualTestStory story={VisualTypeLink} />
-      </VerticalSpacing>
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for Button: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
-  render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Responsive</Text>
-        <VisualTestStory story={ResponsiveButton} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

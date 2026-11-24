@@ -6,7 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
-import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -383,7 +383,7 @@ export const CompactStates: Story = {
 /** Chromatic snapshot for HorizontalStepper: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false }, ...statesPseudo },
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS }, ...statesPseudo },
   render: () => (
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
@@ -413,52 +413,6 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Compact</Text>
         <VisualTestStory story={Compact} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">External navigation</Text>
-        <ExternalNavigationTemplate ariaLabel="External navigation" />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">States</Text>
-        <VisualTestStory story={States} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Compact states</Text>
-        <VisualTestStory story={CompactStates} props={{ labelPrefix: 'Compact: ' }} />
-      </VerticalSpacing>
-    </VerticalSpacing>
-  ),
-};
-
-/** Chromatic mobile snapshot for HorizontalStepper: add every variant that renders differently below its breakpoint here too. */
-export const VisualTestMobile: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375] }, ...statesPseudo },
-  render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Default</Text>
-        <VisualTestStory story={Default} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Second step</Text>
-        <VisualTestStory story={SecondStep} props={{ 'aria-label': 'Second step' }} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Third step</Text>
-        <VisualTestStory story={ThirdStep} props={{ 'aria-label': 'Third step' }} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">With errors</Text>
-        <VisualTestStory story={WithErrors} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">With descriptions</Text>
-        <VisualTestStory story={WithDescriptions} />
-      </VerticalSpacing>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Transparent background</Text>
-        <VisualTestStory story={TransparentBackground} props={{ 'aria-label': 'Transparent background' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">External navigation</Text>

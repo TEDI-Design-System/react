@@ -49,7 +49,7 @@ Components live in two tiers: `src/tedi/` (TEDI-READY, must meet the [Definition
 
 ## Visual tests
 
-Chromatic snapshots each component through one hidden `VisualTest` story, plus a `VisualTestMobile` story for variants that look different on mobile. The docs stories themselves are not snapshotted. When you add a story to a component that has `VisualTest`, add a block for it there too. The block renders the docs story through `<VisualTestStory>` from `.storybook/visual-test-story`, so later changes to the story reach Chromatic. Don't copy the story's markup.
+Chromatic snapshots each component through one hidden `VisualTest` story, at mobile and desktop width (`VISUAL_TEST_VIEWPORTS`). The docs stories themselves are not snapshotted. When you add a story to a component that has `VisualTest`, add a block for it there too. The block renders the docs story through `<VisualTestStory>` from `.storybook/visual-test-story`, so later changes to the story reach Chromatic. Don't copy the story's markup.
 
 `npm run test` fails when a docs story has no block. A story that only demonstrates behaviour (form integration, a controlled-state demo) opts out with `parameters: { visualTest: false }`. The full rules are in section 9 of [stories.md](.agents/skills/contributing/references/stories.md).
 
