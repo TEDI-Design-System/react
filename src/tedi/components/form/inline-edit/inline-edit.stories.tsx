@@ -288,7 +288,11 @@ const meta: Meta<typeof InlineEdit> = {
         'Renders the editor: a TEDI control wired to the render props, forwarding `size` so it matches the read view.',
       table: { type: { summary: '(editor: InlineEditEditor<T>) => ReactNode' } },
     },
-    id: { control: false, description: 'id applied to the read trigger.', table: { type: { summary: 'string' } } },
+    id: {
+      control: false,
+      description: 'id applied to the root: the read trigger, the editor or the read-only text.',
+      table: { type: { summary: 'string' } },
+    },
     className: {
       control: false,
       description: 'Additional class on the root element.',
@@ -863,7 +867,9 @@ export const SupportedControls: Story = {
               label="Kuupäev"
               value={date}
               onChange={setDate}
-              renderValue={(v) => (v ? v.toLocaleDateString('et-EE') : '—')}
+              renderValue={(v) =>
+                v ? v.toLocaleDateString('et-EE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—'
+              }
             >
               {({ value, onChange }) => (
                 <DateField
