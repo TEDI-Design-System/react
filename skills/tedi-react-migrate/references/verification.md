@@ -30,8 +30,9 @@ right fix is) with the error text.
 Never make a check pass by weakening it: no new `any`, `as unknown as`, `// @ts-ignore`, skipped tests or
 lint disables. After the run, the migration's diff must not add any of those: check the lines
 `git diff <Base>` adds (`Base` from the plan header, so commits made per release step count too), plus
-new files from `git status --porcelain`, that are not in `.tedi-migrate/start.diff`. Without a
-start.diff, every added line counts.
+new files from `git status --porcelain`, that are not in `.tedi-migrate/start.diff` (the uncommitted
+changes and untracked files from before the migration, SKILL.md step 0). Without a start.diff, every
+added line counts.
 
 ## Doctor checks
 

@@ -42,8 +42,17 @@ npm and GitHub; `gh` (logged in) avoids GitHub rate limits, else set `GITHUB_TOK
   `.tedi-migrate/cache/` is gone.
 - Check `git status`. With uncommitted changes, ask whether to continue; the migration diff is easier
   to review on its own. Record the starting commit (`git rev-parse HEAD`) as `Base` in the plan header.
-  If you continue with uncommitted changes, save them once:
-  `mkdir -p .tedi-migrate && git diff HEAD > .tedi-migrate/start.diff`.
+  If you continue with uncommitted changes, save them once, untracked files included:
+
+  ```bash
+  mkdir -p .tedi-migrate && {
+    git diff HEAD
+    (cd "$(git rev-parse --show-toplevel)" &&
+      git ls-files -z --others --exclude-standard -- ':(exclude,glob)**/.tedi-migrate/**' |
+      while IFS= read -r -d '' f; do git diff --no-index -- /dev/null "$f" || true; done)
+  } > .tedi-migrate/start.diff
+  ```
+
 - Ask once: create a branch? commit per release step? Default: no branch, no commits, leave the diff.
 - Note the package manager and the project's typecheck, build, lint and test commands. Without a
   typecheck script, run the project's installed compiler (`node_modules/.bin/tsc --noEmit`); without

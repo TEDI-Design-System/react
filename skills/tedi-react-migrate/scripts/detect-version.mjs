@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // Which TEDI version does the project use, and which did it use before?
 // Usage: node detect-version.mjs [projectDir]
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, realpathSync } from 'node:fs';
 import { join, dirname, relative, resolve, sep } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import config from './config.mjs';
 import {
   parseArgs,
@@ -14,6 +15,7 @@ import {
   isExactVersion,
   yarnEntry,
   yarnDependencyRange,
+  bunLockedVersion,
 } from './lib.mjs';
 
 const args = parseArgs();
@@ -103,23 +105,27 @@ const lockedAt = (text, name = pkg, man = manifest, range = depIn(man, name)) =>
   text == null
     ? null
     : lockedVersion(lock.file, text, name, lock.importer, range, lock.importer === '.' ? null : manifest.name);
-// npm nests a copy the library needs under the library's own folder when the hoisted one differs.
+// npm and bun nest a copy the library needs under the library when the hoisted one differs. Only the
+// library copy the project uses counts: a workspace's own copy when it has one, else the root's.
 const nestedCoreAt = (text) => {
-  if (lock.file !== 'package-lock.json' || text == null) return null;
+  if (text == null) return null;
+  if (lock.file === 'bun.lock') {
+    const own = lock.importer !== '.' && manifest.name && `${manifest.name}/${pkg}`;
+    const lib = own && bunLockedVersion(text, [own]) ? own : pkg;
+    return bunLockedVersion(text, [`${lib}/${config.corePkg}`]);
+  }
+  if (lock.file !== 'package-lock.json') return null;
   try {
     const base = lock.importer === '.' ? '' : `${lock.importer}/`;
     const packages = JSON.parse(text).packages ?? {};
-    return (
-      packages[`${base}node_modules/${pkg}/node_modules/${config.corePkg}`]?.version ??
-      packages[`node_modules/${pkg}/node_modules/${config.corePkg}`]?.version ??
-      null
-    );
+    const lib = packages[`${base}node_modules/${pkg}`] ? `${base}node_modules/${pkg}` : `node_modules/${pkg}`;
+    return packages[`${lib}/node_modules/${config.corePkg}`]?.version ?? null;
   } catch {
     return null;
   }
 };
 // Core as the library's own entry resolves it, when core is not a direct dependency: yarn.lock lists the
-// library's core range under its entry, npm may nest a copy under the library.
+// library's core range under its entry, npm and bun may nest a copy under the library.
 const coreAt = (text, man = manifest) => {
   if (text == null) return null;
   if (depIn(man, config.corePkg)) return lockedAt(text, config.corePkg, man);
@@ -138,17 +144,50 @@ if (lock) {
     result.warning = `${result.lockfile} lists no version of ${pkg} for this project; check the lockfile or run the install`;
 }
 
-// node_modules: the project's own, else hoisted to the workspace root.
-const installedOf = (...path) => {
-  for (const d of [dir, lock?.dir].filter(Boolean)) {
-    const f = join(d, 'node_modules', ...path, 'package.json');
-    if (existsSync(f)) return JSON.parse(readFileSync(f, 'utf8')).version;
+// Yarn Plug'n'Play installs without node_modules; its runtime API says which copy the project resolves.
+// It sits in the project's folder or a workspace root above it.
+const pnp = (() => {
+  for (let d = dir; ; d = dirname(d)) {
+    for (const f of ['.pnp.cjs', '.pnp.js'])
+      if (existsSync(join(d, f))) {
+        try {
+          return createRequire(import.meta.url)(join(d, f));
+        } catch {
+          return null;
+        }
+      }
+    if (dirname(d) === d || existsSync(join(d, '.git'))) return null;
   }
-  return null;
+})();
+// `names` is a dependency chain from the project: [pkg], or [pkg, core] for the library's own core.
+const pnpVersionOf = (names) => {
+  try {
+    let locator = pnp.findPackageLocator(join(realpathSync(dir), '/'));
+    for (const name of names) {
+      const ref = pnp.getPackageInformation(locator)?.packageDependencies.get(name);
+      if (ref == null) return null;
+      // An alias is [name, reference]; a peer-dependent copy is "virtual:<hash>#npm:<version>".
+      locator = Array.isArray(ref) ? { name: ref[0], reference: ref[1] } : { name, reference: ref };
+    }
+    return locator.reference.match(/npm:(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)$/)?.[1] ?? null;
+  } catch {
+    return null;
+  }
+};
+// node_modules: the project's own, else hoisted to the workspace root; with PnP, the PnP API. The rest
+// of the chain is looked up under the copy of the first package that the project uses, not another one.
+const installedOf = (...names) => {
+  const path = names.flatMap((n, i) => (i ? ['node_modules', n] : [n]));
+  for (const d of [dir, lock?.dir].filter(Boolean)) {
+    if (!existsSync(join(d, 'node_modules', names[0], 'package.json'))) continue;
+    const f = join(d, 'node_modules', ...path, 'package.json');
+    return existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')).version : null;
+  }
+  return pnp ? pnpVersionOf(names) : null;
 };
 result.installedVersion = installedOf(pkg);
 result.coreInstalledVersion =
-  (result.coreRange ? null : installedOf(pkg, 'node_modules', config.corePkg)) ?? installedOf(config.corePkg);
+  (result.coreRange ? null : installedOf(pkg, config.corePkg)) ?? installedOf(config.corePkg);
 // The core version the project resolves today: the baseline for core's own release notes and diff.
 // Core comes in through the library, so the project's importer entry often doesn't list it (pnpm's
 // isolated node_modules doesn't either); then the library's core dependency decides, if it is a pin.
@@ -184,16 +223,21 @@ if (lock && git(['rev-parse', '--is-inside-work-tree'], lock.dir)) {
       return null;
     }
   };
+  const lockAt = (rev) => git(['show', `${rev}:${lockPath}`], lock.dir);
   const at = (rev) => {
-    const text = git(['show', `${rev}:${lockPath}`], lock.dir);
+    const text = lockAt(rev);
     const man = manifestAt(rev);
     const lib = lockedAt(text, pkg, man);
     // Listed, but no entry matches that revision's range (several copies): unknown, not absent.
     const unresolved = !lib && Boolean(text?.includes(`${pkg}@`));
-    return { lib, core: coreAt(text, man), unresolved };
+    // Core is read only for the revisions that are reported; the lockfile is read again for it then.
+    return { lib, unresolved, core: () => coreAt(lockAt(rev), man) };
   };
   const committed = at('HEAD');
-  const lockChanged = git(['diff', '--quiet', 'HEAD', '--', lock.file], lock.dir) === null;
+  // yarn.lock entries are keyed by the package.json range: switching to a range the lockfile already
+  // lists changes only package.json.
+  const historyPaths = [lock.file, ...(lock.file === 'yarn.lock' ? [manifestPath] : [])];
+  const lockChanged = git(['diff', '--quiet', 'HEAD', '--', ...historyPaths], lock.dir) === null;
   if (
     result.lockfileVersion &&
     (committed.lib ? committed.lib !== result.lockfileVersion : committed.unresolved && lockChanged)
@@ -201,14 +245,23 @@ if (lock && git(['rev-parse', '--is-inside-work-tree'], lock.dir)) {
     result.uncommittedBump = {
       before: committed.lib,
       after: result.lockfileVersion,
-      coreBefore: committed.core,
+      coreBefore: committed.core(),
       coreAfter: result.coreLockfileVersion,
       ...(committed.unresolved && { unresolved: UNRESOLVED }),
     };
   }
   const log =
     git(
-      ['log', '--first-parent', '-n', String(HISTORY_LIMIT + 1), '--format=%h %ad %s', '--date=short', '--', lock.file],
+      [
+        'log',
+        '--first-parent',
+        '-n',
+        String(HISTORY_LIMIT + 1),
+        '--format=%h %ad %s',
+        '--date=short',
+        '--',
+        ...historyPaths,
+      ],
       lock.dir
     ) ?? '';
   const commits = log.split('\n').filter(Boolean);
@@ -216,7 +269,7 @@ if (lock && git(['rev-parse', '--is-inside-work-tree'], lock.dir)) {
     commits.length = HISTORY_LIMIT;
     result.historyTruncated = true;
   }
-  // The lockfile before a listed commit is the lockfile of the next older listed commit.
+  // The state before a listed commit is the state of the next older listed commit.
   const versions = commits.map((line) => at(line.split(' ')[0]));
   // In a shallow clone the oldest listed commit may have no parent here: its `before` is unknown, not
   // "added".
@@ -236,8 +289,8 @@ if (lock && git(['rev-parse', '--is-inside-work-tree'], lock.dir)) {
         subject: subject.join(' '),
         before: before.lib,
         after: after.lib,
-        coreBefore: before.core,
-        coreAfter: after.core,
+        coreBefore: before.core(),
+        coreAfter: after.core(),
         ...(before.unresolved && { unresolved: UNRESOLVED }),
       });
   }
@@ -247,7 +300,9 @@ result.from = result.lockfileVersion ?? result.installedVersion ?? rangeMinimum(
 result.source = result.lockfileVersion
   ? `lockfile (${result.lockfile})`
   : result.installedVersion
-  ? 'node_modules'
+  ? pnp
+    ? "Yarn Plug'n'Play"
+    : 'node_modules'
   : result.from
   ? 'package.json range minimum (estimate)'
   : null;

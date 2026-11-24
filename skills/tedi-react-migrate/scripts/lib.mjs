@@ -106,6 +106,25 @@ export const yarnDependencyRange = (entry, dep) =>
   entry?.body.match(new RegExp(`^[ \\t]+"?${escapeRe(dep)}"?:?[ \\t]+"?([^"\\n]+)"?`, 'm'))?.[1].replace(/^npm:/, '') ??
   null;
 
+// bun.lock is JSONC with trailing commas. `packages[pkg]` is the top-level copy; nested copies are keyed
+// "<dependent>/<pkg>", e.g. "@tedi-design-system/react/@tedi-design-system/core".
+const parseBunLock = (text) => JSON.parse(text.replace(/,(\s*[}\]])/g, '$1'));
+const bunEntryVersion = (lock, keys) => {
+  for (const key of keys.filter(Boolean)) {
+    const entry = lock.packages?.[key]?.[0];
+    if (entry) return exact(entry.slice(entry.lastIndexOf('@') + 1));
+  }
+  return null;
+};
+/** The version of the first of `keys` (bun.lock package keys) that the lockfile lists. */
+export function bunLockedVersion(rawText, keys) {
+  try {
+    return bunEntryVersion(parseBunLock(rawText.replace(/\r\n?/g, '\n')), keys);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * The version of `pkg` that a lockfile resolves for one project. `importer` is the project's path
  * relative to the lockfile ("." for the lockfile's own folder); npm and pnpm workspaces key by it.
@@ -176,12 +195,9 @@ export function lockedVersion(file, rawText, pkg, importer = '.', range = null, 
     }
     if (file === 'yarn.lock') return yarnEntry(text, pkg, range)?.version ?? null;
     if (file === 'bun.lock') {
-      // JSONC with trailing commas. `packages[pkg]` is the top-level copy; nested copies are keyed
-      // "<dependent>/<pkg>".
-      const lock = JSON.parse(text.replace(/,(\s*[}\]])/g, '$1'));
+      const lock = parseBunLock(text);
       const name = importer === '.' ? null : lock.workspaces?.[importer]?.name ?? workspace;
-      const entry = ((name && lock.packages?.[`${name}/${pkg}`]) ?? lock.packages?.[pkg])?.[0];
-      return entry ? exact(entry.slice(entry.lastIndexOf('@') + 1)) : null;
+      return bunEntryVersion(lock, [name && `${name}/${pkg}`, pkg]);
     }
   } catch {
     return null;
