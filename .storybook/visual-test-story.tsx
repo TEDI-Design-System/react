@@ -1,15 +1,15 @@
 import { cloneElement, createElement, isValidElement, type JSXElementConstructor, type ReactNode } from 'react';
 
 /**
- * The parts of a docs story (`StoryObj`) that a `VisualTest` block needs. `never` parameters accept
- * any story's `render`, whatever its args type.
- */
-/**
  * Chromatic widths for every `VisualTest`: 375 for the mobile tokens and layouts below the
  * breakpoints, 1200 (Chromatic's default) for desktop.
  */
 export const VISUAL_TEST_VIEWPORTS = [375, 1200];
 
+/**
+ * The parts of a docs story (`StoryObj`) that a `VisualTest` block needs. `never` parameters accept
+ * any story's `render`, whatever its args type.
+ */
 export interface VisualTestStoryInput {
   args?: object;
   render?: (args: never, context: never) => ReactNode;
