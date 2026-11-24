@@ -159,6 +159,46 @@ describe('InlineEdit', () => {
     });
   });
 
+  it('activates a button inside the editor on Enter instead of committing', async () => {
+    const onChange = jest.fn();
+    const onClick = jest.fn();
+    const user = userEvent.setup();
+    render(
+      <InlineEdit<string> label="Name" defaultValue="Mari" onChange={onChange} renderValue={(v) => v}>
+        {({ value, onChange: setDraft }) => (
+          <>
+            <input aria-label="Name" value={value} onChange={(e) => setDraft(e.target.value)} />
+            <button type="button" onClick={onClick}>
+              Pick
+            </button>
+          </>
+        )}
+      </InlineEdit>
+    );
+
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    screen.getByRole('button', { name: 'Pick' }).focus();
+    await user.keyboard('{Enter}');
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+  });
+
+  it('keeps the id on the visible element in every mode', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<TextEditor id="row" />);
+    expect(document.getElementById('row')).toHaveRole('button');
+
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    expect(document.getElementById('row')).toBeInTheDocument();
+    expect(document.getElementById('row')).toContainElement(screen.getByRole('textbox'));
+
+    await user.keyboard('{Escape}');
+    rerender(<TextEditor id="row" readOnly />);
+    expect(document.getElementById('row')).toHaveTextContent('John Mets');
+  });
+
   describe('Escape in a select editor', () => {
     const options: ISelectOption[] = [
       { value: 'ee', label: 'Eesti' },

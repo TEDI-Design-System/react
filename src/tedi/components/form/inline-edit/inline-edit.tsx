@@ -94,7 +94,8 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
   placeholder?: React.ReactNode;
   /**
    * Renders the value as plain text with no edit affordance, keeping the row's inset so it lines up with editable
-   * rows. For a block that is entirely read-only, use `TextGroup` instead.
+   * rows.
+   * @default false
    */
   readOnly?: boolean;
   /**
@@ -103,7 +104,7 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    */
   disabled?: boolean;
   /**
-   * Marks the row as invalid, setting `aria-invalid` on the trigger and the editor; an `error` helper sets it too.
+   * Marks the row as invalid, setting `aria-invalid` on the editor control; an `error` helper sets it too.
    * @default false
    */
   invalid?: boolean;
@@ -126,7 +127,7 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    * @default end
    */
   editIconPosition?: 'inline' | 'end';
-  /** id applied to the read trigger. */
+  /** id applied to the root: the read trigger, the editor or the read-only text. */
   id?: string;
   /** Additional class on the root element. */
   className?: string;
@@ -265,6 +266,7 @@ export function InlineEdit<T>({
   if (isEditing) {
     return withFeedback(
       <div
+        id={fieldId}
         ref={editorRef}
         className={cn(
           styles['tedi-inline-edit'],
@@ -288,7 +290,8 @@ export function InlineEdit<T>({
             const target = event.target as HTMLElement;
             const isMultiline = target.tagName === 'TEXTAREA';
             const isWidgetInput = !!target.closest('[role="combobox"], [role="listbox"]');
-            if (isMultiline || isWidgetInput) return;
+            const isButton = !!target.closest('button, a[href], [role="button"]');
+            if (isMultiline || isWidgetInput || isButton) return;
             event.preventDefault();
             commitAndRestoreFocus();
           }
@@ -314,6 +317,7 @@ export function InlineEdit<T>({
   if (readOnly) {
     return withFeedback(
       <span
+        id={fieldId}
         className={cn(
           styles['tedi-inline-edit'],
           styles['tedi-inline-edit--readonly'],

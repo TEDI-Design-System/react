@@ -41,7 +41,13 @@
 }
 
 .tedi-inline-edit--editing {
-  input:not([type='checkbox'], [type='radio'], [type='range'], [class*='select__input']),
+  input:not(
+      [type='checkbox'],
+      [type='radio'],
+      [type='range'],
+      [class*='select__input'],
+      [class*='number-field__input']
+    ),
   textarea {
     min-height: var(--_inline-edit-height);
     padding-top: calc(var(--form-field-padding-y-sm) - var(--tedi-borders-01));
@@ -51,7 +57,13 @@
     line-height: var(--_inline-edit-line-height);
   }
 
-  input:not([type='checkbox'], [type='radio'], [type='range'], [class*='select__input']) {
+  input:not(
+      [type='checkbox'],
+      [type='radio'],
+      [type='range'],
+      [class*='select__input'],
+      [class*='number-field__input']
+    ) {
     height: var(--_inline-edit-height);
   }
 

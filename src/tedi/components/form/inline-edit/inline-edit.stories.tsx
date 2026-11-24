@@ -726,8 +726,8 @@ export const Disabled: Story = {
 };
 
 /**
- * `invalid` gives the read trigger an error border and `aria-invalid`. A `helper` item with
- * `type: 'error'` sets it automatically and is linked to the trigger via `aria-describedby`.
+ * `invalid` gives the read trigger an error border and sets `aria-invalid` on the editor control. A `helper` item with
+ * `type: 'error'` sets it automatically and is linked to the trigger and the editor via `aria-describedby`.
  */
 export const Invalid: Story = {
   render: () => (
@@ -849,7 +849,14 @@ export const SupportedControls: Story = {
               renderValue={(v) => (v === undefined ? '—' : String(v))}
             >
               {({ value, onChange }) => (
-                <NumberField id="ie-supported-seats" label="Kohtade arv" hideLabel value={value} onChange={onChange} />
+                <NumberField
+                  id="ie-supported-seats"
+                  label="Kohtade arv"
+                  hideLabel
+                  size="small"
+                  value={value}
+                  onChange={onChange}
+                />
               )}
             </InlineEdit>
           </FieldRow>
