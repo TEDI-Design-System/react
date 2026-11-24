@@ -104,7 +104,7 @@ describe('DatePickerModal', () => {
       setup({ dayStatus });
 
       expect(document.querySelector('.tedi-calendar__day-status')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Kinnitatud vastuvõtt/ })).toBeInTheDocument();
+      expect(screen.getByRole('gridcell', { name: /Kinnitatud vastuvõtt/ })).toBeInTheDocument();
     });
   });
 });
