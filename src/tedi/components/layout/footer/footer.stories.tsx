@@ -82,10 +82,10 @@ const InstagramIcon = () => (
 
 const ContactLinks = () => (
   <>
-    <Link href="#" color="inverted">
+    <Link href="tel:+3725555555" color="inverted">
       +372 555 5555
     </Link>
-    <Link href="#" color="inverted">
+    <Link href="mailto:tedi@tehik.ee" color="inverted">
       tedi@tehik.ee
     </Link>
     <Link href="#" color="inverted">
@@ -126,10 +126,10 @@ const StandardSections = ({
       <Link href="#" color="inverted">
         Uudiskirja tellimine
       </Link>
-      <Link href="#" color="inverted">
+      <Link href="https://x.com" color="inverted">
         Jälgi meid Twitteris
       </Link>
-      <Link href="#" color="inverted">
+      <Link href="https://www.facebook.com/TEHIK" color="inverted">
         Jälgi meid Facebookis
       </Link>
       <Link href="#" color="inverted">
@@ -142,8 +142,12 @@ const StandardSections = ({
   </>
 );
 
-const bottomLinks = ['Facebook', 'Instagram', 'LinkedIn'].map((label) => (
-  <Link key={label} href="#" color="inverted" underline={false}>
+const bottomLinks = [
+  ['Facebook', 'https://www.facebook.com/TEHIK'],
+  ['Instagram', 'https://www.instagram.com/nahtamatudkangelased/'],
+  ['LinkedIn', 'https://www.linkedin.com/showcase/tedi-disain/'],
+].map(([label, href]) => (
+  <Link key={label} href={href} color="inverted" underline={false}>
     {label}
   </Link>
 ));
@@ -479,10 +483,10 @@ export const CustomContent: Story = {
               <ContactLinks />
             </Footer.Section>
             <div className="flex align-self-center gap-3">
-              <Link href="#" color="inverted" aria-label="Facebook">
+              <Link href="https://www.facebook.com/TEHIK" color="inverted" aria-label="Facebook">
                 <FacebookIcon />
               </Link>
-              <Link href="#" color="inverted" aria-label="Instagram">
+              <Link href="https://www.instagram.com/nahtamatudkangelased/" color="inverted" aria-label="Instagram">
                 <InstagramIcon />
               </Link>
             </div>
@@ -503,10 +507,10 @@ export const CustomContent: Story = {
               </Link>
             </Footer.Section>
             <Footer.Section heading="Sotsiaalmeedia">
-              <Link href="#" color="inverted">
+              <Link href="https://x.com" color="inverted">
                 Jälgi meid Twitteris
               </Link>
-              <Link href="#" color="inverted">
+              <Link href="https://www.facebook.com/TEHIK" color="inverted">
                 Jälgi meid Facebookis
               </Link>
               <Link href="#" color="inverted">
