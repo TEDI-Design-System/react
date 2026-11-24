@@ -118,7 +118,9 @@
 
 .tedi-footer-section__heading {
   margin: 0;
+  font-size: inherit;
   font-weight: var(--body-bold-weight);
+  line-height: inherit;
   color: var(--general-text-white);
 }
 

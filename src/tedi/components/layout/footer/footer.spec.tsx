@@ -103,7 +103,21 @@ describe('Footer', () => {
     );
 
     expect(screen.queryByRole('button', { name: /static heading/i })).not.toBeInTheDocument();
-    expect(screen.getByText('Static heading').tagName.toLowerCase()).toBe('strong');
+    expect(screen.getByText('Static heading').tagName.toLowerCase()).toBe('h2');
+  });
+
+  it('renders the section heading at the requested headingLevel', () => {
+    render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Level" headingLevel="h3">
+            <a href="#">Link</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Level' })).toBeInTheDocument();
   });
 
   it('Footer.Bottom renders its children verbatim with no injected separators', () => {

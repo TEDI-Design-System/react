@@ -94,7 +94,9 @@ const ContactLinks = () => (
   </>
 );
 
-type SectionOverrides = Partial<Pick<FooterSectionProps, 'collapsible' | 'defaultOpen' | 'iconBreakpoint'>>;
+type SectionOverrides = Partial<
+  Pick<FooterSectionProps, 'collapsible' | 'defaultOpen' | 'headingLevel' | 'iconBreakpoint'>
+>;
 
 const StandardSections = ({
   contactIcon = 'call',
@@ -240,7 +242,7 @@ export const Default: StoryObj = {
     ...subcomponentArgTypes(Footer.Section, {
       category: 'Footer.Section',
       prefix: 'section',
-      include: ['collapsible', 'defaultOpen', 'iconBreakpoint'],
+      include: ['collapsible', 'defaultOpen', 'headingLevel', 'iconBreakpoint'],
     }),
     ...subcomponentArgTypes(Footer.Side, {
       category: 'Footer.Side',

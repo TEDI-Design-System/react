@@ -8,12 +8,20 @@ import { Collapse } from '../../../content/collapse/collapse';
 import styles from '../footer.module.scss';
 import { FooterContext } from '../footer-context';
 
+export type FooterSectionHeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
 export interface FooterSectionProps {
   /**
    * Section heading text. Rendered as `<strong>` on desktop or as the trigger label of a
    * `<Collapse>` on mobile (when `collapsible` is true).
    */
   heading: ReactNode;
+  /**
+   * Semantic heading level of the section heading, in every layout; the visual style stays the same
+   * regardless. Set it to fit the host page's heading outline (WCAG 1.3.1).
+   * @default h2
+   */
+  headingLevel?: FooterSectionHeadingLevel;
   /**
    * Optional Material Symbols icon name shown in a circular tinted background next to
    * the heading on desktop. Automatically hidden below the `lg` breakpoint to save space.
@@ -52,6 +60,7 @@ export interface FooterSectionProps {
 
 export const FooterSection = ({
   heading,
+  headingLevel = 'h2',
   icon,
   collapsible = false,
   defaultOpen = false,
@@ -65,6 +74,7 @@ export const FooterSection = ({
   const hideIcon = isBreakpointBelow(breakpoint, iconBreakpoint);
   const applyCollapse = collapsible && isMobile;
   const collapseId = useId();
+  const HeadingTag = headingLevel;
 
   return (
     <div
@@ -92,7 +102,7 @@ export const FooterSection = ({
           <Collapse
             id={`tedi-footer-section-${collapseId}`}
             title={
-              <Heading element="h6" color="white">
+              <Heading element={headingLevel} modifiers="h6" color="white">
                 {heading}
               </Heading>
             }
@@ -109,7 +119,7 @@ export const FooterSection = ({
           </Collapse>
         ) : (
           <>
-            <strong className={styles['tedi-footer-section__heading']}>{heading}</strong>
+            <HeadingTag className={styles['tedi-footer-section__heading']}>{heading}</HeadingTag>
             <div className={styles['tedi-footer-section__content']}>{children}</div>
           </>
         )}
