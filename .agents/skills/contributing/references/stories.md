@@ -224,7 +224,7 @@ hidden `VisualTest` story instead of one per docs story.
 - **Separate snapshots** stay separate: stories that need a `play` function, an open overlay,
   JS-driven animation (timers, intervals), scrolling, a fullscreen layout or sticky/fixed
   positioning. Give them `chromatic: { disableSnapshot: false }` and keep them out of `VisualTest`;
-  add `viewports: [375, 1280]` only when such a story also changes at a breakpoint. Breakpoints alone
+  add `viewports: VISUAL_TEST_VIEWPORTS` only when such a story also changes at a breakpoint. Breakpoints alone
   are not a reason for a separate snapshot. Chromatic does not pause JS
   timers, so a timer-driven story starts from a fixed value and skips its timer when
   `isChromatic()` (from `chromatic/isChromatic`) is true.

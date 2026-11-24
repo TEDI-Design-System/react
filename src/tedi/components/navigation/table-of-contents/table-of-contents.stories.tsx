@@ -368,7 +368,7 @@ const layoutIds = layoutFlat.map((node) => node.id);
  */
 export const StickyInLayout: Story = {
   parameters: {
-    chromatic: { disableSnapshot: false, viewports: [375, 1280] },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     fullWidth: true,
   },
   render: function StickyInLayout() {
@@ -505,7 +505,7 @@ export const StickyInLayout: Story = {
  */
 export const Collapsible: Story = {
   parameters: {
-    chromatic: { disableSnapshot: false, viewports: [375, 1280] },
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
     layout: 'fullscreen',
     fullWidth: true,
   },
@@ -641,7 +641,11 @@ export const Collapsible: Story = {
  */
 export const CollapsibleHideOnScroll: Story = {
   name: 'Collapsible: hide on scroll',
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] }, layout: 'fullscreen', fullWidth: true },
+  parameters: {
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
+    layout: 'fullscreen',
+    fullWidth: true,
+  },
   render: () => {
     const items = [
       <TableOfContents.Item key="intro" id="intro">

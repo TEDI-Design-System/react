@@ -7,6 +7,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { VISUAL_TEST_VIEWPORTS } from '../../../../../.storybook/visual-test-story';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -56,7 +57,7 @@ export default meta;
 type Story = StoryObj<typeof Sheet>;
 
 const visualTest: Story = {
-  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
   play: async ({ canvasElement }) => {
     const body = within(canvasElement.ownerDocument.body);
     await waitFor(() => expect(body.getByRole('dialog')).toHaveAttribute('data-status', 'open'));

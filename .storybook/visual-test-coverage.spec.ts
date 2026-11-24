@@ -4,7 +4,7 @@ import { join, relative } from 'path';
 /**
  * Fails when a docs story in a stories file with a `VisualTest` is not rendered by `VisualTest`, so a
  * new story can't silently miss Chromatic. A story passes when the composite (or a non-story helper
- * it uses) references it by name, or calls a template that only this story uses. Stories with their own snapshot (`disableSnapshot: false`), hidden stories
+ * it uses) references it by name, or calls the render helper that only this story uses. Stories with their own snapshot (`disableSnapshot: false`), hidden stories
  * (`!dev`) and stories marked `parameters: { visualTest: false }` are skipped.
  */
 
@@ -57,12 +57,19 @@ const declarations = (source: string): Declaration[] => {
 
 const identifiers = (text: string) => new Set(text.match(IDENTIFIER) ?? []);
 
+/** Blanks quoted strings, so a label such as `"Default, Disabled"` names no story. */
+const withoutStrings = (text: string) => text.replace(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g, '""');
+
 /**
  * Whether `text` uses the story as a value (`story: X`, `X.args`, `{...X}`, `onBrand(X)`, `X as StoryObj`), not
  * just its name as text: `"Default"` in a string or `>Default<` in markup doesn't count.
  */
 const referencesStory = (text: string, name: string): boolean =>
-  new RegExp(`(?<![\\w$"'>-])${name}(?=\\s*[.,)}\\]]|\\s+as\\b)`).test(text);
+  new RegExp(`(?<![\\w$>-])${name}(?=\\s*[.,)}\\]]|\\s+as\\b)`).test(withoutStrings(text));
+
+/** The identifiers in a story's `render` property, so args or data it merely spreads don't count. */
+const renderIds = (story: Declaration) =>
+  identifiers(/^ {2}render:[\s\S]*?(?=\n {0,2}\S|(?![\s\S]))/m.exec(story.body)?.[0] ?? '');
 
 /** Stories that need a `VisualTest` block but have none. */
 const missingStories = (source: string): string[] => {
@@ -89,11 +96,12 @@ const missingStories = (source: string): string[] => {
   const reachedIds = identifiers(reached);
 
   const stories = decls.filter((decl) => decl.isStory && !COMPOSITES.includes(decl.name));
-  // A helper used by exactly one story is that story's markup.
+  // A render helper used by exactly one story is that story's markup. Args or data shared
+  // through a helper (`{ ...meta.args }`) don't count.
   const ownTemplate = (story: Declaration) =>
     helpers.some(
       (helper) =>
-        identifiers(story.body).has(helper.name) &&
+        renderIds(story).has(helper.name) &&
         reachedIds.has(helper.name) &&
         stories.filter((other) => identifiers(other.body).has(helper.name)).length === 1
     );
@@ -135,4 +143,30 @@ describe('VisualTest coverage', () => {
       expect(usesBothWidths(readFileSync(file, 'utf8'))).toBe(true);
     }
   );
+});
+
+describe('missingStories', () => {
+  it('ignores story names inside label text', () => {
+    const source = `
+const meta = { args: {} };
+export const Default: Story = { args: {} };
+export const Disabled: Story = { args: { disabled: true } };
+export const VisualTest: Story = {
+  render: () => <VisualTestStory label="Default, Disabled, enabled" story={Default} />,
+};
+`;
+    expect(missingStories(source)).toEqual(['Disabled']);
+  });
+
+  it("does not treat shared args as a story's template", () => {
+    const source = `
+const meta = { args: { children: 'Nupp' } };
+export const Default: Story = {};
+export const NewVariant: Story = { args: { ...meta.args, disabled: true } };
+export const VisualTest: Story = {
+  render: () => <VisualTestStory story={Default} props={meta.args} />,
+};
+`;
+    expect(missingStories(source)).toEqual(['NewVariant']);
+  });
 });
