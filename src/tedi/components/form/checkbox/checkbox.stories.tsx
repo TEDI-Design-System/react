@@ -766,6 +766,18 @@ export const VisualTestMobile: StoryObj = {
         <Text modifiers="bold">Responsive variant</Text>
         <VisualTestStory story={ResponsiveVariant} />
       </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Group</Text>
+        <VisualTestStory story={Group} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Cards with description</Text>
+        <VisualTestStory story={CardsWithDescription} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Cards with icons</Text>
+        <VisualTestStory story={CardsWithIcons} />
+      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

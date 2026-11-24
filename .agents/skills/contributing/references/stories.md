@@ -176,7 +176,7 @@ Rules:
 - [ ] Figma link is in the meta `parameters.design` and in the JSDoc comment above `export default`,
       and only when it points to the TEDI Figma file (see section 4)
 - [ ] When multiple instances of the same component appear in one story, use unique IDs per instance to avoid conflicts
-- [ ] Component has a `VisualTest` story? Every new visual story adds its variant there too, and to `VisualTestMobile` if it changes below a breakpoint (see §9)
+- [ ] Component has a `VisualTest` story? Every new visual story adds its variant there too, and to `VisualTestMobile` if it changes below a breakpoint, unless it keeps its own snapshot (`play` function, open overlay, scrolling, sticky / fixed positioning; see §9)
 - [ ] Use `CardContent` with `padding` prop to add content padding in story examples (components should not hardcode content padding)
 - [ ] No inline `style` in story markup, and no story docblock that restates what renders (see section 8)
 - [ ] Disabled, loading, error and empty states the component supports have a story, even if Figma omits them; place these after the Figma-ordered stories
@@ -274,7 +274,7 @@ export const VisualTestMobile: Story = {
 
 **A new visual story on a component with `VisualTest` adds its variant to `VisualTest` too**, and
 to `VisualTestMobile` when it renders differently below a breakpoint; otherwise Chromatic never
-sees it. `.storybook/visual-test-coverage.spec.ts` (run by `npm run test`) fails when a docs story
+sees it. A story that keeps its own snapshot (see above) is the exception. `.storybook/visual-test-coverage.spec.ts` (run by `npm run test`) fails when a docs story
 has no block and no opt-out.
 
 ### 10. Verify

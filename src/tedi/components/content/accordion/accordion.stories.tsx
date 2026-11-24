@@ -1126,6 +1126,10 @@ export const VisualTestMobile: StoryObj = {
         <Text modifiers="bold">Customized</Text>
         <VisualTestStory story={Customized} />
       </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Action types</Text>
+        <VisualTestStory story={ActionTypes} />
+      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };
