@@ -18,6 +18,7 @@ import cn from 'classnames';
 import React from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import { isReferenceHidden } from '../../../helpers/is-reference-hidden';
 import { useLabels } from '../../../providers/label-provider';
 import styles from './dropdown.module.scss';
 import { DropdownContent } from './dropdown-content/dropdown-content';
@@ -164,13 +165,35 @@ export const Dropdown = (props: DropdownProps) => {
     [controlledOpen, onOpenChange]
   );
 
+  // The menu renders in a portal, so it closes when its trigger gets hidden (for example by CSS at another breakpoint).
+  const setOpenRef = React.useRef(setOpen);
+  React.useEffect(() => {
+    setOpenRef.current = setOpen;
+  }, [setOpen]);
+
   const floating = useFloating({
     nodeId,
     open,
     placement,
     onOpenChange: setOpen,
     middleware: [offset(DROPDOWN_OFFSET), flip(), shift()],
-    whileElementsMounted: autoUpdate,
+    whileElementsMounted: (reference, floatingElement, update) => {
+      // A controlled dropdown may stay open after it is told to close, so a hidden trigger is reported once.
+      let hasReportedHidden = false;
+
+      return autoUpdate(reference, floatingElement, () => {
+        if (isReferenceHidden(reference)) {
+          if (!hasReportedHidden) {
+            hasReportedHidden = true;
+            setOpenRef.current(false);
+          }
+          return;
+        }
+
+        hasReportedHidden = false;
+        update();
+      });
+    },
   });
 
   const { context, refs, x, y, strategy } = floating;

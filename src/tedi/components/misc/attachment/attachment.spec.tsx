@@ -1,22 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { Breakpoint } from '../../../helpers';
 import { Button } from '../../buttons/button/button';
 import { Attachment } from './attachment';
 
-const mockUseBreakpoint = jest.fn<Breakpoint, []>(() => 'lg');
-
-jest.mock('../../../helpers', () => ({
-  __esModule: true,
-  ...jest.requireActual('../../../helpers'),
-  useBreakpoint: () => mockUseBreakpoint(),
-}));
-
 describe('Attachment component', () => {
-  beforeEach(() => {
-    mockUseBreakpoint.mockReturnValue('lg');
-  });
-
   it('renders the file name', () => {
     render(<Attachment name="invoice.pdf" />);
     expect(screen.getByText('invoice.pdf')).toBeInTheDocument();
@@ -163,28 +150,30 @@ describe('Attachment component', () => {
     expect(container.firstChild).not.toHaveClass('tedi-attachment--multi-line');
   });
 
-  it('auto-switches to vertical below `verticalBelow` (default sm)', () => {
-    mockUseBreakpoint.mockReturnValue('xs');
-    const { container } = render(<Attachment name="invoice.pdf" />);
-    expect(container.firstChild).toHaveClass('tedi-attachment--vertical');
-  });
-
-  it('stays horizontal at or above the breakpoint, and honours a custom `verticalBelow`', () => {
+  it('turns vertical below `verticalBelow` with CSS (default sm) when `direction` is not set', () => {
     const { container, rerender } = render(<Attachment name="invoice.pdf" />);
+    expect(container.firstChild).toHaveClass('tedi-attachment--below-sm');
     expect(container.firstChild).not.toHaveClass('tedi-attachment--vertical');
 
     rerender(<Attachment name="invoice.pdf" verticalBelow="xl" />);
-    expect(container.firstChild).toHaveClass('tedi-attachment--vertical');
+    expect(container.firstChild).toHaveClass('tedi-attachment--below-xl');
+    expect(container.firstChild).not.toHaveClass('tedi-attachment--below-sm');
+  });
+
+  it('never turns vertical with verticalBelow="xs", and adds no stray class', () => {
+    const { container } = render(<Attachment name="invoice.pdf" verticalBelow="xs" />);
+    expect((container.firstChild as HTMLElement).className).not.toContain('undefined');
+    expect(container.firstChild).not.toHaveClass('tedi-attachment--vertical');
   });
 
   it('lets `direction` force the layout regardless of viewport', () => {
-    mockUseBreakpoint.mockReturnValue('lg');
     const { container, rerender } = render(<Attachment name="invoice.pdf" direction="vertical" />);
     expect(container.firstChild).toHaveClass('tedi-attachment--vertical');
+    expect(container.firstChild).not.toHaveClass('tedi-attachment--below-sm');
 
-    mockUseBreakpoint.mockReturnValue('xs');
     rerender(<Attachment name="invoice.pdf" direction="horizontal" />);
     expect(container.firstChild).not.toHaveClass('tedi-attachment--vertical');
+    expect(container.firstChild).not.toHaveClass('tedi-attachment--below-sm');
   });
 
   it('renders feedback below the card and wires aria-describedby', () => {

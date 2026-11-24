@@ -1,5 +1,5 @@
 import * as FloatingUI from '@floating-ui/react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React, { ComponentProps } from 'react';
 
 import { UnknownType } from '../../../types/commonTypes';
@@ -330,5 +330,76 @@ describe('Dropdown component', () => {
     });
     fireEvent.click(screen.getByText('Open menu'));
     expect(document.querySelector(`.${styles['tedi-dropdown__scroll']}`)).toHaveStyle({ maxHeight: '20rem' });
+  });
+
+  describe('hidden trigger', () => {
+    const renderInWrapper = (onOpenChange?: (open: boolean) => void) =>
+      render(
+        <div data-testid="wrapper">
+          <Dropdown onOpenChange={onOpenChange}>
+            <Dropdown.Trigger>
+              <span>Open menu</span>
+            </Dropdown.Trigger>
+            <Dropdown.Content>
+              <Dropdown.Item index={0}>Item</Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown>
+        </div>
+      );
+
+    const resize = () => act(async () => void window.dispatchEvent(new Event('resize')));
+
+    it('closes an open menu when its trigger gets hidden by a `display: none` ancestor', async () => {
+      const onOpenChange = jest.fn();
+      renderInWrapper(onOpenChange);
+      fireEvent.click(screen.getByText('Open menu'));
+      expect(screen.getByText('Item')).toBeInTheDocument();
+
+      screen.getByTestId('wrapper').style.display = 'none';
+      await resize();
+
+      expect(screen.queryByText('Item')).not.toBeInTheDocument();
+      expect(onOpenChange).toHaveBeenLastCalledWith(false);
+    });
+
+    it('reports a hidden trigger once while the consumer keeps the menu open, and again if it is hidden anew', async () => {
+      const onOpenChange = jest.fn();
+      render(
+        <div data-testid="wrapper">
+          <Dropdown open onOpenChange={onOpenChange}>
+            <Dropdown.Trigger>
+              <span>Open menu</span>
+            </Dropdown.Trigger>
+            <Dropdown.Content>
+              <Dropdown.Item index={0}>Item</Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown>
+        </div>
+      );
+      const wrapper = screen.getByTestId('wrapper');
+      const closes = () => onOpenChange.mock.calls.filter(([open]) => open === false).length;
+
+      wrapper.style.display = 'none';
+      await resize();
+      await resize();
+      await resize();
+      expect(screen.getByText('Item')).toBeInTheDocument();
+      expect(closes()).toBe(1);
+
+      wrapper.style.display = 'block';
+      await resize();
+      wrapper.style.display = 'none';
+      await resize();
+      expect(closes()).toBe(2);
+    });
+
+    it('stays open on resize when the trigger is not hidden', async () => {
+      renderInWrapper();
+      fireEvent.click(screen.getByText('Open menu'));
+
+      await resize();
+
+      expect(screen.getByText('Item')).toBeInTheDocument();
+    });
   });
 });

@@ -1,4 +1,4 @@
-@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+@use '../../../styles/breakpoint-classes';
 
 .tedi-attachment-wrapper {
   display: block;
@@ -76,7 +76,7 @@
   width: 100%;
 }
 
-.tedi-attachment--vertical {
+@mixin attachment-vertical {
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: var(--layout-grid-gutters-02) var(--layout-grid-gutters-08);
@@ -112,7 +112,16 @@
   }
 }
 
-.tedi-attachment--multi-line:not(.tedi-attachment--vertical) .tedi-attachment__icon {
+.tedi-attachment--vertical {
+  @include attachment-vertical;
+}
+
+// With no `direction`, the layout turns vertical below `verticalBelow`.
+@include breakpoint-classes.below-modifiers('.tedi-attachment') {
+  @include attachment-vertical;
+}
+
+.tedi-attachment--multi-line .tedi-attachment__icon {
   margin-top: calc(var(--layout-grid-gutters-08) + var(--layout-grid-gutters-02));
 }
 
@@ -122,7 +131,7 @@
   white-space: nowrap;
 }
 
-@include breakpoints.media-breakpoint-down(md) {
+@include breakpoint-classes.below(md) {
   .tedi-attachment__file-size {
     margin-left: 0;
   }

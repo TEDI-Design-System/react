@@ -1,4 +1,4 @@
-@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+@use '../../../styles/breakpoint-classes';
 
 .tedi-button-group {
   display: flex;
@@ -33,7 +33,7 @@
         z-index: 1;
       }
 
-      @include breakpoints.media-breakpoint-down(md) {
+      @include breakpoint-classes.below(md) {
         flex: 1;
       }
 
@@ -158,4 +158,20 @@
     gap: var(--button-md-inner-spacing);
     align-items: center;
   }
+}
+
+.tedi-button-group__mobile-dropdown {
+  display: none;
+}
+
+@include breakpoint-classes.below-modifiers('.tedi-button-group__mobile-dropdown') {
+  display: contents;
+}
+
+.tedi-button-group__buttons {
+  display: contents;
+}
+
+@include breakpoint-classes.below-modifiers('.tedi-button-group__buttons') {
+  display: none;
 }

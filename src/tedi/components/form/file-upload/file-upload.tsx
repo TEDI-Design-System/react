@@ -1,7 +1,6 @@
 import cn from 'classnames';
 import React from 'react';
 
-import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { FileUploadFile, useFileUpload } from '../../../helpers/hooks/use-file-upload';
 import { useLabels } from '../../../providers/label-provider';
 import { Text } from '../../base/typography/text/text';
@@ -146,7 +145,6 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     showRestrictions,
   });
 
-  const currentBreakpoint = useBreakpoint();
   const generatedId = React.useId();
   const inputGroup = useOptionalInputGroup?.();
   const shouldHideLabel = inputGroup?.hasExternalLabel;
@@ -272,7 +270,8 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                   />
                   {hasClearButton && getFiles.length > 0 && !disabled && (
                     <>
-                      {isBreakpointBelow(currentBreakpoint, 'md') ? (
+                      {/* Both clear buttons are rendered, and CSS shows one: text below `md`, icon from `md` up. */}
+                      <span className={styles['tedi-file-upload__clear-text']}>
                         <Button
                           visualType="neutral"
                           iconLeft="close"
@@ -282,9 +281,10 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                         >
                           {getLabel('clear')}
                         </Button>
-                      ) : (
+                      </span>
+                      <span className={styles['tedi-file-upload__clear-icon']}>
                         <ClosingButton onClick={handleClearAndFocus} iconSize={18} title={getLabel('clear')} />
-                      )}
+                      </span>
                       <Separator axis="vertical" height={1.5} spacing={0.5} color="primary" />
                     </>
                   )}
