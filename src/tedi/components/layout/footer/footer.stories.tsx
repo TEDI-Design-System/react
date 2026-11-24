@@ -210,7 +210,7 @@ const DeviceFrame = ({
   return (
     <div ref={outerRef} style={{ flex: `0 1 ${width}px`, width: '100%', maxWidth: width, minWidth: 0 }}>
       {label && (
-        <Text element="h5" color="secondary">
+        <Text element="h3" modifiers="h5" color="secondary">
           {label}
         </Text>
       )}
@@ -341,7 +341,9 @@ export const LogoPosition: Story = {
   render: () => (
     <section aria-label="Logo position examples">
       <VerticalSpacing size={1.5}>
-        <Text element="h4">Right</Text>
+        <Text element="h3" modifiers="h4">
+          Right
+        </Text>
         <LogoFooter>
           <Footer.Side placement="end">
             <LogoPlaceholder />
@@ -352,7 +354,9 @@ export const LogoPosition: Story = {
             <LogoPlaceholder />
           </Footer.Side>
         </LogoFooter>
-        <Text element="h4">Left</Text>
+        <Text element="h3" modifiers="h4">
+          Left
+        </Text>
         <LogoFooter>
           <Footer.Side placement="start">
             <LogoPlaceholder />
@@ -451,7 +455,9 @@ export const ShowIcons: Story = {
   render: () => (
     <section aria-label="Footer icon examples">
       <VerticalSpacing size={1}>
-        <Text element="h4">With icons</Text>
+        <Text element="h3" modifiers="h4">
+          With icons
+        </Text>
         <Footer>
           <Footer.Body>
             <StandardSections />
@@ -460,7 +466,9 @@ export const ShowIcons: Story = {
             <LogoPlaceholder />
           </Footer.Side>
         </Footer>
-        <Text element="h4">Without icons</Text>
+        <Text element="h3" modifiers="h4">
+          Without icons
+        </Text>
         <Footer>
           <Footer.Body>
             <StandardSections showIcons={false} />
