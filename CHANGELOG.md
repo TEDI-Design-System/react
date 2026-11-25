@@ -1,3 +1,17 @@
+# [21.0.0-rc.28](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.27...react-21.0.0-rc.28) (2026-11-25)
+
+
+### Bug Fixes
+
+* **shadow-dom:** avoid document lookups inside shadow roots [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1096](https://github.com/TEDI-Design-System/react/issues/1096)) ([2f867d2](https://github.com/TEDI-Design-System/react/commit/2f867d2758afe7ae93ebc27c9c2bd6f4baef1fc9))
+
+
+### Features
+
+* **overlays:** render portals into the style provider container [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1094](https://github.com/TEDI-Design-System/react/issues/1094)) ([dafcd74](https://github.com/TEDI-Design-System/react/commit/dafcd7431b71b7eb453cf242f4b6a4a5c68114db))
+* **style-provider:** add containerElement for shadow dom support [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1092](https://github.com/TEDI-Design-System/react/issues/1092)) ([478cf80](https://github.com/TEDI-Design-System/react/commit/478cf80dceb2893ca268b6e37e3392b7c48bc80b))
+* **style-provider:** add scrollContainer for shadow dom scroll locking [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1097](https://github.com/TEDI-Design-System/react/issues/1097)) ([285c480](https://github.com/TEDI-Design-System/react/commit/285c480d35ce35a328cd266c413948f7c05e8517))
+
 # [21.0.0-rc.27](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.26...react-21.0.0-rc.27) (2026-11-24)
 
 
