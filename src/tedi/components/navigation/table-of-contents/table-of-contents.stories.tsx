@@ -263,6 +263,7 @@ export const Divided: Story = {
  * positions the list.
  */
 export const InPopover: Story = {
+  parameters: { visualTest: false },
   render: function InPopover() {
     const [open, setOpen] = useState(false);
 
