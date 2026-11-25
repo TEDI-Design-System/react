@@ -82,7 +82,8 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
    */
   returnFocus?: boolean;
   /**
-   * Render the dimmed backdrop. `false` keeps portal + focus management but no overlay.
+   * Render the dimmed backdrop. `false` keeps portal + focus management but no overlay. Hidden while
+   * the sheet is collapsed.
    *
    * On its own this only removes the backdrop: scroll stays locked and a click on the page still
    * closes the sheet. For a non-modal sheet the page stays usable behind (docked peek), also set
@@ -197,6 +198,8 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
     useSheetContext();
   const { isMounted, status } = useTransitionStatus(context, { duration: { open: 350, close: 300 } });
   const isScrollContainerLocked = useScrollContainerLock(lockScroll && isMounted);
+  // The page stays undimmed while the sheet is collapsed, so it can still be used.
+  const showBackdrop = showOverlay && !collapsed;
 
   const { snapPoints, defaultSnapPoint, onSnapPointChange } = props;
   const snaps = useMemo(() => (snapPoints ? [...snapPoints].sort((a, b) => a - b) : []), [snapPoints]);
@@ -380,7 +383,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
         // Out of the Tab order, the accessibility tree and pointer input while it animates out.
         {...(status === 'close' && { inert: '' })}
         className={cn(styles['tedi-sheet__overlay'], {
-          [styles['tedi-sheet__overlay--no-overlay']]: !showOverlay,
+          [styles['tedi-sheet__overlay--no-overlay']]: !showBackdrop,
           [styles['tedi-sheet__overlay--hidden']]: !active,
         })}
       >
