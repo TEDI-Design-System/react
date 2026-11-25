@@ -244,6 +244,7 @@ files. This is the part of this document worth maintaining by hand.
 - **Set `meta: { rowHeader: true }` on the column that identifies a row** (a name, say). Its cells
   render as `<th scope="row">`, so screen readers announce that value as row context. Give row
   action buttons the same context, e.g. `Muuda<span className="sr-only"> {row.original.name}</span>`.
+- **Give the page an element with `id="main-content"`** when using the default `SkipLinks` link.
 - **Give a stepper's `<nav>` an `aria-label`.** `VerticalStepper` and `CardStepper` both render a
   landmark; unnamed landmarks are noise when a page has more than one.
 - **Don't signal state by colour alone**, and give every sort, pagination, expansion and reorder

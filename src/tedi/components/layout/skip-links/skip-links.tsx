@@ -1,0 +1,109 @@
+import cn from 'classnames';
+
+import { useLabels } from '../../../providers/label-provider';
+import Link, { LinkProps } from '../../navigation/link/link';
+import styles from './skip-links.module.scss';
+
+export type SkipLink = Omit<LinkProps<'a'>, 'as'>;
+
+export interface SkipLinksProps {
+  /**
+   * Links to landmarks on the page. Each `href` should point to the `id` of an element that exists on the page.
+   * Defaults to a single link to `#main-content` labelled with the `skip-links.main-content` label.
+   */
+  links?: SkipLink[];
+  /**
+   * Additional class name
+   */
+  className?: string;
+}
+
+// Like the browser's own fragment navigation, which tries the id as written first: `#%C3%B5ige` finds `id="õige"`.
+const decodeId = (id: string) => {
+  try {
+    return decodeURIComponent(id);
+  } catch {
+    return id;
+  }
+};
+
+// Keyed by href (numbered when repeated), so a reorder can't hand a focused link another destination.
+const getLinkKeys = (links: SkipLink[]) => {
+  const seen = new Map<string, number>();
+  return links.map(({ href = '' }) => {
+    const count = seen.get(href) ?? 0;
+    seen.set(href, count + 1);
+    return `${count}-${href}`;
+  });
+};
+
+// A modifier click asks the browser for a new tab or window.
+const hasModifierKey = (event: React.MouseEvent) => event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+
+// A link that opens elsewhere (e.g. `target="_blank"`) keeps the behaviour its label announces.
+const opensInCurrentTab = (link: Element) => (link.getAttribute('target') || '_self').toLowerCase() === '_self';
+
+/**
+ * Links that let keyboard users bypass repeated content (WCAG 2.4.1). Hidden until a link receives focus.
+ * Render it as the first element on the page, before `Header`.
+ */
+export const SkipLinks = (props: SkipLinksProps): JSX.Element => {
+  const { links, className } = props;
+  const { getLabel } = useLabels();
+
+  // Focuses the target directly: an app's <base href="/"> would turn `#id` into a link to the home page.
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.defaultPrevented || hasModifierKey(event)) return;
+
+    const link = (event.target as Element).closest('a[href^="#"]');
+    const href = link?.getAttribute('href');
+    if (!link || !href || !opensInCurrentTab(link)) return;
+
+    const id = href.slice(1);
+    const target = document.getElementById(id) ?? document.getElementById(decodeId(id));
+    if (!target) return;
+
+    event.preventDefault();
+
+    // A non-interactive target takes focus only to move the Tab start point, so it gets no focus ring.
+    if (target.tabIndex < 0) {
+      const addedTabIndex = !target.hasAttribute('tabindex');
+      if (addedTabIndex) target.setAttribute('tabindex', '-1');
+      target.classList.add(styles['tedi-skip-links__target']);
+      target.addEventListener(
+        'blur',
+        () => {
+          target.classList.remove(styles['tedi-skip-links__target']);
+          if (addedTabIndex) target.removeAttribute('tabindex');
+        },
+        { once: true }
+      );
+    }
+
+    target.focus();
+  };
+
+  const linkKeys = links ? getLinkKeys(links) : [];
+
+  return (
+    <div data-name="skip-links" className={cn(styles['tedi-skip-links'], className)} onClick={handleClick}>
+      <ul className={styles['tedi-skip-links__list']}>
+        {links ? (
+          links.map((link, index) => (
+            <li key={linkKeys[index]}>
+              <Link {...link} />
+            </li>
+          ))
+        ) : (
+          <li>
+            <Link href="#main-content">{getLabel('skip-links.main-content')}</Link>
+          </li>
+        )}
+      </ul>
+    </div>
+  );
+};
+
+SkipLinks.displayName = 'SkipLinks';
+
+export default SkipLinks;

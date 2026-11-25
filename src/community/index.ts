@@ -77,6 +77,7 @@ export {
   Radio,
   Select,
   SideNav,
+  SkipLinks,
   Table,
   Tag,
   ToggleOpen,

@@ -94,6 +94,7 @@ export const MobileNavToggle = ({
         {...getReferenceProps()}
         ref={referenceRef as React.Ref<HTMLButtonElement>}
         type="button"
+        data-name="mobile-nav-toggle"
         aria-expanded={menuOpen}
         className={BEM}
         onClick={() => toggleMenu(!menuOpen)}
@@ -117,6 +118,8 @@ export const MobileNavToggle = ({
         size: variant === 'collapse' ? 18 : 24,
       }}
       visualType={variant === 'collapse' ? 'secondary' : 'primary'}
+      data-name="mobile-nav-toggle"
+      aria-expanded={variant === 'mobile' ? menuOpen : undefined}
       className={BEM}
       onClick={() => toggleMenu(!menuOpen)}
       onKeyDown={handleKeyDown}
