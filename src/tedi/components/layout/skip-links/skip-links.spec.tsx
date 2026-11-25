@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { useBreakpointProps } from '../../../helpers';
 import { SkipLinks } from './skip-links';
@@ -179,5 +180,51 @@ describe('SkipLinks component', () => {
 
     expect(fireEvent.click(screen.getByRole('link'), { [modifier]: true })).toBe(true);
     expect(screen.getByRole('main')).not.toHaveFocus();
+  });
+
+  it('prefers an id that matches the href as written over the decoded one', () => {
+    render(
+      <>
+        <SkipLinks links={[{ href: '#p%C3%B5hisisu', children: 'Skip' }]} />
+        <section id="p%C3%B5hisisu">As written</section>
+        <main id="põhisisu">Decoded</main>
+      </>
+    );
+
+    fireEvent.click(screen.getByRole('link'));
+    expect(screen.getByText('As written')).toHaveFocus();
+  });
+
+  it('lets keyboard users skip the header and continue from the main content', async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <SkipLinks />
+        <header>
+          <a href="#">Header link</a>
+        </header>
+        <main id="main-content">
+          <a href="#">Link in main content</a>
+        </main>
+      </>
+    );
+    const main = screen.getByRole('main');
+
+    await user.tab();
+    expect(screen.getByRole('link', { name: 'skip-links.main-content' })).toHaveFocus();
+
+    await user.keyboard('{Enter}');
+    expect(main).toHaveFocus();
+
+    await user.tab();
+    expect(screen.getByRole('link', { name: 'Link in main content' })).toHaveFocus();
+    expect(main).not.toHaveAttribute('tabindex');
+    expect(main).not.toHaveClass('tedi-skip-links__target');
+  });
+
+  it('leaves a link alone when its id is not valid percent-encoding and nothing matches it', () => {
+    render(<SkipLinks links={[{ href: '#50%', children: 'Skip' }]} />);
+
+    expect(fireEvent.click(screen.getByRole('link'))).toBe(true);
   });
 });

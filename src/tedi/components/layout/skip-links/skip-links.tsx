@@ -18,7 +18,7 @@ export interface SkipLinksProps {
   className?: string;
 }
 
-// Like the browser's own fragment navigation, so `#%C3%B5ige` finds `id="õige"`.
+// Like the browser's own fragment navigation, which tries the id as written first: `#%C3%B5ige` finds `id="õige"`.
 const decodeId = (id: string) => {
   try {
     return decodeURIComponent(id);
@@ -49,7 +49,8 @@ export const SkipLinks = (props: SkipLinksProps): JSX.Element => {
     const href = link?.getAttribute('href');
     if (!link || !href || !opensInCurrentTab(link)) return;
 
-    const target = document.getElementById(decodeId(href.slice(1)));
+    const id = href.slice(1);
+    const target = document.getElementById(id) ?? document.getElementById(decodeId(id));
     if (!target) return;
 
     event.preventDefault();
