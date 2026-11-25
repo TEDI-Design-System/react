@@ -855,6 +855,7 @@ export const AccordionBehavior: StoryObj = {
 };
 
 export const BackgroundColors: StoryObj = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <Accordion allowMultiple defaultExpanded>
       {backgroundColorExamples.map(({ color, label }) => (
