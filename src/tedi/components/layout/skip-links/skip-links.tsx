@@ -27,6 +27,16 @@ const decodeId = (id: string) => {
   }
 };
 
+// Keyed by href (numbered when repeated), so a reorder can't hand a focused link another destination.
+const getLinkKeys = (links: SkipLink[]) => {
+  const seen = new Map<string, number>();
+  return links.map(({ href = '' }) => {
+    const count = seen.get(href) ?? 0;
+    seen.set(href, count + 1);
+    return `${count}-${href}`;
+  });
+};
+
 // A modifier click asks the browser for a new tab or window.
 const hasModifierKey = (event: React.MouseEvent) => event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
 
@@ -73,12 +83,14 @@ export const SkipLinks = (props: SkipLinksProps): JSX.Element => {
     target.focus();
   };
 
+  const linkKeys = links ? getLinkKeys(links) : [];
+
   return (
     <div data-name="skip-links" className={cn(styles['tedi-skip-links'], className)} onClick={handleClick}>
       <ul className={styles['tedi-skip-links__list']}>
         {links ? (
           links.map((link, index) => (
-            <li key={index}>
+            <li key={linkKeys[index]}>
               <Link {...link} />
             </li>
           ))

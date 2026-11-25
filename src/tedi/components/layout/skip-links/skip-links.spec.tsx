@@ -227,4 +227,39 @@ describe('SkipLinks component', () => {
 
     expect(fireEvent.click(screen.getByRole('link'))).toBe(true);
   });
+
+  it('keeps the focused link pointing at the same destination when the links reorder', () => {
+    const main = { href: '#main-content', children: 'Skip to main content' };
+    const search = { href: '#search', children: 'Skip to search' };
+    const { rerender } = render(<SkipLinks links={[main, search]} />);
+
+    screen.getByRole('link', { name: 'Skip to main content' }).focus();
+    rerender(<SkipLinks links={[search, main]} />);
+
+    expect(document.activeElement).toHaveAttribute('href', '#main-content');
+  });
+
+  it('renders links that share an href without key warnings', () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    render(
+      <SkipLinks
+        links={[
+          { href: '#main-content', children: 'First' },
+          { href: '#main-content', children: 'Second' },
+          { href: '#main-content-1', children: 'Third' },
+        ]}
+      />
+    );
+
+    expect(screen.getAllByRole('link')).toHaveLength(3);
+    expect(consoleError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
+  it('renders an entry without an href', () => {
+    render(<SkipLinks links={[{ children: 'No destination' }, { href: '#main-content', children: 'Skip' }]} />);
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+  });
 });
