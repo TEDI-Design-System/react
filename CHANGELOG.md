@@ -1,3 +1,10 @@
+# [21.0.0-rc.30](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.29...react-21.0.0-rc.30) (2026-11-25)
+
+
+### Features
+
+* **inline-edit:** new TEDI-Ready component [#199](https://github.com/TEDI-Design-System/react/issues/199) ([#904](https://github.com/TEDI-Design-System/react/issues/904)) ([f11fd3c](https://github.com/TEDI-Design-System/react/commit/f11fd3cdc184682d12801c38bf666890b6bb36ad))
+
 # [21.0.0-rc.29](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.28...react-21.0.0-rc.29) (2026-11-25)
 
 
