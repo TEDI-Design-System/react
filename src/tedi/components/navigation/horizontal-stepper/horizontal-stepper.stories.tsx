@@ -44,7 +44,7 @@ type Story = StoryObj<HorizontalStepperProps>;
  * `disabled`, `description`, …) — flattened into namespaced controls via the shared
  * `subcomponentArgTypes` helper — drive the **first** step (current by default) so their
  * effect is visible next to the unchanged later steps. The ungrouped controls are
- * `HorizontalStepper`'s own props (`background`, `compact`, …); `label` is excluded since
+ * `HorizontalStepper`'s own props (`backgroundColor`, `compact`, …); `label` is excluded since
  * each step sets its own.
  */
 export const Default: StoryObj = {

@@ -265,7 +265,7 @@ export interface TablePaginationOptions {
   pageSizeOptions?: number[] | false;
   /**
    * Props forwarded to the built-in `Pagination` to customise its appearance
-   * and behaviour — e.g. `background`, `borders`, `hideResults`,
+   * and behaviour — e.g. `backgroundColor`, `borders`, `hideResults`,
    * `showPrevNextButtons`, `arrowVariant`, `labels`. The data / state props the
    * Table owns (`pageCount`, `page`, `totalItems`, `pageSize`, `pageSizeOptions`
    * and the change handlers) are managed internally and cannot be overridden.
