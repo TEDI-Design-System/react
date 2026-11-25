@@ -418,7 +418,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
         {children}
 
         {summary && (
-          <Card.Content padding={1} background="tertiary" hasSeparator={summaryHasSeparator}>
+          <Card.Content padding={1} backgroundColor="tertiary" hasSeparator={summaryHasSeparator}>
             <TextGroupList
               type="horizontal"
               labelAlign={resolvedLabelAlign}

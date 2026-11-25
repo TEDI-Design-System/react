@@ -21,7 +21,7 @@ export interface HorizontalStepperProps {
    * Background style of the stepper track.
    * @default default
    */
-  background?: HorizontalStepperBackground;
+  backgroundColor?: HorizontalStepperBackground;
   /**
    * Collapse labels so only the indicators plus the selected step's label are
    * visible. `true` collapses at every width; a breakpoint (`'sm'`, `'md'`,
@@ -36,7 +36,7 @@ export interface HorizontalStepperProps {
 }
 
 const HorizontalStepperComponent = forwardRef<HTMLElement, HorizontalStepperProps>(
-  ({ children, 'aria-label': ariaLabel, background = 'default', compact = 'sm', className }, ref) => {
+  ({ children, 'aria-label': ariaLabel, backgroundColor = 'default', compact = 'sm', className }, ref) => {
     let stepNumber = 0;
     const items = Children.map(children, (child) => {
       if (isValidElement(child) && child.type === HorizontalStepperItem) {
@@ -58,7 +58,7 @@ const HorizontalStepperComponent = forwardRef<HTMLElement, HorizontalStepperProp
         className={cn(
           styles['tedi-horizontal-stepper'],
           {
-            [styles['tedi-horizontal-stepper--transparent']]: background === 'transparent',
+            [styles['tedi-horizontal-stepper--transparent']]: backgroundColor === 'transparent',
             [styles['tedi-horizontal-stepper--compact']]: compact === true,
           },
           typeof compact === 'string' && styles[`tedi-horizontal-stepper--compact-${compact}`],

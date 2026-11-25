@@ -162,7 +162,7 @@ const SideNavItem = <C extends React.ElementType = 'a'>(props: SideNavItem<C>) =
             ...defaultIconProps,
             ...icon,
             className: cn(defaultIconProps.className, icon?.className),
-            background: undefined,
+            backgroundColor: undefined,
           };
 
     return <Icon {...iconProps} />;

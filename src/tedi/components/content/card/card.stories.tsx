@@ -90,7 +90,7 @@ const GeneralTemplate: StoryFn<CardStory> = (args) => {
         <Col>
           <StretchContent>
             <Card borderless={true}>
-              <Card.Content background="secondary">Right</Card.Content>
+              <Card.Content backgroundColor="secondary">Right</Card.Content>
             </Card>
           </StretchContent>
         </Col>
@@ -213,7 +213,7 @@ const SplitCard: StoryFn = () => (
       <Col>
         <StretchContent>
           <Card borderless={true} borderRadius={{ left: false }}>
-            <Card.Content background="secondary">Right</Card.Content>
+            <Card.Content backgroundColor="secondary">Right</Card.Content>
           </Card>
         </StretchContent>
       </Col>
@@ -300,22 +300,22 @@ export const BreakpointProps: Story = {
   render: GeneralTemplate,
   args: {
     card: {
-      background: 'success-primary',
+      backgroundColor: 'success-primary',
       border: 'brand-primary',
     },
     cardContent: {
       className: 'test123',
-      background: undefined,
+      backgroundColor: undefined,
       sm: {
-        background: 'brand-secondary',
+        backgroundColor: 'brand-secondary',
         padding: 0,
       },
       md: {
-        background: 'brand-tertiary',
+        backgroundColor: 'brand-tertiary',
         padding: 1,
       },
       lg: {
-        background: undefined,
+        backgroundColor: undefined,
         padding: 1.5,
       },
     },
@@ -333,7 +333,7 @@ export const WithNotification: Story = {
       padding: 0.75,
     },
     cardHeader: {
-      background: 'primary',
+      backgroundColor: 'primary',
       children: <Heading element="h3">Kaardi pealkiri</Heading>,
     },
     cardNotification: true,
@@ -369,7 +369,7 @@ const TwoToned: StoryFn<CardProps> = (_args) => (
       <Col width="auto">
         <StretchContent>
           <Card borderRadius={{ right: false }} borderless>
-            <Card.Content background="secondary">
+            <Card.Content backgroundColor="secondary">
               <Icon name="straighten" className="text-disabled"></Icon>
             </Card.Content>
           </Card>

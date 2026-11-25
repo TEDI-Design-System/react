@@ -56,7 +56,7 @@ export const CardsExample: StoryObj<Partial<StretchContentProps>> = {
     const card = (title: string, content: JSX.Element) => {
       return (
         <Card>
-          <CardHeader background="brand-primary">
+          <CardHeader backgroundColor="brand-primary">
             <Heading element="h2">{title}</Heading>
           </CardHeader>
           <CardContent>

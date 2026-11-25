@@ -186,7 +186,7 @@ export const VisualTest: Story = {
         <Text modifiers="bold">Color brand</Text>
         <VisualTestStory story={{ ...ColorBrand, args: { ...ColorBrand.args, idPrefix: 'vt-brand-' } }} />
       </VerticalSpacing>
-      <Card background="brand-primary" borderless>
+      <Card backgroundColor="brand-primary" borderless>
         <Card.Content>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold" color="white">

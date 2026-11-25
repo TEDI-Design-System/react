@@ -116,7 +116,7 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
       {tooltipText && (
         <span className={styles['tedi-base-map-selection__info']}>
           <Icon
-            background="brand-secondary"
+            backgroundColor="brand-secondary"
             name={tooltipType === 'error' ? 'error' : 'info'}
             size={16}
             color={tooltipType === 'error' ? 'danger' : 'brand'}

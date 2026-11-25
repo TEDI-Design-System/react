@@ -52,7 +52,7 @@ export const DirectionItem = (props: DirectionItemProps): JSX.Element => {
         {showAboveIndicator && <div className={styles['tedi-directions__drop-indicator']} />}
         {children}
         <div className={styles['tedi-directions__drag-icon']} {...attributes} {...listeners}>
-          <Icon name="drag_indicator" size={12} background="brand-secondary" />
+          <Icon name="drag_indicator" size={12} backgroundColor="brand-secondary" />
         </div>
         {showBelowIndicator && <div className={styles['tedi-directions__drop-indicator']} />}
       </div>

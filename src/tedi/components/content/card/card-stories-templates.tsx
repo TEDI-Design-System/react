@@ -18,18 +18,18 @@ import { CardBackground } from './utility';
 export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
   <VerticalSpacing>
     <Card>
-      <Card.Header background="primary">
+      <Card.Header backgroundColor="primary">
         <Heading element="h3">Pealkiri</Heading>
       </Card.Header>
     </Card>
     <Card>
-      <Card.Header background="primary">
+      <Card.Header backgroundColor="primary">
         <Heading element="h3">Pealkiri</Heading>
         <Text color="secondary">Kirjeldus</Text>
       </Card.Header>
     </Card>
     <Card>
-      <Card.Header background="primary">
+      <Card.Header backgroundColor="primary">
         <Row>
           <Col>
             <Heading element="h3">Pealkiri</Heading>
@@ -46,7 +46,7 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       </Card.Header>
     </Card>
     <Card>
-      <Card.Header background="primary">
+      <Card.Header backgroundColor="primary">
         <Row>
           <Col>
             <Heading element="h3">Pealkiri</Heading>
@@ -68,7 +68,7 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       </Card.Header>
     </Card>
     <Card>
-      <Card.Header background="primary">
+      <Card.Header backgroundColor="primary">
         <Row>
           <Col>
             <Heading element="h3">Pealkiri</Heading>
@@ -87,7 +87,7 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       </Card.Header>
     </Card>
     <Card>
-      <Card.Header background="primary">
+      <Card.Header backgroundColor="primary">
         <Row>
           <Col>
             <Heading element="h3">Pealkiri</Heading>
@@ -104,7 +104,7 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       </Card.Header>
     </Card>
     <Card>
-      <Card.Header background="secondary">
+      <Card.Header backgroundColor="secondary">
         <Row>
           <Col>
             <Heading element="h3">Pealkiri</Heading>
@@ -121,7 +121,7 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       </Card.Header>
     </Card>
     <Card>
-      <Card.Header background="tertiary">
+      <Card.Header backgroundColor="tertiary">
         <Row>
           <Col>
             <Heading element="h3">Pealkiri</Heading>
@@ -138,7 +138,7 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       </Card.Header>
     </Card>
     <Card>
-      <Card.Header background="brand-primary">
+      <Card.Header backgroundColor="brand-primary">
         <Row>
           <Col>
             <Heading element="h3">Pealkiri</Heading>
@@ -155,7 +155,7 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       </Card.Header>
     </Card>
     <Card>
-      <Card.Header background="brand-secondary">
+      <Card.Header backgroundColor="brand-secondary">
         <Row>
           <Col>
             <Heading element="h3">Pealkiri</Heading>
@@ -271,10 +271,10 @@ export const DefaultCardTemplates: StoryFn<CardStory> = (_args) => (
 export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
   <VerticalSpacing>
     <Card>
-      <Card.Content background="brand-tertiary">
+      <Card.Content backgroundColor="brand-tertiary">
         <Row>
           <Col width="auto" className="flex align-items-center gap-3">
-            <Icon background="primary" name="assignment_late" />
+            <Icon backgroundColor="primary" name="assignment_late" />
             <VerticalSpacing size={0}>
               <Text modifiers="bold">Pealkiri</Text>
               <Text color="secondary">Kirjeldus</Text>
@@ -285,7 +285,7 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
     </Card>
     <Card>
       <Card.Content
-        background="brand-tertiary"
+        backgroundColor="brand-tertiary"
         backgroundImage="card-background-example.svg"
         backgroundSize="75px"
         backgroundPosition="right center"
@@ -293,7 +293,7 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
       >
         <Row>
           <Col width="auto" className="flex align-items-center gap-3">
-            <Icon background="primary" name="assignment_late" />
+            <Icon backgroundColor="primary" name="assignment_late" />
             <VerticalSpacing size={0}>
               <Text modifiers="bold">Pealkiri</Text>
               <Text color="secondary">Kirjeldus</Text>
@@ -303,10 +303,10 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
       </Card.Content>
     </Card>
     <Card border="accent">
-      <Card.Content background="accent">
+      <Card.Content backgroundColor="accent">
         <Row>
           <Col width="auto" className="flex align-items-center gap-3">
-            <Icon background="primary" name="assignment_late" />
+            <Icon backgroundColor="primary" name="assignment_late" />
             <VerticalSpacing size={0}>
               <Text modifiers="bold">Pealkiri</Text>
               <Text color="secondary">Kirjeldus</Text>
@@ -316,10 +316,10 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
       </Card.Content>
     </Card>
     <Card border="neutral-primary">
-      <Card.Content background="neutral-primary">
+      <Card.Content backgroundColor="neutral-primary">
         <Row>
           <Col width="auto" className="flex align-items-center gap-3">
-            <Icon background="primary" name="calendar_today" filled />
+            <Icon backgroundColor="primary" name="calendar_today" filled />
             <Text color="secondary">
               Haigusleht: <strong>118.</strong> päev
             </Text>
@@ -335,7 +335,7 @@ export const AlternativeCardsTemplate: StoryFn<CardStory> = (_args) => (
     <Row>
       <Col lg={6} sm={12}>
         <Card>
-          <Card.Header background="primary">
+          <Card.Header backgroundColor="primary">
             <HeadingWithIcon name="assignment_ind" headingColor="brand" iconColor="brand">
               Minu tahteavaldus
             </HeadingWithIcon>
@@ -369,7 +369,7 @@ export const AlternativeCardsTemplate: StoryFn<CardStory> = (_args) => (
     <Row>
       <Col lg={6} sm={12}>
         <Card>
-          <Card.Header background="brand-primary">
+          <Card.Header backgroundColor="brand-primary">
             <Heading element="h3" color="white">
               Lühike pealkiri
             </Heading>
@@ -448,7 +448,7 @@ export const BackgroundColorsTemplate: StoryFn<CardStory> = (_args) => {
     <Row>
       {backgroundColors.map((color, index) => (
         <Col lg={4} sm={12} key={index} style={{ marginBottom: '1.5rem' }}>
-          <Card background={color} borderless={color !== 'primary' ? true : false}>
+          <Card backgroundColor={color} borderless={color !== 'primary' ? true : false}>
             <Card.Content>
               <Text>
                 Cabbage, comprising several cultivars of Brassica oleracea, is a leafy green, red (purple), or white

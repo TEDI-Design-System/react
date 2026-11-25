@@ -506,7 +506,7 @@
       "description": "Render a bordered content surface composed from Card.Header, Card.Content, and Card.Notification sub-components.",
       "keyProps": [
         "padding",
-        "background",
+        "backgroundColor",
         "borderless"
       ]
     },
@@ -564,7 +564,7 @@
       "keyProps": [
         "children",
         "compact",
-        "background"
+        "backgroundColor"
       ]
     },
     {

@@ -64,7 +64,7 @@ const IconCard = ({ icon, title, description }: { icon: string; title: string; d
       <Col width="auto" style={{ display: 'flex' }}>
         <StretchContent>
           <Card borderRadius={{ right: false }} borderless>
-            <Card.Content background="secondary">
+            <Card.Content backgroundColor="secondary">
               <Icon name={icon} color="secondary" />
             </Card.Content>
           </Card>
@@ -383,7 +383,7 @@ const ComplexCardTemplate = () => (
         <Col width="auto" style={{ display: 'flex' }}>
           <StretchContent>
             <Card borderRadius={{ right: false, bottom: false }} borderless>
-              <Card.Content background="secondary">
+              <Card.Content backgroundColor="secondary">
                 <Icon name="prescriptions" color="secondary" />
               </Card.Content>
             </Card>

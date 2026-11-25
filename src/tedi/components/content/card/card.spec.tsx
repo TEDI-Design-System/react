@@ -42,11 +42,11 @@ describe('Card Component', () => {
 
   it('provides context values to child components', () => {
     render(
-      <Card padding={2} background="primary">
+      <Card padding={2} backgroundColor="primary">
         <CardContext.Consumer>
           {(value) => (
             <div>
-              Padding: {value.padding as number}, Background: {value.background}
+              Padding: {value.padding as number}, Background: {value.backgroundColor}
             </div>
           )}
         </CardContext.Consumer>
