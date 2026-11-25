@@ -27,7 +27,7 @@ export interface SheetHeaderProps {
    * Colour scheme.
    * - `brand` - brand-blue background with white content.
    * - `default` - surface background with primary content.
-   * @default brand
+   * @default default
    */
   variant?: SheetHeaderVariant;
   /**
@@ -59,7 +59,7 @@ export interface SheetHeaderProps {
   actions?: ReactNode;
   /**
    * Show the close button.
-   * @default true
+   * @default false
    */
   closeButton?: boolean;
   /**
@@ -80,13 +80,13 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
   const {
     title,
     headingLevel = 'h3',
-    variant = 'brand',
+    variant = 'default',
     titlePosition = 'start',
     collapsible = false,
     startSlot,
     endSlot,
     actions,
-    closeButton = true,
+    closeButton = false,
     closeButtonProps,
     children,
     className,

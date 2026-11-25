@@ -13,7 +13,7 @@ import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Accordion } from '../../content/accordion/accordion';
 import { TextGroup } from '../../content/text-group/text-group';
-import { Checkbox } from '../../form/checkbox/checkbox';
+import { Checkbox } from '../../form/checkbox';
 import { ChoiceGroup } from '../../form/choice-group/choice-group';
 import { DateField } from '../../form/date-field/date-field';
 import { Search } from '../../form/search/search';
@@ -184,16 +184,10 @@ const exampleGroup = (label: string, examples: Example[]) => (
 );
 
 const settingsBody = (idPrefix: string) => (
-  <VerticalSpacing size={0.5}>
-    <Checkbox
-      id={`${idPrefix}-lengths`}
-      name={`${idPrefix}-lengths`}
-      value="lengths"
-      label="Näita pikkusi"
-      defaultChecked
-    />
-    <Checkbox id={`${idPrefix}-angles`} name={`${idPrefix}-angles`} value="angles" label="Näita nurki" />
-  </VerticalSpacing>
+  <Checkbox.Group label="Seaded" hideLabel name={`${idPrefix}-settings`} defaultValue={['lengths']}>
+    <Checkbox id={`${idPrefix}-lengths`} value="lengths" label="Näita pikkusi" />
+    <Checkbox id={`${idPrefix}-angles`} value="angles" label="Näita nurki" />
+  </Checkbox.Group>
 );
 
 const notificationsBody = (
@@ -290,17 +284,7 @@ const SenderSelection = ({ idPrefix, selected, onChange }: SenderSelectionProps)
   })).filter((group) => group.senders.length > 0);
 
   const senderCheckbox = (sender: string) => (
-    <Checkbox
-      key={sender}
-      id={`${idPrefix}-${SENDERS.indexOf(sender)}`}
-      name={`${idPrefix}-senders`}
-      value={sender}
-      label={sender}
-      checked={selected.includes(sender)}
-      onChange={(_, checked) =>
-        onChange(checked ? [...selected, sender] : selected.filter((value) => value !== sender))
-      }
-    />
+    <Checkbox key={sender} id={`${idPrefix}-${SENDERS.indexOf(sender)}`} value={sender} label={sender} />
   );
 
   return (
@@ -323,7 +307,11 @@ const SenderSelection = ({ idPrefix, selected, onChange }: SenderSelectionProps)
         onChange={(_, checked) => onChange(checked ? SENDERS : [])}
       />
       <Separator spacing={0} />
-      {visibleSenders.length > 0 && <VerticalSpacing size={0.5}>{visibleSenders.map(senderCheckbox)}</VerticalSpacing>}
+      {visibleSenders.length > 0 && (
+        <Checkbox.Group label="Saatjad" hideLabel value={selected} onChange={onChange}>
+          {visibleSenders.map(senderCheckbox)}
+        </Checkbox.Group>
+      )}
       {visibleGroups.length > 0 && (
         <Accordion>
           {visibleGroups.map((group) => (
@@ -339,7 +327,9 @@ const SenderSelection = ({ idPrefix, selected, onChange }: SenderSelectionProps)
                 expandActionPosition="end"
               />
               <Accordion.Item.Content>
-                <VerticalSpacing size={0.5}>{group.senders.map(senderCheckbox)}</VerticalSpacing>
+                <Checkbox.Group label={group.title} hideLabel value={selected} onChange={onChange}>
+                  {group.senders.map(senderCheckbox)}
+                </Checkbox.Group>
               </Accordion.Item.Content>
             </Accordion.Item>
           ))}
@@ -369,6 +359,7 @@ function ContentNavigationSheet(): JSX.Element {
       </Sheet.Trigger>
       <Sheet.Content>
         <Sheet.Header
+          closeButton
           title={step === 'filters' ? 'Filtreerimine' : 'Saatja'}
           variant="default"
           startSlot={
@@ -419,7 +410,7 @@ function ContentNavigationSheet(): JSX.Element {
 }
 
 const dockedSheetProps: Partial<SheetProps> = { closeOnBackdropClick: false };
-const dockedContentProps: Partial<SheetContentProps> = { showOverlay: false, trapFocus: false, lockScroll: false };
+const dockedContentProps: Partial<SheetContentProps> = { trapFocus: false, lockScroll: false };
 
 const MAP_LAYERS = ['Hübriidkaart', 'Reljeef', 'Katastriüksused', 'Kitsendused', 'Aadressandmed'];
 
@@ -485,7 +476,7 @@ export const ActionsSlot: Story = {
         caption: 'With footer',
         content: (
           <Sheet.Content>
-            <Sheet.Header title="Seaded" variant="default" />
+            <Sheet.Header closeButton title="Seaded" variant="default" />
             <Sheet.Body>{settingsBody('sheet-actions-footer')}</Sheet.Body>
             <ApplyFooter more />
           </Sheet.Content>
@@ -497,7 +488,7 @@ export const ActionsSlot: Story = {
         icon: 'info',
         content: (
           <Sheet.Content>
-            <Sheet.Header title="Loe lähemalt" variant="default" />
+            <Sheet.Header closeButton title="Loe lähemalt" variant="default" />
             <Sheet.Body>
               <Text>
                 Orav ehk harilik orav ehk punaorav on oravlaste sugukonda kuuluv näriline. See on ainus Eestis
@@ -526,7 +517,7 @@ export const CornerRadius: Story = {
         caption,
         content: (
           <Sheet.Content radius={radius}>
-            <Sheet.Header title="Seaded" variant="default" />
+            <Sheet.Header closeButton title="Seaded" variant="default" />
             <Sheet.Body>{settingsBody(`sheet-radius-${radius}`)}</Sheet.Body>
           </Sheet.Content>
         ),
@@ -535,7 +526,7 @@ export const CornerRadius: Story = {
         caption: '0px → 4px from md',
         content: (
           <Sheet.Content radius="none" md={{ radius: 'card' }}>
-            <Sheet.Header title="Seaded" variant="default" />
+            <Sheet.Header closeButton title="Seaded" variant="default" />
             <Sheet.Body>{settingsBody('sheet-radius-responsive')}</Sheet.Body>
           </Sheet.Content>
         ),
@@ -551,7 +542,7 @@ export const HeaderVariant: Story = {
         caption: 'Default',
         content: (
           <Sheet.Content>
-            <Sheet.Header title="Seaded" variant="default" />
+            <Sheet.Header closeButton title="Seaded" variant="default" />
             <Sheet.Body>{settingsBody('sheet-variant-default')}</Sheet.Body>
           </Sheet.Content>
         ),
@@ -561,7 +552,7 @@ export const HeaderVariant: Story = {
         visualType: 'primary',
         content: (
           <Sheet.Content>
-            <Sheet.Header title="Seaded" variant="brand" />
+            <Sheet.Header closeButton title="Seaded" variant="brand" />
             <Sheet.Body>{settingsBody('sheet-variant-brand')}</Sheet.Body>
           </Sheet.Content>
         ),
@@ -576,7 +567,7 @@ export const HeaderType: Story = {
       {exampleGroup('Default', [
         {
           caption: 'Default',
-          content: headerExample('sheet-type-default', <Sheet.Header title="Seaded" variant="default" />),
+          content: headerExample('sheet-type-default', <Sheet.Header closeButton title="Seaded" variant="default" />),
         },
       ])}
       {exampleGroup('Collapsible', [
@@ -584,14 +575,14 @@ export const HeaderType: Story = {
           caption: 'Heading left',
           content: headerExample(
             'sheet-type-collapsible',
-            <Sheet.Header title="Seaded" variant="default" collapsible />
+            <Sheet.Header closeButton title="Seaded" variant="default" collapsible />
           ),
         },
         {
           caption: 'Heading center',
           content: headerExample(
             'sheet-type-collapsible-center',
-            <Sheet.Header title="Seaded" variant="default" titlePosition="center" collapsible />
+            <Sheet.Header closeButton title="Seaded" variant="default" titlePosition="center" collapsible />
           ),
         },
       ])}
@@ -600,38 +591,39 @@ export const HeaderType: Story = {
           caption: 'Heading center',
           content: headerExample(
             'sheet-type-center',
-            <Sheet.Header title="Seaded" variant="default" titlePosition="center" />
+            <Sheet.Header closeButton title="Seaded" variant="default" titlePosition="center" />
           ),
         },
       ])}
       {exampleGroup('Without closing button', [
         {
           caption: 'Heading left',
-          content: headerExample(
-            'sheet-type-no-close',
-            <Sheet.Header title="Seaded" variant="default" closeButton={false} />
-          ),
+          content: headerExample('sheet-type-no-close', <Sheet.Header title="Seaded" variant="default" />),
         },
         {
           caption: 'Heading center',
           content: headerExample(
             'sheet-type-no-close-center',
-            <Sheet.Header title="Seaded" variant="default" titlePosition="center" closeButton={false} />
+            <Sheet.Header title="Seaded" variant="default" titlePosition="center" />
           ),
         },
       ])}
       {exampleGroup('Without handle', [
         {
           caption: 'Heading left',
-          content: headerExample('sheet-type-no-handle', <Sheet.Header title="Seaded" variant="default" />, {
-            showHandle: false,
-          }),
+          content: headerExample(
+            'sheet-type-no-handle',
+            <Sheet.Header closeButton title="Seaded" variant="default" />,
+            {
+              showHandle: false,
+            }
+          ),
         },
         {
           caption: 'Heading center',
           content: headerExample(
             'sheet-type-no-handle-center',
-            <Sheet.Header title="Seaded" variant="default" titlePosition="center" />,
+            <Sheet.Header closeButton title="Seaded" variant="default" titlePosition="center" />,
             { showHandle: false }
           ),
         },
@@ -645,7 +637,6 @@ export const HeaderType: Story = {
               title="Seaded"
               variant="default"
               titlePosition="center"
-              closeButton={false}
               actions={
                 <Sheet.Closer>
                   <Button visualType="secondary" icon="close">
@@ -663,7 +654,12 @@ export const HeaderType: Story = {
           label: 'Teated',
           icon: 'notifications',
           content: notificationsExample(
-            <Sheet.Header title="Teated" variant="default" endSlot={<Tag color="primary">2 uut teadet</Tag>} />
+            <Sheet.Header
+              closeButton
+              title="Teated"
+              variant="default"
+              endSlot={<Tag color="primary">2 uut teadet</Tag>}
+            />
           ),
         },
         {
@@ -671,7 +667,7 @@ export const HeaderType: Story = {
           label: 'Teated',
           icon: 'notifications',
           content: notificationsExample(
-            <Sheet.Header title="Teated" variant="default" startSlot={<Tag color="primary">2</Tag>} />
+            <Sheet.Header closeButton title="Teated" variant="default" startSlot={<Tag color="primary">2</Tag>} />
           ),
         },
         {
@@ -680,6 +676,7 @@ export const HeaderType: Story = {
           icon: 'notifications',
           content: notificationsExample(
             <Sheet.Header
+              closeButton
               title="Teated"
               variant="default"
               titlePosition="center"
@@ -703,7 +700,7 @@ export const HeaderType: Story = {
  * The sheet can collapse to just its header while the page remains interactive.
  *
  * - Enable `collapsible` on `Sheet.Header`.
- * - Set `showOverlay`, `trapFocus` and `lockScroll` to `false` on `Sheet.Content`.
+ * - Set `trapFocus` and `lockScroll` to `false` on `Sheet.Content`. The backdrop is hidden while the sheet is collapsed.
  * - Set `closeOnBackdropClick` to `false` on `Sheet` so clicks outside don't close it.
  */
 export const DockedPeek: Story = {
@@ -714,7 +711,7 @@ export const DockedPeek: Story = {
         <Button iconLeft="calendar_month">Vali aeg</Button>
       </Sheet.Trigger>
       <Sheet.Content {...dockedContentProps}>
-        <Sheet.Header title="Vali aeg" variant="brand" collapsible />
+        <Sheet.Header closeButton title="Vali aeg" variant="brand" collapsible />
         <Sheet.Body>{dateTimeBody('sheet-docked')}</Sheet.Body>
         <ApplyFooter />
       </Sheet.Content>
@@ -737,13 +734,13 @@ export const SnapPoints: Story = {
         <Button iconLeft="layers">Kihid</Button>
       </Sheet.Trigger>
       <Sheet.Content snapPoints={[0.4, 0.9]}>
-        <Sheet.Header title="Kihid" variant="default" collapsible />
+        <Sheet.Header closeButton title="Kihid" variant="default" collapsible />
         <Sheet.Body>
-          <VerticalSpacing size={0.5}>
+          <Checkbox.Group label="Kihid" hideLabel name="snap-layers">
             {MAP_LAYERS.concat(MAP_LAYERS).map((layer, i) => (
-              <Checkbox key={i} id={`snap-layer-${i}`} name={`snap-layer-${i}`} value={layer} label={layer} />
+              <Checkbox key={i} id={`snap-layer-${i}`} value={layer} label={layer} />
             ))}
-          </VerticalSpacing>
+          </Checkbox.Group>
         </Sheet.Body>
       </Sheet.Content>
     </Sheet>
@@ -761,7 +758,7 @@ export const KeepMounted: Story = {
         <Button iconLeft="edit_note">Märkmed</Button>
       </Sheet.Trigger>
       <Sheet.Content keepMounted>
-        <Sheet.Header title="Märkmed" variant="default" />
+        <Sheet.Header closeButton title="Märkmed" variant="default" />
         <Sheet.Body>
           <TextField id="sheet-persisted-note" label="Märkus" placeholder="Kirjuta midagi…" />
         </Sheet.Body>
@@ -779,7 +776,7 @@ export const Controlled: Story = {
         <Button onClick={() => setOpen(true)}>Ava seaded</Button>
         <Sheet open={open} onToggle={setOpen}>
           <Sheet.Content>
-            <Sheet.Header title="Seaded" variant="default" />
+            <Sheet.Header closeButton title="Seaded" variant="default" />
             <Sheet.Body>{settingsBody('sheet-controlled')}</Sheet.Body>
             <Sheet.Footer fullWidth>
               <Sheet.Closer>
@@ -830,7 +827,7 @@ export const ControlledCollapse: Story = {
           {...dockedSheetProps}
         >
           <Sheet.Content {...dockedContentProps}>
-            <Sheet.Header title="Uus ala" variant="brand" collapsible />
+            <Sheet.Header closeButton title="Uus ala" variant="brand" collapsible />
             <Sheet.Body>
               <TextField id="sheet-controlled-collapse-name" label="Ala nimi" />
             </Sheet.Body>
@@ -867,7 +864,7 @@ export const ScrollableContent: Story = {
         <Button iconLeft="edit">Ava vorm</Button>
       </Sheet.Trigger>
       <Sheet.Content maxHeight="32rem">
-        <Sheet.Header title="Andmete sisestamine" variant="default" />
+        <Sheet.Header closeButton title="Andmete sisestamine" variant="default" />
         <Sheet.Body>{scrollableForm}</Sheet.Body>
         <ApplyFooter />
       </Sheet.Content>
@@ -887,7 +884,7 @@ export const Padding: Story = {
         labeledTrigger(
           `padding="${padding}"`,
           <Sheet.Content padding={padding}>
-            <Sheet.Header title="Seaded" variant="default" />
+            <Sheet.Header closeButton title="Seaded" variant="default" />
             <Sheet.Body>{settingsBody(`sheet-padding-${padding}`)}</Sheet.Body>
             <ApplyFooter more />
           </Sheet.Content>
@@ -906,7 +903,7 @@ export const FooterAlignment: Story = {
         labeledTrigger(
           `align="${align}"`,
           <Sheet.Content>
-            <Sheet.Header title="Seaded" variant="default" />
+            <Sheet.Header closeButton title="Seaded" variant="default" />
             <Sheet.Body>{settingsBody(`sheet-footer-${align}`)}</Sheet.Body>
             <Sheet.Footer align={align}>
               <Sheet.Closer>
@@ -920,7 +917,7 @@ export const FooterAlignment: Story = {
       {labeledTrigger(
         'fullWidth',
         <Sheet.Content>
-          <Sheet.Header title="Seaded" variant="default" />
+          <Sheet.Header closeButton title="Seaded" variant="default" />
           <Sheet.Body>{settingsBody('sheet-footer-full')}</Sheet.Body>
           <ApplyFooter />
         </Sheet.Content>
@@ -928,7 +925,7 @@ export const FooterAlignment: Story = {
       {labeledTrigger(
         'fullWidth + right',
         <Sheet.Content>
-          <Sheet.Header title="Seaded" variant="default" />
+          <Sheet.Header closeButton title="Seaded" variant="default" />
           <Sheet.Body>{settingsBody('sheet-footer-full-right')}</Sheet.Body>
           <ApplyFooter more />
         </Sheet.Content>
@@ -943,7 +940,7 @@ export const OpenForVisualTest: Story = {
   render: () => (
     <Sheet defaultOpen>
       <Sheet.Content>
-        <Sheet.Header title="Filtreerimine" variant="default" />
+        <Sheet.Header closeButton title="Filtreerimine" variant="default" />
         <Sheet.Body padding="none">{filterChoices('sheet-visual-default')}</Sheet.Body>
         <ApplyFooter more />
       </Sheet.Content>
@@ -957,7 +954,7 @@ export const OpenBrandForVisualTest: Story = {
   render: () => (
     <Sheet defaultOpen>
       <Sheet.Content>
-        <Sheet.Header title="Vali aeg" variant="brand" collapsible />
+        <Sheet.Header closeButton title="Vali aeg" variant="brand" collapsible />
         <Sheet.Body>{dateTimeBody('sheet-visual-brand')}</Sheet.Body>
         <ApplyFooter />
       </Sheet.Content>
@@ -971,7 +968,7 @@ export const OpenSmallForVisualTest: Story = {
   render: () => (
     <Sheet defaultOpen>
       <Sheet.Content padding="small" radius="card">
-        <Sheet.Header title="Teated" variant="default" startSlot={<Tag color="primary">2</Tag>} />
+        <Sheet.Header closeButton title="Teated" variant="default" startSlot={<Tag color="primary">2</Tag>} />
         <Sheet.Body>{notificationsBody}</Sheet.Body>
         <Sheet.Footer align="right">
           <Sheet.Closer>
@@ -994,7 +991,6 @@ export const OpenWithoutHandleForVisualTest: Story = {
           title="Seaded"
           variant="default"
           titlePosition="center"
-          closeButton={false}
           actions={
             <Sheet.Closer>
               <Button visualType="secondary" icon="close">
@@ -1015,7 +1011,7 @@ export const CollapsedForVisualTest: Story = {
   render: () => (
     <Sheet defaultOpen defaultCollapsed {...dockedSheetProps}>
       <Sheet.Content {...dockedContentProps}>
-        <Sheet.Header title="Vali aeg" variant="brand" collapsible />
+        <Sheet.Header closeButton title="Vali aeg" variant="brand" collapsible />
         <Sheet.Body>{dateTimeBody('sheet-visual-collapsed')}</Sheet.Body>
         <ApplyFooter />
       </Sheet.Content>
@@ -1029,19 +1025,13 @@ export const OpenSnapPointForVisualTest: Story = {
   render: () => (
     <Sheet defaultOpen>
       <Sheet.Content snapPoints={[0.4, 0.9]} defaultSnapPoint={0}>
-        <Sheet.Header title="Kihid" variant="default" collapsible />
+        <Sheet.Header closeButton title="Kihid" variant="default" collapsible />
         <Sheet.Body>
-          <VerticalSpacing size={0.5}>
+          <Checkbox.Group label="Kihid" hideLabel name="visual-layers">
             {MAP_LAYERS.concat(MAP_LAYERS).map((layer, index) => (
-              <Checkbox
-                key={index}
-                id={`visual-layer-${index}`}
-                name={`visual-layer-${index}`}
-                value={layer}
-                label={layer}
-              />
+              <Checkbox key={index} id={`visual-layer-${index}`} value={layer} label={layer} />
             ))}
-          </VerticalSpacing>
+          </Checkbox.Group>
         </Sheet.Body>
       </Sheet.Content>
     </Sheet>
@@ -1054,7 +1044,7 @@ export const OpenScrollableForVisualTest: Story = {
   render: () => (
     <Sheet defaultOpen>
       <Sheet.Content maxHeight="32rem">
-        <Sheet.Header title="Andmete sisestamine" variant="default" />
+        <Sheet.Header closeButton title="Andmete sisestamine" variant="default" />
         <Sheet.Body>{scrollableForm}</Sheet.Body>
         <ApplyFooter />
       </Sheet.Content>

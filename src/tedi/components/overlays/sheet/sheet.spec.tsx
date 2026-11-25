@@ -48,7 +48,7 @@ describe('Sheet', () => {
           <button type="button">Open</button>
         </Sheet.Trigger>
         <Sheet.Content>
-          <Sheet.Header title="Layers" />
+          <Sheet.Header closeButton title="Layers" />
           <Sheet.Body>Body content</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -64,7 +64,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Title text" />
+          <Sheet.Header closeButton title="Title text" />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -98,7 +98,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content aria-label="Custom labelled sheet">
-          <Sheet.Header title="Ignored title">
+          <Sheet.Header closeButton title="Ignored title">
             <span>Fully custom header</span>
           </Sheet.Header>
           <Sheet.Body>Body</Sheet.Body>
@@ -127,7 +127,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" />
+          <Sheet.Header closeButton title="Layers" />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -142,7 +142,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" />
+          <Sheet.Header closeButton title="Layers" />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -159,7 +159,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" />
+          <Sheet.Header closeButton title="Layers" />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -173,7 +173,7 @@ describe('Sheet', () => {
     const { rerender } = render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" />
+          <Sheet.Header closeButton title="Layers" />
         </Sheet.Content>
       </Sheet>
     );
@@ -182,7 +182,7 @@ describe('Sheet', () => {
     rerender(
       <Sheet defaultOpen>
         <Sheet.Content showHandle={false}>
-          <Sheet.Header title="Layers" />
+          <Sheet.Header closeButton title="Layers" />
         </Sheet.Content>
       </Sheet>
     );
@@ -193,7 +193,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Header closeButton title="Layers" collapsible />
           <Sheet.Body>Body content</Sheet.Body>
           <Sheet.Footer>Footer content</Sheet.Footer>
         </Sheet.Content>
@@ -213,7 +213,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Header closeButton title="Layers" collapsible />
           <Sheet.Body>
             <input aria-label="Note" />
           </Sheet.Body>
@@ -231,7 +231,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Header closeButton title="Layers" collapsible />
           <Sheet.Body>Body content</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -255,7 +255,7 @@ describe('Sheet', () => {
           <button type="button">Open</button>
         </Sheet.Trigger>
         <Sheet.Content>
-          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Header closeButton title="Layers" collapsible />
           <Sheet.Body>Body content</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -272,6 +272,43 @@ describe('Sheet', () => {
     expect(screen.getByText('Body content')).not.toBeVisible();
     // Let the open transition settle so its state update lands inside act().
     await waitFor(() => expect(screen.getByRole('dialog')).toHaveAttribute('data-status', 'open'));
+  });
+
+  it('hides the backdrop while collapsed and shows it again when expanded', () => {
+    const Controlled = () => {
+      const [collapsed, setCollapsed] = useState(false);
+      return (
+        <Sheet defaultOpen collapsed={collapsed} onCollapsedChange={setCollapsed}>
+          <Sheet.Content>
+            <Sheet.Header title="Layers" collapsible />
+            <Sheet.Body>Body content</Sheet.Body>
+          </Sheet.Content>
+        </Sheet>
+      );
+    };
+    render(<Controlled />);
+    const overlay = () => document.querySelector('[class*="tedi-sheet__overlay"]');
+
+    expect(overlay()?.className).not.toContain('tedi-sheet__overlay--no-overlay');
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
+    expect(overlay()?.className).toContain('tedi-sheet__overlay--no-overlay');
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.expand' }));
+    expect(overlay()?.className).not.toContain('tedi-sheet__overlay--no-overlay');
+  });
+
+  it('renders the default header variant without a close button by default', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" />
+          <Sheet.Body>Body content</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    expect(document.querySelector('[class*="tedi-sheet__header--default"]')).toBeInTheDocument();
+    expect(document.querySelector('[class*="tedi-sheet__header--brand"]')).not.toBeInTheDocument();
   });
 
   it('supports controlled collapsed state', () => {
@@ -292,7 +329,7 @@ describe('Sheet', () => {
             }}
           >
             <Sheet.Content trapFocus={false}>
-              <Sheet.Header title="Layers" collapsible />
+              <Sheet.Header closeButton title="Layers" collapsible />
               <Sheet.Body>Body content</Sheet.Body>
             </Sheet.Content>
           </Sheet>
@@ -353,7 +390,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Header closeButton title="Layers" collapsible />
           <Sheet.Body>Body content</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -375,7 +412,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Header closeButton title="Layers" collapsible />
           <Sheet.Body>Body content</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -483,7 +520,7 @@ describe('Sheet', () => {
           <button type="button">Open</button>
         </Sheet.Trigger>
         <Sheet.Content keepMounted={keepMounted}>
-          <Sheet.Header title="Layers" />
+          <Sheet.Header closeButton title="Layers" />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -509,7 +546,7 @@ describe('Sheet', () => {
     const renderSheet = (changed: boolean) => (
       <Sheet defaultOpen collapsed={changed && change === 'collapse'}>
         <Sheet.Content showHandle={!(changed && change === 'hide handle')}>
-          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Header closeButton title="Layers" collapsible />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -576,7 +613,7 @@ describe('Sheet', () => {
       render(
         <Sheet defaultOpen>
           <Sheet.Content {...contentProps}>
-            <Sheet.Header title="Layers" endSlot={<span>3 items</span>} />
+            <Sheet.Header closeButton title="Layers" endSlot={<span>3 items</span>} />
             <Sheet.Body>Body content</Sheet.Body>
           </Sheet.Content>
         </Sheet>
@@ -710,7 +747,7 @@ describe('Sheet', () => {
           </button>
           <Sheet open={open} onToggle={setOpen}>
             <Sheet.Content>
-              <Sheet.Header title="Layers" />
+              <Sheet.Header closeButton title="Layers" />
               <Sheet.Body>Body content</Sheet.Body>
             </Sheet.Content>
           </Sheet>
@@ -730,7 +767,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" startSlot={<span>Start content</span>} />
+          <Sheet.Header closeButton title="Layers" startSlot={<span>Start content</span>} />
         </Sheet.Content>
       </Sheet>
     );
@@ -746,6 +783,7 @@ describe('Sheet', () => {
       <Sheet defaultOpen>
         <Sheet.Content>
           <Sheet.Header
+            closeButton
             title="Layers"
             collapsible
             endSlot={<span>End content</span>}
@@ -769,7 +807,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" endSlot={<span>End content</span>} />
+          <Sheet.Header closeButton title="Layers" endSlot={<span>End content</span>} />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -784,7 +822,7 @@ describe('Sheet', () => {
     const { rerender } = render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" />
+          <Sheet.Header closeButton title="Layers" />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -794,7 +832,7 @@ describe('Sheet', () => {
     rerender(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" titlePosition="center" />
+          <Sheet.Header closeButton title="Layers" titlePosition="center" />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -806,7 +844,7 @@ describe('Sheet', () => {
     const { rerender } = render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" />
+          <Sheet.Header closeButton title="Layers" />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -816,7 +854,7 @@ describe('Sheet', () => {
     rerender(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" headingLevel="h2" />
+          <Sheet.Header closeButton title="Layers" headingLevel="h2" />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -912,7 +950,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content snapPoints={[0.4, 0.9]}>
-          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Header closeButton title="Layers" collapsible />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -1207,7 +1245,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content minHeight="60dvh">
-          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Header closeButton title="Layers" collapsible />
           <Sheet.Body>Body content</Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -1234,7 +1272,7 @@ describe('Sheet', () => {
           <button type="button">Open</button>
         </Sheet.Trigger>
         <Sheet.Content>
-          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Header closeButton title="Layers" collapsible />
           <Sheet.Body>
             <Recorder />
           </Sheet.Body>
@@ -1268,7 +1306,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" />
+          <Sheet.Header closeButton title="Layers" />
         </Sheet.Content>
       </Sheet>
     );
@@ -1286,7 +1324,7 @@ describe('Sheet', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title={0} />
+          <Sheet.Header closeButton title={0} />
         </Sheet.Content>
       </Sheet>
     );
@@ -1346,7 +1384,7 @@ describe('Sheet', () => {
       <StyleProvider scrollContainer={scrollContainer}>
         <Sheet defaultOpen>
           <Sheet.Content>
-            <Sheet.Header title="Layers" />
+            <Sheet.Header closeButton title="Layers" />
             <Sheet.Body>Body</Sheet.Body>
           </Sheet.Content>
         </Sheet>
