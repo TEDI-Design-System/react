@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import React from 'react';
 
 import { useElementSize } from '../../../helpers';
-import Popover from '../../overlays/popover/popover';
+import Tooltip from '../../overlays/tooltip/tooltip';
 import styles from './ellipsis.module.scss';
 
 export type EllipsisPosition = 'start' | 'end';
@@ -28,8 +28,8 @@ export interface EllipsisProps {
    */
   position?: EllipsisPosition;
   /**
-   * Determines whether a popover should be displayed when the text is truncated.
-   * If `true`, hovering over the truncated text will show the full content in a popover.
+   * Determines whether a tooltip should be displayed when the text is truncated.
+   * If `true`, hovering over or focusing the truncated text will show the full content in a tooltip.
    * @default true
    */
   popover?: boolean;
@@ -56,14 +56,13 @@ export const Ellipsis = (props: EllipsisProps): JSX.Element => {
     );
   }, [elementSize, position, lineClamp]);
 
-  const showPopover = isEllipsed && popover;
+  const showTooltip = isEllipsed && popover;
 
   const ellipsis = (
     <div
       data-name="ellipsis"
       {...rest}
       ref={elementRef}
-      role={showPopover ? 'button' : undefined}
       className={classNames(
         styles['tedi-ellipsis'],
         { [styles['tedi-ellipsis--start']]: position === 'start' },
@@ -75,13 +74,13 @@ export const Ellipsis = (props: EllipsisProps): JSX.Element => {
     </div>
   );
 
-  return showPopover ? (
-    <Popover openWith="hover" focusManager={{ modal: false }}>
-      <Popover.Trigger>{ellipsis}</Popover.Trigger>
-      <Popover.Content>
+  return showTooltip ? (
+    <Tooltip>
+      <Tooltip.Trigger>{ellipsis}</Tooltip.Trigger>
+      <Tooltip.Content>
         <span className={styles['tedi-ellipsis__overlay']}>{children}</span>
-      </Popover.Content>
-    </Popover>
+      </Tooltip.Content>
+    </Tooltip>
   ) : (
     ellipsis
   );

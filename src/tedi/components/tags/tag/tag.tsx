@@ -21,7 +21,7 @@ type TagBreakpointProps = {
   color?: TagColor;
   /**
    * Truncates the label when the Tag is width-constrained, revealing the full text
-   * in a popover on hover/focus. `end` shows a trailing ellipsis (`Long label…`);
+   * in a tooltip on hover/focus. `end` shows a trailing ellipsis (`Long label…`);
    * `start` shows a leading one (`…label`), keeping the most significant tail
    * (e.g. dates, IDs) visible. `false` never truncates — the label wraps and the
    * Tag keeps its full width.

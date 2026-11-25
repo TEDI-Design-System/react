@@ -103,7 +103,7 @@ export const Danger: Story = {
 
 /**
  * When width-constrained, `ellipsis` truncates the label (the close button stays fixed) and
- * reveals the full text in a popover on hover/focus. `false` never truncates — the label wraps;
+ * reveals the full text in a tooltip on hover/focus. `false` never truncates — the label wraps;
  * `end` cuts the end; `start` cuts the start.
  */
 export const Ellipsis: Story = {
