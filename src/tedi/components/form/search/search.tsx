@@ -13,6 +13,7 @@ import cn from 'classnames';
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import { getNextFocusable } from '../../../helpers/shadow-dom';
 import { useLabels } from '../../../providers/label-provider';
 import { StylePortal } from '../../../providers/style-provider/style-portal';
 import { IconWithoutBackgroundProps } from '../../base/icon/icon';
@@ -363,10 +364,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     if (!inputEl) return;
 
     const panel = refs.floating.current;
-    const focusables = Array.from(document.body.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-      (element) => !panel?.contains(element)
-    );
-    focusables[focusables.indexOf(inputEl) + 1]?.focus();
+    getNextFocusable(inputEl, FOCUSABLE_SELECTOR, (element) => !!panel?.contains(element))?.focus();
   };
 
   const handleAutocompleteKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
