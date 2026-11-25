@@ -1,3 +1,10 @@
+# [21.0.0-rc.29](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.28...react-21.0.0-rc.29) (2026-11-25)
+
+
+### Bug Fixes
+
+* **dock-panel:** stop redefining the core sheet header height variable [#1191](https://github.com/TEDI-Design-System/react/issues/1191) ([#1192](https://github.com/TEDI-Design-System/react/issues/1192)) ([2d45832](https://github.com/TEDI-Design-System/react/commit/2d4583247ac532a5a04cafec2a88fb459ef641bc))
+
 # [21.0.0-rc.28](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.27...react-21.0.0-rc.28) (2026-11-25)
 
 
