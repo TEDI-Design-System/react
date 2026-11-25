@@ -1,7 +1,7 @@
 // Shared helpers. Zero dependencies, Node >= 20.
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join, dirname, resolve, sep } from 'node:path';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve, sep } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 
 export function parseArgs(argv = process.argv.slice(2)) {

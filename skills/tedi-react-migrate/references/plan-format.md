@@ -33,12 +33,12 @@ Mark finished items `[x]`. Add `failed: <reason>` when an attempt didn't verify.
 
 - [ ] **<component or area>: <one-line change>** (`auto`, #<issue>)
   - Change: <old> → <new>
-  - Where: `src/app/foo.component.html:12`, `src/app/bar.component.ts:40`
+  - Where: `src/pages/Home.tsx:12`, `src/components/Header.tsx:40`
 - [ ] **<component>: <change>** (`assisted`, #<issue>)
   - Choice: <question for the developer, with your recommendation>
   - Depends on: <other item, when its choice changes this one>
 - [x] **<component>: <change>** (`n/a`)
-  - Searched: `rg -n "tedi-carousel" src` (0 hits)
+  - Searched: `rg -n "<Carousel" src` (0 hits)
 
 ### Core CSS variables
 

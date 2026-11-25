@@ -25,9 +25,10 @@
     "start": "storybook dev -p 4400 -c .storybook",
     "build": "rm -rf dist && vite build --config vite.lib.config.ts && replace-in-file //fonts//g \"./fonts/\" dist/index.css dist/index-without-icons.css --isRegex",
     "build:sb": "storybook build -c .storybook -o dist/storybook-static --stats-json && replace-in-file //fonts//g \"../fonts/\" \"dist/storybook-static/assets/*.css\" --isRegex",
-    "lint": "npx stylelint \"src/**/*.scss\" --fix && eslint \"src/**/*.{ts,tsx}\" --no-ignore --fix",
-    "lint:ci": "npx stylelint \"src/**/*.scss\" --quiet && npx eslint . --quiet",
+    "lint": "npx stylelint \"src/**/*.scss\" --fix && eslint \"src/**/*.{ts,tsx}\" \"skills/**/*.mjs\" --no-ignore --fix",
+    "lint:ci": "npx stylelint \"src/**/*.scss\" --quiet && npx eslint . \"skills/**/*.mjs\" --quiet",
     "test": "jest --config ./jest.config.ts --passWithNoTests",
+    "test:skills": "node --test \"skills/__tests__/**/*.test.mjs\"",
     "test:coverage": "jest --config ./jest.config.ts --coverage",
     "test-storybook": "test-storybook",
     "test-storybook:ci": "concurrently -k -s first -n \"SB,A11Y\" -c \"magenta,blue\" \"http-server dist/storybook-static --port 6006 --silent\" \"wait-on tcp:127.0.0.1:6006 && test-storybook --index-json --url http://127.0.0.1:6006 --junit\"",
@@ -181,6 +182,10 @@
       "prettier --write"
     ],
     "src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "skills/**/*.mjs": [
       "eslint --fix",
       "prettier --write"
     ]

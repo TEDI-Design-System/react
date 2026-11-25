@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 // Which TEDI version does the project use, and which did it use before?
 // Usage: node detect-version.mjs [projectDir]
-import { readFileSync, existsSync, realpathSync } from 'node:fs';
-import { join, dirname, relative, resolve, sep } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { dirname, join, relative, resolve, sep } from 'node:path';
+
 import config from './config.mjs';
 import {
-  parseArgs,
-  rangeMinimum,
-  printJson,
-  LOCKFILES,
-  lockedVersion,
-  isExactVersion,
-  yarnEntry,
-  yarnDependencyRange,
   bunLockedVersion,
+  isExactVersion,
+  lockedVersion,
+  LOCKFILES,
+  parseArgs,
+  printJson,
+  yarnDependencyRange,
+  yarnEntry,
 } from './lib.mjs';
 
 const args = parseArgs();
@@ -174,20 +174,30 @@ const pnpVersionOf = (names) => {
     return null;
   }
 };
-// node_modules: the project's own, else hoisted to the workspace root; with PnP, the PnP API. The rest
-// of the chain is looked up under the copy of the first package that the project uses, not another one.
+// node_modules: the project's own, else hoisted to the workspace root; with PnP, the PnP API. Each
+// further name in the chain is resolved the way Node resolves it from the previous package's real
+// folder, so a nested, hoisted or pnpm-store copy is the one that package actually loads.
 const installedOf = (...names) => {
-  const path = names.flatMap((n, i) => (i ? ['node_modules', n] : [n]));
-  for (const d of [dir, lock?.dir].filter(Boolean)) {
-    if (!existsSync(join(d, 'node_modules', names[0], 'package.json'))) continue;
-    const f = join(d, 'node_modules', ...path, 'package.json');
-    return existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')).version : null;
+  const first = [dir, lock?.dir]
+    .filter(Boolean)
+    .map((d) => join(d, 'node_modules', names[0]))
+    .find((p) => existsSync(join(p, 'package.json')));
+  if (!first) return pnp ? pnpVersionOf(names) : null;
+  let at = first;
+  for (const name of names.slice(1)) {
+    const real = realpathSync(at);
+    // Only the node_modules folders above the package: Node's list also holds global folders
+    // (~/.node_modules, NODE_PATH) that the app's bundler never loads.
+    const paths = (createRequire(join(real, 'package.json')).resolve.paths(name) ?? []).filter((p) =>
+      (real + sep).startsWith(dirname(p) + sep)
+    );
+    at = paths.map((p) => join(p, name)).find((p) => existsSync(join(p, 'package.json')));
+    if (!at) return null;
   }
-  return pnp ? pnpVersionOf(names) : null;
+  return JSON.parse(readFileSync(join(at, 'package.json'), 'utf8')).version;
 };
 result.installedVersion = installedOf(pkg);
-result.coreInstalledVersion =
-  (result.coreRange ? null : installedOf(pkg, config.corePkg)) ?? installedOf(config.corePkg);
+result.coreInstalledVersion = result.coreRange ? installedOf(config.corePkg) : installedOf(pkg, config.corePkg);
 // The core version the project resolves today: the baseline for core's own release notes and diff.
 // Core comes in through the library, so the project's importer entry often doesn't list it (pnpm's
 // isolated node_modules doesn't either); then the library's core dependency decides, if it is a pin.
@@ -296,19 +306,17 @@ if (lock && git(['rev-parse', '--is-inside-work-tree'], lock.dir)) {
   }
 }
 
-result.from = result.lockfileVersion ?? result.installedVersion ?? rangeMinimum(range);
+result.from = result.lockfileVersion ?? result.installedVersion ?? null;
 result.source = result.lockfileVersion
   ? `lockfile (${result.lockfile})`
   : result.installedVersion
   ? pnp
     ? "Yarn Plug'n'Play"
     : 'node_modules'
-  : result.from
-  ? 'package.json range minimum (estimate)'
   : null;
 if (!range) result.error = `${pkg} is not a dependency of ${dir}/package.json`;
 else if (!result.from)
-  result.error = `cannot read an exact version from "${range}" without a lockfile or node_modules; ask the developer`;
+  result.error = `no lockfile or installed version of ${pkg} (package.json: "${range}"); ask the developer which exact version is in use, or where to find it`;
 if (result.lockfileVersion && result.installedVersion && result.lockfileVersion !== result.installedVersion) {
   result.warning = "lockfile and node_modules disagree; run the package manager's install first";
 }

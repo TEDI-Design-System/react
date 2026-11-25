@@ -4,20 +4,21 @@
 // Usage: node fetch-releases.mjs --from <version> --to <version> [--project <dir>] [--stable-only]
 //                                [--core-from <core version> --core-to <core version>]
 // Writes .tedi-migrate/cache/releases/<tag>.md and index.json, prints a summary.
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+
 import config from './config.mjs';
 import {
-  parseArgs,
-  projectArg,
-  walkProject,
+  compareVersions,
+  ensureWorkDir,
   fail,
   githubReleases,
-  parseVersion,
-  compareVersions,
   isExactVersion,
-  ensureWorkDir,
+  parseArgs,
+  parseVersion,
   printJson,
+  projectArg,
+  walkProject,
 } from './lib.mjs';
 
 const args = parseArgs();

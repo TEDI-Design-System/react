@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 // Which version to migrate to, and what it requires.
 // Usage: node resolve-target.mjs --from <version> [--channel stable|rc|auto] [--version <exact>] [--project <dir>]
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+
 import config from './config.mjs';
 import {
-  parseArgs,
-  fail,
-  projectArg,
-  npmMetadata,
   compareVersions,
-  isPrerelease,
-  isExactVersion,
   coreVersionOf,
+  fail,
+  isExactVersion,
+  isPrerelease,
+  npmMetadata,
+  parseArgs,
   printJson,
+  projectArg,
 } from './lib.mjs';
 
 const args = parseArgs();
