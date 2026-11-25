@@ -1,3 +1,10 @@
+# [21.0.0-rc.33](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.32...react-21.0.0-rc.33) (2026-11-25)
+
+
+### Bug Fixes
+
+* **table-card:** skip role-based controls on header click, use the small collapse arrow [#1197](https://github.com/TEDI-Design-System/react/issues/1197) ([#1198](https://github.com/TEDI-Design-System/react/issues/1198)) ([2fe8cea](https://github.com/TEDI-Design-System/react/commit/2fe8cea646a1fbac1b0f501ad2d9c21df716ac5e))
+
 # [21.0.0-rc.32](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.31...react-21.0.0-rc.32) (2026-11-25)
 
 
