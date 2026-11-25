@@ -82,8 +82,8 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
    */
   returnFocus?: boolean;
   /**
-   * Render the dimmed backdrop. `false` keeps portal + focus management but no overlay. The backdrop is
-   * hidden while the sheet is collapsed, so the page stays usable.
+   * Render the dimmed backdrop. `false` keeps portal + focus management but no overlay. Hidden while
+   * the sheet is collapsed.
    *
    * On its own this only removes the backdrop: scroll stays locked and a click on the page still
    * closes the sheet. For a non-modal sheet the page stays usable behind (docked peek), also set
