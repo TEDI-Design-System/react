@@ -1,3 +1,10 @@
+# [21.0.0-rc.27](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.26...react-21.0.0-rc.27) (2026-11-24)
+
+
+### Bug Fixes
+
+* **check,choice-group:** update deprecation annotations and warnings [#1174](https://github.com/TEDI-Design-System/react/issues/1174) ([#1175](https://github.com/TEDI-Design-System/react/issues/1175)) ([c33e573](https://github.com/TEDI-Design-System/react/commit/c33e573cfb3cac1bbdb1f674f0e3614682f8acc1))
+
 # [21.0.0-rc.26](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.25...react-21.0.0-rc.26) (2026-11-24)
 
 
