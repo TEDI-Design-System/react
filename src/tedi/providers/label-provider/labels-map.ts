@@ -1136,6 +1136,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Pages',
     ru: 'Страницы',
   },
+  'pagination.select-page': {
+    description: 'Heading of the mobile page picker',
+    components: ['Pagination'],
+    et: 'Vali lehekülg',
+    en: 'Select page',
+    ru: 'Выберите страницу',
+  },
   'pagination.page': {
     description: 'Label of individual page numbers. The current page is conveyed by `aria-current`, not by the label.',
     components: ['Table', 'Pagination'],
