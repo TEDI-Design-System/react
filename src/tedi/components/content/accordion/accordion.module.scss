@@ -1,4 +1,5 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+@use '../card/card-colors';
 
 :root,
 :host {
@@ -98,6 +99,16 @@
   &--hoverable {
     cursor: pointer;
 
+    &:has(.tedi-accordion-item-header__trigger:focus-visible) {
+      z-index: 1;
+      outline: none;
+      box-shadow: 0 0 0 1px var(--general-effect-colors-focus-outset-inner-shadow),
+        0 0 0 3px var(--general-effect-colors-focus-outset-outer-shadow);
+    }
+  }
+
+  // Hover/active colors for backgroundColor are pending design: https://github.com/TEDI-Design-System/design/issues/478
+  &--hoverable:not(.tedi-accordion-item-header--colored) {
     &:hover {
       background: var(--general-state-hover);
     }
@@ -107,11 +118,8 @@
     }
 
     &:has(.tedi-accordion-item-header__trigger:focus-visible) {
-      z-index: 1;
-      outline: none;
       background: var(--card-background-primary);
       border: 1px solid var(--card-border-primary);
-      box-shadow: 0 0 0 1px var(--tedi-neutral-100), 0 0 0 3px var(--tedi-primary-500);
     }
   }
 
@@ -234,6 +242,34 @@
 
 .tedi-accordion-item-content__inner {
   padding: var(--card-padding-md-default);
+}
+
+// After the base blocks so modifiers win over the default background.
+@each $name, $color-var in card-colors.$card-colors {
+  .tedi-accordion-item-header--background--#{$name},
+  .tedi-accordion-item-content--background--#{$name} {
+    background-color: var(#{$color-var});
+  }
+}
+
+@each $name in ('brand-primary', 'brand-secondary') {
+  .tedi-accordion-item-content--background--#{$name} {
+    color: var(--general-text-white);
+  }
+
+  .tedi-accordion-item-header--background--#{$name} {
+    color: var(--general-text-white);
+
+    .tedi-accordion-item-header__title-main [class*='tedi-text'],
+    .tedi-accordion-item-header__expand-indicator {
+      color: inherit;
+    }
+  }
+}
+
+// Disabled wins over the white text of brand backgrounds.
+.tedi-accordion-item-header--colored.tedi-accordion-item-header--disabled {
+  color: var(--general-text-disabled);
 }
 
 @include breakpoints.media-breakpoint-down(md) {

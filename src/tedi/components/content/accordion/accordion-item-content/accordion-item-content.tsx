@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { CardBackground } from '../../card/utility';
 import styles from '../accordion.module.scss';
 import { useAccordionItemContext } from '../accordion-item/accordion-item-context';
 
@@ -13,10 +14,14 @@ export interface AccordionItemContentProps {
    * Custom CSS class for the accordion content.
    */
   contentClass?: string;
+  /**
+   * Background color of the content. Uses the same values as the Card `background`.
+   */
+  backgroundColor?: CardBackground;
 }
 
 export const AccordionItemContent = (props: AccordionItemContentProps): JSX.Element => {
-  const { children, contentClass } = props;
+  const { children, contentClass, backgroundColor } = props;
   const { headerId, contentId, expanded, showIconCard } = useAccordionItemContext('Accordion.Item.Content');
 
   const hostClasses = cn(
@@ -24,6 +29,7 @@ export const AccordionItemContent = (props: AccordionItemContentProps): JSX.Elem
     {
       [styles['tedi-accordion-item-content--with-icon-card']]: showIconCard,
     },
+    backgroundColor && styles[`tedi-accordion-item-content--background--${backgroundColor}`],
     contentClass
   );
 

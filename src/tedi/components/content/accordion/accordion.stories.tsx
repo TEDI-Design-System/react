@@ -18,6 +18,7 @@ import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Separator from '../../misc/separator/separator';
 import { Link } from '../../navigation/link/link';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
+import { CardBackground } from '../card/utility';
 import { Accordion, AccordionProps } from './accordion';
 import { AccordionItemProps } from './accordion-item/accordion-item';
 import { AccordionItemContentProps } from './accordion-item-content/accordion-item-content';
@@ -85,6 +86,20 @@ export default {
     },
   },
 } as Meta;
+
+const backgroundColorExamples: { color: CardBackground; label: string }[] = [
+  { color: 'primary', label: 'Primary' },
+  { color: 'secondary', label: 'Secondary' },
+  { color: 'tertiary', label: 'Tertiary' },
+  { color: 'brand-primary', label: 'Brand primary' },
+  { color: 'brand-secondary', label: 'Brand secondary' },
+  { color: 'brand-tertiary', label: 'Brand tertiary' },
+  { color: 'brand-quaternary', label: 'Brand quaternary' },
+  { color: 'accent', label: 'Accent' },
+  { color: 'success-primary', label: 'Success' },
+  { color: 'warning-primary', label: 'Warning' },
+  { color: 'danger-primary', label: 'Danger' },
+];
 
 const contentExample = (
   <>
@@ -199,7 +214,6 @@ export const Default: StoryObj = {
     header__showDefaultExpandAction: true,
     header__expandActionPosition: 'end',
     header__expandActionArrowType: 'default',
-    header__expandActionInverted: false,
     header__expandActionUnderline: false,
   },
   parameters: {
@@ -209,8 +223,8 @@ export const Default: StoryObj = {
  The accordion item is composed of three parts:
 
 - \`Accordion.Item\`: owns the item's state (\`expanded\`) and the inputs shared by header and content (\`selected\`, \`showIconCard\`, \`defaultExpanded\`).
-- \`Accordion.Item.Header\`: owns header appearance and interaction (\`titleLayout\`, \`headerClickable\`, expand labels, \`headerClass\`, slot props for badges/actions/etc).
-- \`Accordion.Item.Content\`: owns content styling (\`contentClass\`) and the collapsible body.
+- \`Accordion.Item.Header\`: owns header appearance and interaction (\`titleLayout\`, \`headerClickable\`, expand labels, \`headerClass\`, \`backgroundColor\`, slot props for badges/actions/etc).
+- \`Accordion.Item.Content\`: owns content styling (\`contentClass\`, \`backgroundColor\`) and the collapsible body.
 
 | Slot prop | Description |
 |----------|------------|
@@ -840,6 +854,20 @@ export const AccordionBehavior: StoryObj = {
   ),
 };
 
+export const BackgroundColors: StoryObj = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Accordion allowMultiple defaultExpanded>
+      {backgroundColorExamples.map(({ color, label }) => (
+        <Accordion.Item key={color}>
+          <Accordion.Item.Header backgroundColor={color} title={label} />
+          <Accordion.Item.Content backgroundColor={color}>{contentExample}</Accordion.Item.Content>
+        </Accordion.Item>
+      ))}
+    </Accordion>
+  ),
+};
+
 export const Disabled: StoryObj = {
   parameters: {
     docs: {
@@ -1090,6 +1118,7 @@ const visualTestStories: { label: string; story: StoryObj }[] = [
   { label: 'Action types', story: ActionTypes },
   { label: 'With icon card', story: WithIconCard },
   { label: 'Customized', story: Customized },
+  { label: 'Background colors', story: BackgroundColors },
   { label: 'Disabled', story: Disabled },
 ];
 
