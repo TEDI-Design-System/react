@@ -152,6 +152,14 @@ describe('TableCard', () => {
       }
     );
 
+    it('uses the small collapse button for the plain arrow and the default size for the secondary one', () => {
+      const { rerender } = render(<TableCard rows={rows} title="Hambaarst" collapsible />);
+      expect(screen.getByRole('button', { name: /Hambaarst/ })).toHaveClass('tedi-collapse-button--small');
+
+      rerender(<TableCard rows={rows} title="Hambaarst" collapsible arrowType="secondary" />);
+      expect(screen.getByRole('button', { name: /Hambaarst/ })).not.toHaveClass('tedi-collapse-button--small');
+    });
+
     it('respects controlled `open` and calls onOpenChange without self-toggling', () => {
       const onOpenChange = jest.fn();
       render(

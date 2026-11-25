@@ -359,6 +359,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
               <CollapseButton
                 hideText
                 arrowType={arrowType}
+                size={arrowType === 'secondary' ? 'default' : 'small'}
                 open={isOpen}
                 onOpenChange={handleOpenChange}
                 aria-controls={bodyId}
