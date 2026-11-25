@@ -9,6 +9,7 @@ import {
   CollapseButtonArrowType,
   CollapseButtonSize,
 } from '../../../buttons/collapse-button/collapse-button';
+import { CardBackground } from '../../card/utility';
 import styles from '../accordion.module.scss';
 import { useAccordionItemContext } from '../accordion-item/accordion-item-context';
 
@@ -84,8 +85,8 @@ export interface AccordionItemHeaderProps {
   /**
    * Use the inverted (light-on-dark) palette for the default expand
    * action, for placement on a dark or brand background. Only effective
-   * when `headerClickable` is `false`.
-   * @default false
+   * when `headerClickable` is `false`. When omitted, it is `true` on
+   * `brand-primary` and `brand-secondary` backgrounds.
    */
   expandActionInverted?: boolean;
   /**
@@ -102,6 +103,12 @@ export interface AccordionItemHeaderProps {
    * Custom CSS class for the accordion header.
    */
   headerClass?: string;
+  /**
+   * Background color of the header. Uses the same values as the Card `background`.
+   * `brand-primary` and `brand-secondary` switch the title and expand indicator to white text.
+   * Hover and active backgrounds are not applied when `backgroundColor` is set.
+   */
+  backgroundColor?: CardBackground;
   /**
    * The accordion title content. Renders inside the header's title slot.
    * Use a string for plain text, or a node for richer content.
@@ -152,9 +159,10 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
     expandActionPosition = 'end',
     expandActionArrowType = 'default',
     expandActionSize,
-    expandActionInverted = false,
+    expandActionInverted,
     expandActionUnderline = false,
     headerClass,
+    backgroundColor,
     title,
     beforeTitle,
     afterTitle,
@@ -174,6 +182,8 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
   const expandLabel = expanded ? resolvedCloseText : resolvedOpenText;
   const showStartExpandAction = showDefaultExpandAction && expandActionPosition === 'start';
   const showEndExpandAction = showDefaultExpandAction && expandActionPosition === 'end';
+  const resolvedExpandActionInverted =
+    expandActionInverted ?? (backgroundColor === 'brand-primary' || backgroundColor === 'brand-secondary');
   const resolvedExpandActionSize: CollapseButtonSize = expandActionSize ?? (showExpandLabel ? 'default' : 'small');
 
   const hostClasses = cn(
@@ -183,7 +193,9 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
       [styles['tedi-accordion-item-header--expanded']]: expanded,
       [styles['tedi-accordion-item-header--with-icon-card']]: showIconCard,
       [styles['tedi-accordion-item-header--disabled']]: disabled,
+      [styles['tedi-accordion-item-header--colored']]: !!backgroundColor,
     },
+    backgroundColor && styles[`tedi-accordion-item-header--background--${backgroundColor}`],
     headerClass
   );
 
@@ -224,7 +236,7 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
         hideText={!showExpandLabel}
         arrowType={expandActionArrowType}
         size={resolvedExpandActionSize}
-        inverted={expandActionInverted}
+        inverted={resolvedExpandActionInverted}
         underline={expandActionUnderline}
         disabled={disabled}
         aria-controls={contentId}

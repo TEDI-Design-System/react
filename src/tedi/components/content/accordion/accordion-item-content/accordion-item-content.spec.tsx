@@ -72,6 +72,22 @@ describe('AccordionItemContent', () => {
     expect(content.className).toMatch(/tedi-accordion-item-content/);
   });
 
+  it('applies the backgroundColor modifier alongside contentClass', () => {
+    render(
+      <AccordionItem>
+        <AccordionItem.Header title="Hello" />
+        <AccordionItemContent backgroundColor="warning-primary" contentClass="custom-content">
+          Body
+        </AccordionItemContent>
+      </AccordionItem>
+    );
+
+    const trigger = screen.getByRole('button');
+    const content = document.getElementById(trigger.getAttribute('aria-controls')!) as HTMLElement;
+    expect(content).toHaveClass('tedi-accordion-item-content--background--warning-primary');
+    expect(content).toHaveClass('custom-content');
+  });
+
   it('applies the with-icon-card modifier when the parent item enables the icon card', () => {
     render(
       <AccordionItem showIconCard iconCard={<span>icon</span>}>

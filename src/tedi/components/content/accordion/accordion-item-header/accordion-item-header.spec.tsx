@@ -74,6 +74,49 @@ describe('AccordionItemHeader', () => {
     expect(host?.className).toMatch(/tedi-accordion-item-header/);
   });
 
+  it('applies the backgroundColor modifier alongside headerClass', () => {
+    const { container } = renderHeader({ backgroundColor: 'brand-primary', headerClass: 'custom-header' });
+
+    const host = container.querySelector('[data-name="accordion-item-header"]');
+    expect(host).toHaveClass('tedi-accordion-item-header--background--brand-primary');
+    expect(host).toHaveClass('tedi-accordion-item-header--colored');
+    expect(host).toHaveClass('custom-header');
+  });
+
+  it('inverts the collapse button on brand backgrounds unless set explicitly', () => {
+    const { rerender } = renderHeader({ headerClickable: false, backgroundColor: 'secondary' });
+    expect(screen.getByRole('button')).not.toHaveClass('tedi-collapse-button--inverted');
+
+    rerender(
+      <AccordionItem>
+        <AccordionItemHeader title="Hello" headerClickable={false} backgroundColor="brand-primary" />
+        <AccordionItem.Content>Body</AccordionItem.Content>
+      </AccordionItem>
+    );
+    expect(screen.getByRole('button')).toHaveClass('tedi-collapse-button--inverted');
+
+    rerender(
+      <AccordionItem>
+        <AccordionItemHeader
+          title="Hello"
+          headerClickable={false}
+          backgroundColor="brand-primary"
+          expandActionInverted={false}
+        />
+        <AccordionItem.Content>Body</AccordionItem.Content>
+      </AccordionItem>
+    );
+    expect(screen.getByRole('button')).not.toHaveClass('tedi-collapse-button--inverted');
+  });
+
+  it('does not add background modifiers by default', () => {
+    const { container } = renderHeader();
+
+    const host = container.querySelector('[data-name="accordion-item-header"]');
+    expect(host?.className).not.toMatch(/--background--/);
+    expect(host).not.toHaveClass('tedi-accordion-item-header--colored');
+  });
+
   it('renders header slots (startAction, beforeTitle, afterTitle, endAction)', () => {
     renderHeader({
       startAction: <span data-testid="start-action">start</span>,
