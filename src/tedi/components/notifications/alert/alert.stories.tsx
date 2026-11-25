@@ -1,5 +1,10 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import {
+  VISUAL_TEST_VIEWPORTS,
+  VisualTestStory,
+  type VisualTestStoryInput,
+} from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
@@ -26,6 +31,7 @@ const meta: Meta<typeof Alert> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4263-61880&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -214,4 +220,35 @@ export const WithActionButton: Story = {
       </Button>
     ),
   },
+};
+
+const visualTestStories: { label: string; story: VisualTestStoryInput }[] = [
+  { label: 'Default', story: Default },
+  { label: 'Sizes', story: Sizes },
+  { label: 'Headless', story: Headless },
+  { label: 'Global', story: Global },
+  { label: 'Without side borders', story: WithoutSideBorders },
+  { label: 'With icon', story: WithIcon },
+  { label: 'With close button', story: WithCloseButton },
+  { label: 'Alert types', story: AlertTypes },
+  { label: 'Without title, long text', story: WithoutTitleLongText },
+  { label: 'Without title, long text and closing button', story: WithoutTitleLongTextAndClosingButton },
+  { label: 'With title, long text and closing button', story: WithTitleLongTextAndClosingButton },
+  { label: 'With action button', story: WithActionButton },
+];
+
+/** Chromatic snapshot for Alert: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestStories.map(({ label, story }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          <VisualTestStory story={story} component={Alert} />
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
 };

@@ -1,8 +1,11 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
+import isChromatic from 'chromatic/isChromatic';
 import { useEffect, useState } from 'react';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { ProgressBar, ProgressBarProps } from './progress-bar';
 
 const HINT = { text: 'Üleslaadimine', type: 'hint' } as const;
@@ -26,6 +29,7 @@ const meta: Meta<typeof ProgressBar> = {
     controls: {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
+    chromatic: { disableSnapshot: true },
   },
   argTypes: {
     value: { control: { type: 'range', min: 0, max: 100, step: 1 } },
@@ -247,8 +251,9 @@ export const Responsive: Story = {
  */
 export const Animated: Story = {
   render: function AnimatedStory() {
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(isChromatic() ? 40 : 0);
     useEffect(() => {
+      if (isChromatic()) return;
       const id = window.setInterval(() => {
         setValue((v) => (v >= 100 ? 0 : v + 5));
       }, 300);
@@ -256,4 +261,51 @@ export const Animated: Story = {
     }, []);
     return <ProgressBar value={value} label="Üleslaadimine..." />;
   },
+  parameters: { chromatic: { disableSnapshot: false } },
+};
+
+/** Chromatic snapshot for ProgressBar: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} component={ProgressBar} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <VisualTestStory story={Sizes} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Position</Text>
+        <VisualTestStory story={Position} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With label</Text>
+        <VisualTestStory story={WithLabel} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Regular</Text>
+        <VisualTestStory story={Regular} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With hint</Text>
+        <VisualTestStory story={WithHint} component={ProgressBar} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With error</Text>
+        <VisualTestStory story={WithError} component={ProgressBar} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Value hidden</Text>
+        <VisualTestStory story={ValueHidden} component={ProgressBar} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={Responsive} component={ProgressBar} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

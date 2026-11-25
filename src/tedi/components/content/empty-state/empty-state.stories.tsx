@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Card, CardContent } from '../../content/card';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Link } from '../../navigation/link/link';
 import type { EmptyStateProps } from './empty-state';
 import { EmptyState } from './empty-state';
@@ -22,6 +25,7 @@ const meta: Meta<typeof EmptyState> = {
     actions: { control: false },
   },
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.65.81?node-id=2413-40492&m=dev',
@@ -111,25 +115,29 @@ export const Separate: Story = {
   },
 };
 
+const AttachedToComponentTemplate = () => (
+  <div>
+    <Card borderRadius={{ bottomLeft: false, bottomRight: false }}>
+      <CardContent>Previous content</CardContent>
+    </Card>
+    <EmptyState type="attached">Andmed puuduvad</EmptyState>
+  </div>
+);
+
 export const AttachedToComponent: Story = {
-  render: () => (
-    <div>
-      <Card borderRadius={{ bottomLeft: false, bottomRight: false }}>
-        <CardContent>Previous content</CardContent>
-      </Card>
-      <EmptyState type="attached">Andmed puuduvad</EmptyState>
-    </div>
-  ),
+  render: AttachedToComponentTemplate,
 };
 
+const InsideComponentTemplate = () => (
+  <Card>
+    <CardContent>
+      <EmptyState type="inside">Andmed puuduvad</EmptyState>
+    </CardContent>
+  </Card>
+);
+
 export const InsideComponent: Story = {
-  render: () => (
-    <Card>
-      <CardContent>
-        <EmptyState type="inside">Andmed puuduvad</EmptyState>
-      </CardContent>
-    </Card>
-  ),
+  render: InsideComponentTemplate,
 };
 
 export const CustomIcon: Story = {
@@ -144,4 +152,35 @@ export const DifferentIconColor: Story = {
     children: 'Andmed puuduvad',
     icon: { name: 'spa', color: 'tertiary' },
   },
+};
+
+const visualTestVariants: { label: string; story: Story }[] = [
+  { label: 'Default', story: Default },
+  { label: 'With primary action', story: WithPrimaryAction },
+  { label: 'With secondary action', story: WithSecondaryAction },
+  { label: 'With link', story: WithLink },
+  { label: 'With heading', story: WithHeading },
+  { label: 'Minimal', story: Minimal },
+  { label: 'Small padding', story: SmallPadding },
+  { label: 'Separate', story: Separate },
+  { label: 'Attached to component', story: AttachedToComponent },
+  { label: 'Inside component', story: InsideComponent },
+  { label: 'Custom icon', story: CustomIcon },
+  { label: 'Different icon color', story: DifferentIconColor },
+];
+
+/** Chromatic snapshot for EmptyState: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestVariants.map(({ label, story }) => (
+        <VerticalSpacing key={label} size={0.5}>
+          <Text modifiers="bold">{label}</Text>
+          <VisualTestStory story={story} component={EmptyState} />
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
 };

@@ -1,5 +1,8 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { Text } from '../../base/typography/text/text';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Popover from '../../overlays/popover/popover';
 import Ellipsis, { EllipsisProps } from './ellipsis';
 
@@ -14,6 +17,7 @@ const meta: Meta<typeof Ellipsis> = {
     status: {
       type: ['devComponent'],
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -87,4 +91,30 @@ export const ResponsiveWithCustomPopover: Story = {
       </Popover>
     ),
   },
+};
+
+/** Chromatic snapshot for Ellipsis: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Leading start</Text>
+        <VisualTestStory story={LeadingStart} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={ResponsiveExample} component={Ellipsis} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive with custom popover</Text>
+        <VisualTestStory story={ResponsiveWithCustomPopover} component={Ellipsis} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

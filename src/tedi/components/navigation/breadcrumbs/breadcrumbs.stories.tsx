@@ -1,6 +1,8 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Icon } from '../../base/icon/icon';
+import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Link } from '../link/link';
 import Breadcrumbs, { BreadcrumbsProps } from './breadcrumbs';
@@ -47,6 +49,7 @@ export default {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=2409-21799&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 } as Meta;
 
@@ -104,6 +107,7 @@ export const Short: Story = {
 };
 
 export const CustomAriaLabel: Story = {
+  parameters: { visualTest: false },
   render: Template,
   args: {
     ariaLabel: 'Site path',
@@ -189,6 +193,40 @@ export const CustomSeparator: Story = {
         <Link href="#">Documents</Link>
         <span aria-current="page">Restrictions</span>
       </Breadcrumbs>
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic snapshot for Breadcrumbs: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} props={{ ariaLabel: 'Default trail' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Long</Text>
+        <VisualTestStory story={Long} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Short</Text>
+        <VisualTestStory story={Short} props={{ ariaLabel: 'Short trail' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Condensed</Text>
+        <VisualTestStory story={Condensed} props={{ ariaLabel: 'Condensed trail' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Custom separator</Text>
+        <VisualTestStory story={CustomSeparator} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive variant</Text>
+        <VisualTestStory story={ResponsiveVariant} props={{ ariaLabel: 'Responsive trail' }} />
+      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

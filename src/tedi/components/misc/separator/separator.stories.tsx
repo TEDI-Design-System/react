@@ -1,5 +1,10 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import {
+  VISUAL_TEST_VIEWPORTS,
+  VisualTestStory,
+  type VisualTestStoryInput,
+} from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Card, CardContent } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
@@ -25,6 +30,7 @@ const meta: Meta<typeof Separator> = {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=3518-32729&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -432,4 +438,41 @@ export const VerticalDottedSmallCardExample: Story = {
     dotPosition: 1.25,
     md: { axis: 'vertical' },
   },
+};
+
+const visualTestBlocks: { label: string; story: VisualTestStoryInput }[] = [
+  { label: 'Default', story: Default },
+  { label: 'Horizontal spacings', story: HorizontalSpacings },
+  { label: 'Horizontal thickness', story: HorizontalThickness },
+  { label: 'Vertical', story: Vertical },
+  { label: 'Vertical spacings', story: VerticalSpacings },
+  { label: 'Vertical thickness', story: VerticalThickness },
+  { label: 'Dotted line horizontal', story: DottedLineHorizontal },
+  { label: 'Dotted line vertical', story: DottedLineVertical },
+  { label: 'Sizes', story: Sizes },
+  { label: 'Spacing top default', story: SpacingTopDefault },
+  { label: 'Spacing top small', story: SpacingTopSmall },
+  { label: 'Position', story: Position },
+  { label: 'Dot filled', story: DotFilled },
+  { label: 'Dot outlined', story: DotOutlined },
+  { label: 'Dotted sizes', story: DottedSizes },
+  { label: 'Inline separator usage', story: InlineSeparatorUsage },
+  { label: 'Vertical dotted card example', story: VerticalDottedCardExample },
+  { label: 'Vertical dotted small card example', story: VerticalDottedSmallCardExample },
+];
+
+/** Chromatic snapshot for Separator: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestBlocks.map(({ label, story }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          <VisualTestStory story={story} />
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
 };

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
@@ -33,6 +34,7 @@ const meta: Meta<typeof TableOfContents> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=8469-72329&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
   decorators: [
     (Story, context) => (
@@ -365,7 +367,10 @@ const layoutIds = layoutFlat.map((node) => node.id);
  * within the sidebar's scrollbar. Below `lg` the list collapses into `TableOfContents.Collapsible`.
  */
 export const StickyInLayout: Story = {
-  parameters: { fullWidth: true },
+  parameters: {
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
+    fullWidth: true,
+  },
   render: function StickyInLayout() {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [activeId, setActiveId] = useState('sec-1');
@@ -499,7 +504,11 @@ export const StickyInLayout: Story = {
  * to switch between the two.
  */
 export const Collapsible: Story = {
-  parameters: { layout: 'fullscreen', fullWidth: true },
+  parameters: {
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
+    layout: 'fullscreen',
+    fullWidth: true,
+  },
   render: () => {
     const items = [
       <TableOfContents.Item key="intro" id="intro">
@@ -632,7 +641,11 @@ export const Collapsible: Story = {
  */
 export const CollapsibleHideOnScroll: Story = {
   name: 'Collapsible: hide on scroll',
-  parameters: { layout: 'fullscreen', fullWidth: true },
+  parameters: {
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
+    layout: 'fullscreen',
+    fullWidth: true,
+  },
   render: () => {
     const items = [
       <TableOfContents.Item key="intro" id="intro">
@@ -756,4 +769,68 @@ export const CollapsibleHideOnScroll: Story = {
       </>
     );
   },
+};
+
+/** Chromatic snapshot for TableOfContents: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS }, fullWidth: true },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Item states</Text>
+        <VisualTestStory story={ItemStates} />
+      </VerticalSpacing>
+      <Row gutterY={3}>
+        <Col md={4}>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold">Default</Text>
+            <VisualTestStory story={Default} props={{ ariaLabel: 'Sisukord: default' }} />
+          </VerticalSpacing>
+        </Col>
+        <Col md={4}>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold">Transparent</Text>
+            <VisualTestStory story={Transparent} props={{ ariaLabel: 'Sisukord: transparent' }} />
+          </VerticalSpacing>
+        </Col>
+        <Col md={4}>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold">With slot</Text>
+            <VisualTestStory story={WithSlot} props={{ ariaLabel: 'Sisukord: with slot' }} />
+          </VerticalSpacing>
+        </Col>
+        <Col md={4}>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold">Numbered</Text>
+            <VisualTestStory story={Numbered} props={{ ariaLabel: 'Sisukord: numbered' }} />
+          </VerticalSpacing>
+        </Col>
+        <Col md={4}>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold">With icon</Text>
+            <VisualTestStory story={WithIcon} props={{ ariaLabel: 'Sisukord: with icon' }} />
+          </VerticalSpacing>
+        </Col>
+        <Col md={4}>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold">Headless</Text>
+            <VisualTestStory story={Headless} props={{ ariaLabel: 'Sisukord: headless' }} />
+          </VerticalSpacing>
+        </Col>
+        <Col md={4}>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold">With separator</Text>
+            <VisualTestStory story={WithSeparator} props={{ ariaLabel: 'Sisukord: with separator' }} />
+          </VerticalSpacing>
+        </Col>
+        <Col md={4}>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold">Divided</Text>
+            <VisualTestStory story={Divided} props={{ ariaLabel: 'Sisukord: divided' }} />
+          </VerticalSpacing>
+        </Col>
+      </Row>
+    </VerticalSpacing>
+  ),
 };
