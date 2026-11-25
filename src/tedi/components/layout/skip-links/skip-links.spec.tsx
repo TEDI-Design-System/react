@@ -144,4 +144,40 @@ describe('SkipLinks component', () => {
 
     expect(fireEvent.click(screen.getByRole('list'))).toBe(true);
   });
+
+  it('leaves a link that opens in another tab to the browser', () => {
+    render(
+      <>
+        <SkipLinks links={[{ href: '#main-content', children: 'Skip', target: '_blank' }]} />
+        <main id="main-content">Main</main>
+      </>
+    );
+
+    expect(fireEvent.click(screen.getByRole('link'))).toBe(true);
+    expect(screen.getByRole('main')).not.toHaveFocus();
+  });
+
+  it('handles a link whose target is the current tab, in any letter case', () => {
+    render(
+      <>
+        <SkipLinks links={[{ href: '#main-content', children: 'Skip', target: '_SELF' }]} />
+        <main id="main-content">Main</main>
+      </>
+    );
+
+    expect(fireEvent.click(screen.getByRole('link'))).toBe(false);
+    expect(screen.getByRole('main')).toHaveFocus();
+  });
+
+  it.each(['metaKey', 'ctrlKey', 'shiftKey', 'altKey'])('leaves a click with %s to the browser', (modifier) => {
+    render(
+      <>
+        <SkipLinks />
+        <main id="main-content">Main</main>
+      </>
+    );
+
+    expect(fireEvent.click(screen.getByRole('link'), { [modifier]: true })).toBe(true);
+    expect(screen.getByRole('main')).not.toHaveFocus();
+  });
 });

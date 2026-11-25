@@ -27,6 +27,12 @@ const decodeId = (id: string) => {
   }
 };
 
+// A modifier click asks the browser for a new tab or window.
+const hasModifierKey = (event: React.MouseEvent) => event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+
+// A link that opens elsewhere (e.g. `target="_blank"`) keeps the behaviour its label announces.
+const opensInCurrentTab = (link: Element) => (link.getAttribute('target') || '_self').toLowerCase() === '_self';
+
 /**
  * Links that let keyboard users bypass repeated content (WCAG 2.4.1). Hidden until a link receives focus.
  * Render it as the first element on the page, before `Header`.
@@ -37,10 +43,13 @@ export const SkipLinks = (props: SkipLinksProps): JSX.Element => {
 
   // Focuses the target directly: an app's <base href="/"> would turn `#id` into a link to the home page.
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (event.defaultPrevented) return;
+    if (event.defaultPrevented || hasModifierKey(event)) return;
 
-    const href = (event.target as Element).closest('a[href^="#"]')?.getAttribute('href');
-    const target = href ? document.getElementById(decodeId(href.slice(1))) : null;
+    const link = (event.target as Element).closest('a[href^="#"]');
+    const href = link?.getAttribute('href');
+    if (!link || !href || !opensInCurrentTab(link)) return;
+
+    const target = document.getElementById(decodeId(href.slice(1)));
     if (!target) return;
 
     event.preventDefault();
