@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../../.storybook/visual-test-story';
 import { Col, Row } from '../../../layout/grid';
 import { VerticalSpacing } from '../../../layout/vertical-spacing';
 import { Text } from './text';
@@ -13,6 +14,7 @@ const meta: Meta<typeof Text> = {
   component: Text,
   title: 'Tedi-Ready/Base/Typography/Text',
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?node-id=115-11630&m=dev',
@@ -217,4 +219,34 @@ export const GeneralText: Story = {
 export const StatusText: Story = {
   render: TemplateStatusText,
   name: 'Status text colors',
+};
+
+/** Chromatic snapshot for Text: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} component={Text} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Body</Text>
+        <VisualTestStory story={BodyText} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Subtitles</Text>
+        <VisualTestStory story={Subtitles} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">General text colors</Text>
+        <VisualTestStory story={GeneralText} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Status text colors</Text>
+        <VisualTestStory story={StatusText} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

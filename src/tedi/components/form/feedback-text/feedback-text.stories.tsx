@@ -1,5 +1,9 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { Text } from '../../base/typography/text/text';
+import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { FeedbackText } from './feedback-text';
 
 /**
@@ -14,6 +18,7 @@ const meta: Meta<typeof FeedbackText> = {
     status: {
       type: ['devComponent'],
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -53,4 +58,32 @@ export const PositionRight: Story = {
     type: 'valid',
     position: 'right',
   },
+};
+
+const visualTestVariants: { label: string; story: Story }[] = [
+  { label: 'Helper', story: Helper },
+  { label: 'Error', story: Error },
+  { label: 'Valid', story: Valid },
+  { label: 'Position left', story: PositionLeft },
+  { label: 'Position right', story: PositionRight },
+];
+
+/** Chromatic snapshot for FeedbackText: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing>
+      {visualTestVariants.map(({ label, story }) => (
+        <Row key={label}>
+          <Col lg={2} xs={12}>
+            <Text modifiers="bold">{label}</Text>
+          </Col>
+          <Col>
+            <VisualTestStory story={story} component={FeedbackText} />
+          </Col>
+        </Row>
+      ))}
+    </VerticalSpacing>
+  ),
 };

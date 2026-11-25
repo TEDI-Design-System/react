@@ -1,6 +1,8 @@
-import { FloatingArrow, FloatingFocusManager, FloatingPortal } from '@floating-ui/react';
+import { FloatingArrow, FloatingFocusManager } from '@floating-ui/react';
 import { CSSProperties, ReactNode, useContext, useEffect } from 'react';
 
+import { lockElementScroll, useScrollContainerLock } from '../../../helpers/hooks/use-scroll-container-lock';
+import { StylePortal } from '../../../providers/style-provider/style-portal';
 import { OverlayContext } from './overlay';
 
 export interface OverlayContentProps {
@@ -78,21 +80,21 @@ export const OverlayContent = (props: OverlayContentProps) => {
     ariaHidden,
   } = useContext(OverlayContext);
 
-  useEffect(() => {
-    if (scrollLock) {
-      if (open) {
-        document.documentElement.style.overflow = 'hidden';
-        const hasScrollbar = document.documentElement.scrollHeight > window.innerHeight;
+  const isScrollContainerLocked = useScrollContainerLock(!!scrollLock && open);
 
-        if (hasScrollbar) {
-          document.body.style.overflow = 'scroll';
-        }
-      } else {
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
-      }
-    }
-  }, [open, scrollLock]);
+  useEffect(() => {
+    if (!scrollLock || !open || isScrollContainerLocked) return undefined;
+
+    const { documentElement, body } = document;
+    const unlockDocument = lockElementScroll(documentElement);
+    const hasScrollbar = documentElement.scrollHeight > window.innerHeight;
+    const unlockBody = hasScrollbar ? lockElementScroll(body, 'scroll') : undefined;
+
+    return () => {
+      unlockDocument();
+      unlockBody?.();
+    };
+  }, [open, scrollLock, isScrollContainerLocked]);
 
   if (!open) return null;
 
@@ -133,7 +135,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
   );
 
   return (
-    <FloatingPortal>
+    <StylePortal>
       {role === 'tooltip' ? (
         floatingNode
       ) : (
@@ -141,6 +143,6 @@ export const OverlayContent = (props: OverlayContentProps) => {
           {floatingNode}
         </FloatingFocusManager>
       )}
-    </FloatingPortal>
+    </StylePortal>
   );
 };

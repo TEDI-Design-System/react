@@ -1,7 +1,8 @@
 @use '@tedi-design-system/core/mixins';
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
-:root {
+:root,
+:host {
   --tedi-btn-text-padding-inline: var(--button-md-inner-spacing);
 }
 
@@ -164,12 +165,6 @@
   font-size: var(--button-text-size-sm);
 }
 
-.tedi-btn--large {
-  height: var(--tedi-dimensions-19);
-  padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x) calc(var(--button-md-padding-y) - 1px)
-    var(--button-md-padding-x);
-}
-
 .tedi-btn--neutral {
   padding: 0;
   padding-top: calc(var(--button-md-neutral-padding-y) - 1px);
@@ -204,11 +199,6 @@
 
   &.tedi-btn--small {
     @include button-icon-size('sm');
-  }
-
-  &.tedi-btn--large {
-    width: var(--tedi-dimensions-19);
-    height: var(--tedi-dimensions-19);
   }
 
   &.tedi-btn--extra-small {

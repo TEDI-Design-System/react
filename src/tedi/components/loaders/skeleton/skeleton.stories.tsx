@@ -6,6 +6,8 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -40,6 +42,7 @@ const meta: Meta<typeof Skeleton> = {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2188-34298&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -148,6 +151,7 @@ const AccessibilityTemplate: StoryFn<AccessibilityTemplateProps> = ({ style, id,
  * **For optimal accessibility, it is strongly recommended to provide both label and completedLabel props.** These labels inform users about the type of content being loaded and when the loading process has finished, offering a more informative and accessible experience.
  */
 export const Accessibility: Story = {
+  parameters: { visualTest: false },
   render: (args) => {
     const [skeletons, setSkeletons] = React.useState<AccessibilityTemplateProps[]>([]);
 
@@ -194,4 +198,26 @@ export const Accessibility: Story = {
       </VerticalSpacing>
     );
   },
+};
+
+/** Chromatic snapshot for Skeleton: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Height</Text>
+        <VisualTestStory story={SkeletonHeight} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Width</Text>
+        <VisualTestStory story={SkeletonWidth} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

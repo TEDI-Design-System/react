@@ -1,6 +1,9 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Tag, TagProps } from './tag';
 
 /**
@@ -22,6 +25,7 @@ export default {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2405-49832&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 } as Meta;
 type Story = StoryObj<TagProps>;
@@ -113,5 +117,35 @@ export const Ellipsis: Story = {
         start, a fairly long tag label
       </Tag>
     </div>
+  ),
+};
+
+/** Chromatic snapshot for Tag: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Primary</Text>
+        <VisualTestStory story={Primary} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Secondary</Text>
+        <VisualTestStory story={Secondary} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Danger</Text>
+        <VisualTestStory story={Danger} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Ellipsis</Text>
+        <VisualTestStory story={Ellipsis} />
+      </VerticalSpacing>
+    </VerticalSpacing>
   ),
 };

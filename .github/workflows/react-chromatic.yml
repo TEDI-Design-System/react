@@ -109,7 +109,10 @@ jobs:
             const previewPackages =
               /^[-+]\s*"(react|react-dom|storybook|dayjs|@storybook\/[^"]+|@mui\/[^"]+|@emotion\/[^"]+|@tedi-design-system\/core)"/m;
             const forcesFullBuild = (f) =>
-              f.filename.startsWith('.storybook/') ||
+              // Only stories import the VisualTest helper, so TurboSnap traces it like a story;
+              // its coverage spec isn't in the Storybook build at all.
+              (f.filename.startsWith('.storybook/') &&
+                !f.filename.startsWith('.storybook/visual-test-')) ||
               previewImports.includes(f.filename) ||
               (f.filename === 'package.json' && previewPackages.test(f.patch ?? ''));
             const config = files.filter(forcesFullBuild).map((f) => f.filename);

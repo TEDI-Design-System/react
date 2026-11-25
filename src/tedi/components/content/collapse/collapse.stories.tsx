@@ -1,14 +1,17 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { Card } from '../card';
 import Collapse from './collapse';
 
 const meta: Meta<typeof Collapse> = {
   component: Collapse,
   title: 'TEDI-Ready/Content/Collapse',
   parameters: {
+    chromatic: { disableSnapshot: true },
     status: {
       type: [
         'devComponent',
@@ -126,4 +129,48 @@ export const Nested: Story = {
       </VerticalSpacing>
     ),
   },
+};
+
+/** Chromatic snapshot for Collapse: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} component={Collapse} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon only</Text>
+        <VisualTestStory story={IconOnly} component={Collapse} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Secondary arrow</Text>
+        <VisualTestStory story={SecondaryArrow} component={Collapse} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Full row toggle</Text>
+        <VisualTestStory story={FullRowToggle} component={Collapse} />
+      </VerticalSpacing>
+      <Card background="brand-primary" borderless>
+        <Card.Content>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold" color="white">
+              Inverted
+            </Text>
+            <VisualTestStory story={Inverted} component={Collapse} />
+          </VerticalSpacing>
+        </Card.Content>
+      </Card>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Without underline</Text>
+        <VisualTestStory story={WithoutUnderline} component={Collapse} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Nested</Text>
+        <VisualTestStory story={Nested} component={Collapse} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

@@ -1,7 +1,6 @@
 import {
   autoUpdate,
   flip,
-  FloatingPortal,
   offset,
   shift,
   size,
@@ -13,7 +12,10 @@ import {
 import cn from 'classnames';
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import { getNextFocusable } from '../../../helpers/shadow-dom';
 import { useLabels } from '../../../providers/label-provider';
+import { StylePortal } from '../../../providers/style-provider/style-portal';
 import { IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button, ButtonProps } from '../../buttons/button/button';
@@ -60,6 +62,26 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
+const LARGE_BUTTON_ICON_SIZE = 24;
+
+const enlargeIcon = (icon?: string | IconWithoutBackgroundProps): string | IconWithoutBackgroundProps | undefined => {
+  if (!icon) return icon;
+
+  return typeof icon === 'string'
+    ? { name: icon, size: LARGE_BUTTON_ICON_SIZE }
+    : { size: LARGE_BUTTON_ICON_SIZE, ...icon };
+};
+
+type SearchButtonContentProps = Omit<
+  ButtonProps,
+  'size' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'defaultServerBreakpoint'
+>;
+
+/**
+ * Button props for Search. `size` is left out (also inside the breakpoint objects) because Search sets it from its own size.
+ */
+export type SearchButtonProps = BreakpointSupport<SearchButtonContentProps>;
+
 export interface SearchProps
   extends Omit<
     TextFieldProps,
@@ -85,7 +107,7 @@ export interface SearchProps
   /**
    * Optional button properties.
    */
-  button?: Partial<ButtonProps>;
+  button?: Partial<SearchButtonProps>;
   /**
    * Accessible name for the search landmark. Unnamed by default; set it when the page has more than
    * one search. It does not name the field, which keeps its own `label`.
@@ -194,7 +216,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     onChange,
     onClear,
     onFocus,
-    button,
+    button: buttonProp,
     ariaLabel,
     className,
     input,
@@ -215,6 +237,10 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
   } = props;
 
   const { getLabel } = useLabels();
+  const { getCurrentBreakpointProps } = useBreakpointProps(buttonProp?.defaultServerBreakpoint);
+  const button = buttonProp
+    ? getCurrentBreakpointProps<SearchButtonContentProps>(buttonProp as SearchButtonProps)
+    : undefined;
 
   const generatedId = React.useId();
   const resolvedId = id ?? generatedId;
@@ -338,10 +364,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     if (!inputEl) return;
 
     const panel = refs.floating.current;
-    const focusables = Array.from(document.body.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-      (element) => !panel?.contains(element)
-    );
-    focusables[focusables.indexOf(inputEl) + 1]?.focus();
+    getNextFocusable(inputEl, FOCUSABLE_SELECTOR, (element) => !!panel?.contains(element))?.focus();
   };
 
   const handleAutocompleteKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
@@ -538,6 +561,8 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     );
   };
 
+  const isLargeSearch = rest.size === 'large';
+
   return (
     <div
       ref={refs.setReference}
@@ -554,6 +579,10 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
       {button && (
         <Button
           {...button}
+          size={rest.size === 'small' ? 'small' : 'default'}
+          icon={isLargeSearch ? enlargeIcon(button.icon) : button.icon}
+          iconLeft={isLargeSearch ? enlargeIcon(button.iconLeft) : button.iconLeft}
+          iconRight={isLargeSearch ? enlargeIcon(button.iconRight) : button.iconRight}
           onClick={handleButtonClick}
           className={cn(
             styles['tedi-search__button'],
@@ -573,7 +602,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
       )}
 
       {panelVisible && (
-        <FloatingPortal>
+        <StylePortal>
           <div
             ref={refs.setFloating}
             style={floatingStyles}
@@ -587,7 +616,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
               </div>
             )}
           </div>
-        </FloatingPortal>
+        </StylePortal>
       )}
     </div>
   );

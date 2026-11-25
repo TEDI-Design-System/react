@@ -1,9 +1,11 @@
-import { FloatingFocusManager, FloatingOverlay, FloatingPortal } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingOverlay } from '@floating-ui/react';
 import cn from 'classnames';
 import { ComponentProps, CSSProperties, ReactNode } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../../helpers';
+import { useScrollContainerLock } from '../../../../helpers/hooks/use-scroll-container-lock';
 import { useLabels } from '../../../../providers/label-provider';
+import { StylePortal } from '../../../../providers/style-provider/style-portal';
 import styles from '../modal.module.scss';
 import { useModalContext } from '../modal-context';
 
@@ -138,6 +140,7 @@ export const ModalContent = (props: ModalContentProps): JSX.Element | null => {
 
   const { getLabel } = useLabels();
   const { open, floating, getFloatingProps, context, labelId, descriptionId } = useModalContext();
+  const isScrollContainerLocked = useScrollContainerLock(lockScroll && open);
 
   if (!open) return null;
 
@@ -161,9 +164,9 @@ export const ModalContent = (props: ModalContentProps): JSX.Element | null => {
   const fullscreenOverlayClass = fullscreen === 'edge' ? styles['tedi-modal__overlay--fullscreen-edge'] : undefined;
 
   return (
-    <FloatingPortal>
+    <StylePortal>
       <FloatingOverlay
-        lockScroll={lockScroll}
+        lockScroll={lockScroll && !isScrollContainerLocked}
         className={cn(
           styles['tedi-modal__overlay'],
           styles[`tedi-modal__overlay--position-${position}`],
@@ -202,7 +205,7 @@ export const ModalContent = (props: ModalContentProps): JSX.Element | null => {
           </div>
         </FloatingFocusManager>
       </FloatingOverlay>
-    </FloatingPortal>
+    </StylePortal>
   );
 };
 

@@ -1,9 +1,11 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import classNames from 'classnames';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Heading } from '../typography/heading/heading';
+import { Text } from '../typography/text/text';
 import { Icon, IconProps } from './icon';
 
 /**
@@ -21,6 +23,7 @@ const meta: Meta<typeof Icon> = {
   title: 'Tedi-Ready/Base/Icon',
   component: Icon,
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=45-30752&mode=dev',
@@ -245,46 +248,82 @@ export const Backgrounds: Story = {
   name: 'Icon background colors',
 };
 
+const UsedInsideTextTemplate = (args: { name: IconProps['name'] }) => {
+  return (
+    <VerticalSpacing size={0.25}>
+      <Heading element="h1">
+        <Icon name={args.name} display="inline" />
+        This is level 1 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <Heading element="h2">
+        <Icon name={args.name} display="inline" />
+        This is level 2 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <Heading element="h3">
+        <Icon name={args.name} display="inline" />
+        This is level 3 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <Heading element="h4">
+        <Icon name={args.name} display="inline" />
+        This is level 4 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <Heading element="h5">
+        <Icon name={args.name} display="inline" />
+        This is level 5 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <Heading element="h6">
+        <Icon name={args.name} display="inline" />
+        This is level 6 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <p>
+        <Icon name={args.name} display="inline" />
+        This is paragraph text with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </p>
+      <small>
+        <Icon name={args.name} display="inline" />
+        This is small text with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </small>
+    </VerticalSpacing>
+  );
+};
+
 export const UsedInsideText: Story = {
-  render: (args: { name: IconProps['name'] }) => {
-    return (
-      <VerticalSpacing size={0.25}>
-        <Heading element="h1">
-          <Icon name={args.name} display="inline" />
-          This is level 1 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <Heading element="h2">
-          <Icon name={args.name} display="inline" />
-          This is level 2 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <Heading element="h3">
-          <Icon name={args.name} display="inline" />
-          This is level 3 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <Heading element="h4">
-          <Icon name={args.name} display="inline" />
-          This is level 4 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <Heading element="h5">
-          <Icon name={args.name} display="inline" />
-          This is level 5 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <Heading element="h6">
-          <Icon name={args.name} display="inline" />
-          This is level 6 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <p>
-          <Icon name={args.name} display="inline" />
-          This is paragraph text with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </p>
-        <small>
-          <Icon name={args.name} display="inline" />
-          This is small text with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </small>
-      </VerticalSpacing>
-    );
-  },
+  render: UsedInsideTextTemplate,
   args: {
     name: 'account_circle',
   },
+};
+
+/** Chromatic snapshot for Icon: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon size</Text>
+        <VisualTestStory story={Sizes} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon size inside background</Text>
+        <VisualTestStory story={SizesWithBackground} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon colors</Text>
+        <VisualTestStory story={Colors} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon background colors</Text>
+        <VisualTestStory story={Backgrounds} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Used inside text</Text>
+        <VisualTestStory story={UsedInsideText} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

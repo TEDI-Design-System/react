@@ -1,3 +1,65 @@
+# [21.0.0-rc.29](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.28...react-21.0.0-rc.29) (2026-11-25)
+
+
+### Bug Fixes
+
+* **dock-panel:** stop redefining the core sheet header height variable [#1191](https://github.com/TEDI-Design-System/react/issues/1191) ([#1192](https://github.com/TEDI-Design-System/react/issues/1192)) ([2d45832](https://github.com/TEDI-Design-System/react/commit/2d4583247ac532a5a04cafec2a88fb459ef641bc))
+
+# [21.0.0-rc.28](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.27...react-21.0.0-rc.28) (2026-11-25)
+
+
+### Bug Fixes
+
+* **shadow-dom:** avoid document lookups inside shadow roots [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1096](https://github.com/TEDI-Design-System/react/issues/1096)) ([2f867d2](https://github.com/TEDI-Design-System/react/commit/2f867d2758afe7ae93ebc27c9c2bd6f4baef1fc9))
+
+
+### Features
+
+* **overlays:** render portals into the style provider container [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1094](https://github.com/TEDI-Design-System/react/issues/1094)) ([dafcd74](https://github.com/TEDI-Design-System/react/commit/dafcd7431b71b7eb453cf242f4b6a4a5c68114db))
+* **style-provider:** add containerElement for shadow dom support [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1092](https://github.com/TEDI-Design-System/react/issues/1092)) ([478cf80](https://github.com/TEDI-Design-System/react/commit/478cf80dceb2893ca268b6e37e3392b7c48bc80b))
+* **style-provider:** add scrollContainer for shadow dom scroll locking [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1097](https://github.com/TEDI-Design-System/react/issues/1097)) ([285c480](https://github.com/TEDI-Design-System/react/commit/285c480d35ce35a328cd266c413948f7c05e8517))
+
+# [21.0.0-rc.27](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.26...react-21.0.0-rc.27) (2026-11-24)
+
+
+### Bug Fixes
+
+* **check,choice-group:** update deprecation annotations and warnings [#1174](https://github.com/TEDI-Design-System/react/issues/1174) ([#1175](https://github.com/TEDI-Design-System/react/issues/1175)) ([c33e573](https://github.com/TEDI-Design-System/react/commit/c33e573cfb3cac1bbdb1f674f0e3614682f8acc1))
+
+# [21.0.0-rc.26](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.25...react-21.0.0-rc.26) (2026-11-24)
+
+
+### Bug Fixes
+
+* **sheet:** use a white handle on the brand header and align the stories [#1166](https://github.com/TEDI-Design-System/react/issues/1166) ([#1169](https://github.com/TEDI-Design-System/react/issues/1169)) ([8784c8e](https://github.com/TEDI-Design-System/react/commit/8784c8ee0ea06295520724a892fae52bd7e197e3))
+
+# [21.0.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.24...react-21.0.0-rc.25) (2026-11-24)
+
+
+### Bug Fixes
+
+* **calendar:** Shorten Day Labels [#1131](https://github.com/TEDI-Design-System/react/issues/1131) ([#1143](https://github.com/TEDI-Design-System/react/issues/1143)) ([68c8b11](https://github.com/TEDI-Design-System/react/commit/68c8b1144210a369b93ad8f31803f4a7351cfe6c))
+
+# [21.0.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.23...react-21.0.0-rc.24) (2026-11-20)
+
+
+### Features
+
+* **button:** remove large size, move it into search and category-search [#1113](https://github.com/TEDI-Design-System/react/issues/1113) ([#1160](https://github.com/TEDI-Design-System/react/issues/1160)) ([5eb169f](https://github.com/TEDI-Design-System/react/commit/5eb169fee5a501c9715eef8d5ed36acf93c5c983))
+
+
+### BREAKING CHANGES
+
+* **button:** Button `size` no longer accepts "large". Search's `button`
+prop no longer accepts `size`; Search sets the button size from its own `size`.
+
+# [21.0.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.22...react-21.0.0-rc.23) (2026-11-19)
+
+
+### Features
+
+* **rating:** new TEDI-Ready component [#531](https://github.com/TEDI-Design-System/react/issues/531) ([#958](https://github.com/TEDI-Design-System/react/issues/958)) ([3cf4193](https://github.com/TEDI-Design-System/react/commit/3cf419321d1d04da092a8f53ba24e94fdb01c8a2))
+
 # [21.0.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.21...react-21.0.0-rc.22) (2026-11-19)
 
 

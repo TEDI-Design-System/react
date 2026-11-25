@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
@@ -26,6 +27,7 @@ const meta: Meta<typeof NumberField> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4536-78765&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 export default meta;
@@ -178,7 +180,7 @@ export const FullWidth: Story = {
 };
 
 export const Controlled: Story = {
-  parameters: { chromatic: { disableSnapshot: true } },
+  parameters: { visualTest: false },
   args: {
     step: 1,
     max: 10,
@@ -220,4 +222,42 @@ export const Controlled: Story = {
       </VerticalSpacing>
     );
   },
+};
+
+/** Chromatic snapshot for NumberField: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} component={NumberField} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <VisualTestStory story={Sizes} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <VisualTestStory story={States} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With hint</Text>
+        <VisualTestStory story={WithHint} component={NumberField} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Decimal</Text>
+        <VisualTestStory story={Decimal} component={NumberField} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With unit</Text>
+        <VisualTestStory story={WithUnit} component={NumberField} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Full width</Text>
+        <VisualTestStory story={FullWidth} component={NumberField} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

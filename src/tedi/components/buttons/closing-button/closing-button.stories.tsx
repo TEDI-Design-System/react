@@ -1,7 +1,10 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
+import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import ClosingButton, { ClosingButtonProps } from './closing-button';
 
 /**
@@ -13,6 +16,7 @@ const meta: Meta<typeof ClosingButton> = {
   component: ClosingButton,
   title: 'Tedi-Ready/Components/Buttons/ClosingButton',
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4514-63815&m=dev',
@@ -43,7 +47,7 @@ const SizeTemplate: StoryFn = () => {
 
 const stateArray = ['Default', 'Hover', 'Active', 'Focus'];
 
-const StatesTemplate: StoryFn = (args) => {
+const StatesTemplate: StoryFn = ({ idPrefix = '', ...args }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '200px' }}>
       {stateArray.map((state) => (
@@ -54,7 +58,7 @@ const StatesTemplate: StoryFn = (args) => {
             </Text>
           </Col>
           <Col>
-            <ClosingButton id={state} {...args} />
+            <ClosingButton id={`${idPrefix}${state}`} {...args} />
           </Col>
         </Row>
       ))}
@@ -147,4 +151,51 @@ export const ColorInverted: Story = {
     },
   },
   globals: { backgrounds: { value: 'brand' } },
+};
+
+/** Chromatic snapshot for ClosingButton: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
+    pseudo: {
+      hover: ['.hover', '#vt-states-Hover', '#vt-brand-Hover', '#vt-inverted-Hover'],
+      active: ['#vt-states-Active', '#vt-brand-Active', '#vt-inverted-Active'],
+      focusVisible: ['#vt-states-Focus', '#vt-brand-Focus', '#vt-inverted-Focus'],
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} component={ClosingButton} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Size</Text>
+        <VisualTestStory story={Size} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon sizes</Text>
+        <VisualTestStory story={IconSizes} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <VisualTestStory story={{ ...States, args: { ...States.args, idPrefix: 'vt-states-' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Color brand</Text>
+        <VisualTestStory story={{ ...ColorBrand, args: { ...ColorBrand.args, idPrefix: 'vt-brand-' } }} />
+      </VerticalSpacing>
+      <Card background="brand-primary" borderless>
+        <Card.Content>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold" color="white">
+              Color inverted
+            </Text>
+            <VisualTestStory story={{ ...ColorInverted, args: { ...ColorInverted.args, idPrefix: 'vt-inverted-' } }} />
+          </VerticalSpacing>
+        </Card.Content>
+      </Card>
+    </VerticalSpacing>
+  ),
 };

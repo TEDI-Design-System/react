@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { ReactNode } from 'react';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import InfoButton from '../../buttons/info-button/info-button';
@@ -33,6 +34,7 @@ const meta: Meta<typeof TextGroup> = {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=45-30752&mode=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
   argTypes: {
     labelAlign: {
@@ -531,5 +533,36 @@ export const WithList: Story = {
         },
       ]}
     />
+  ),
+};
+
+const visualTestBlocks: { label: string; content: ReactNode }[] = [
+  { label: 'Default', content: <VisualTestStory story={Default} component={TextGroup} /> },
+  ...[
+    { label: 'Position', story: PositionType },
+    { label: 'Text weight', story: TextWeight },
+    { label: 'Type', story: Types },
+    { label: 'Has slot', story: HasSlot },
+    { label: 'Horizontal label length', story: HorizontalLabelLength },
+    { label: 'Long text values', story: LongTextValues },
+    { label: 'Custom label', story: CustomLabel },
+    { label: 'With list', story: WithList },
+    { label: 'Responsive', story: Responsive },
+  ].map(({ label, story }) => ({ label, content: <VisualTestStory story={story} /> })),
+];
+
+/** Chromatic snapshot for TextGroup: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestBlocks.map(({ label, content }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          {content}
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
   ),
 };

@@ -2,7 +2,9 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import NextLink from 'next/link';
 import { ElementType, forwardRef } from 'react';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text, TextProps } from '../../base/typography/text/text';
+import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Link, LinkProps } from './link';
@@ -26,6 +28,7 @@ const meta: Meta<typeof Link> = {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2160-25385&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -112,13 +115,15 @@ export const Colors = {
   render: ColorTemplate,
 };
 
-type TemplateMultipleProps<Type = typeof linkStateArray> = LinkProps<'a'> & {
+type TemplateMultipleProps<Type = typeof linkStateArray> = Omit<LinkProps<'a'>, 'children'> & {
   array: Type;
-  titleColor: TextProps['color'];
+  titleColor?: TextProps['color'];
+  idPrefix?: string;
 };
 
 const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
-  const { array, titleColor, ...buttonProps } = args;
+  const { array, titleColor, idPrefix, ...buttonProps } = args;
+  const getId = (value: string, index: number) => (idPrefix ? `${idPrefix}-${value}-${index}` : value);
 
   return (
     <>
@@ -144,24 +149,24 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
               </Text>
             </Col>
             <Col className="flex align-items-center gap-3">
-              <Link id={value} href="#" {...buttonProps}>
+              <Link id={getId(value, 1)} href="#" {...buttonProps}>
                 Create
               </Link>
-              <Link id={value} href="#" {...buttonProps} iconRight="arrow_right_alt">
+              <Link id={getId(value, 2)} href="#" {...buttonProps} iconRight="arrow_right_alt">
                 Continue
               </Link>
-              <Link id={value} href="#" {...buttonProps} iconLeft="edit">
+              <Link id={getId(value, 3)} href="#" {...buttonProps} iconLeft="edit">
                 Edit
               </Link>
             </Col>
             <Col className="flex align-items-center gap-3">
-              <Link id={value} href="#" size="small" {...buttonProps}>
+              <Link id={getId(value, 4)} href="#" size="small" {...buttonProps}>
                 Create
               </Link>
-              <Link id={value} href="#" size="small" {...buttonProps} iconRight="arrow_right_alt">
+              <Link id={getId(value, 5)} href="#" size="small" {...buttonProps} iconRight="arrow_right_alt">
                 Continue
               </Link>
-              <Link id={value} href="#" size="small" {...buttonProps} iconLeft="edit">
+              <Link id={getId(value, 6)} href="#" size="small" {...buttonProps} iconLeft="edit">
                 Edit
               </Link>
             </Col>
@@ -349,5 +354,90 @@ export const LinkIconFlexed: Story = {
         </Link>
       </Col>
     </Row>
+  ),
+};
+
+const withIdPrefix = (story: StoryObj<TemplateMultipleProps>, idPrefix: string) => ({
+  ...story,
+  args: { ...story.args, idPrefix },
+});
+
+const visualTestVariants: { label: string; inverted?: boolean; story: StoryObj<TemplateMultipleProps> }[] = [
+  { label: 'Default underlined', story: withIdPrefix(DefaultUnderlined, 'vt-underlined') },
+  { label: 'Default no underline', story: withIdPrefix(DefaultNoUnderline, 'vt-no-underline') },
+  { label: 'Inverted underline', inverted: true, story: withIdPrefix(InvertedUnderline, 'vt-inverted-underline') },
+  {
+    label: 'Inverted no underline',
+    inverted: true,
+    story: withIdPrefix(InvertedNoUnderline, 'vt-inverted-no-underline'),
+  },
+  { label: 'As primary button', story: withIdPrefix(AsPrimaryButton, 'vt-primary-button') },
+];
+
+/** Chromatic snapshot for Link: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
+    pseudo: {
+      hover: '[id^="vt-"][id*="-Hover-"]',
+      active: '[id^="vt-"][id*="-Active-"]',
+      focusVisible: '[id^="vt-"][id*="-Focus-"]',
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <VisualTestStory story={Sizes} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Colors</Text>
+        <VisualTestStory story={Colors} />
+      </VerticalSpacing>
+      {visualTestVariants.map(({ label, inverted, story }) =>
+        inverted ? (
+          <Card key={label} background="brand-primary" borderless>
+            <Card.Content>
+              <VerticalSpacing size={0.5}>
+                <Text modifiers="bold" color="white">
+                  {label}
+                </Text>
+                <VisualTestStory story={story} />
+              </VerticalSpacing>
+            </Card.Content>
+          </Card>
+        ) : (
+          <VerticalSpacing key={label} size={0.5}>
+            <Text modifiers="bold">{label}</Text>
+            <VisualTestStory story={story} />
+          </VerticalSpacing>
+        )
+      )}
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Custom component</Text>
+        <VisualTestStory story={CustomComponent} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">No style link</Text>
+        <VisualTestStory story={NoStyleLink} component={Link} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Full width</Text>
+        <VisualTestStory story={FullWidth} component={Link} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Long text icon inline</Text>
+        <VisualTestStory story={LongTextIconInline} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Link icon flexed</Text>
+        <VisualTestStory story={LinkIconFlexed} />
+      </VerticalSpacing>
+    </VerticalSpacing>
   ),
 };
