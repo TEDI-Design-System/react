@@ -1,3 +1,15 @@
+# [21.0.0-rc.32](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.31...react-21.0.0-rc.32) (2026-11-25)
+
+
+### Bug Fixes
+
+* **sheet:** align header defaults, button gap and collapsed overlay with Figma [#1188](https://github.com/TEDI-Design-System/react/issues/1188) ([#1194](https://github.com/TEDI-Design-System/react/issues/1194)) ([6f007a7](https://github.com/TEDI-Design-System/react/commit/6f007a7852984c13df2a26cf71e41f155e479bb8))
+
+
+### BREAKING CHANGES
+
+* **sheet:** the header defaults changed. Set `variant="brand"` and `closeButton` to keep the previous look.
+
 # [21.0.0-rc.31](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.30...react-21.0.0-rc.31) (2026-11-25)
 
 
