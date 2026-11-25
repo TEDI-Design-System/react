@@ -1,5 +1,7 @@
 import throttle from 'lodash-es/throttle';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+
+import { StyleContext } from '../../providers/style-provider/style-provider';
 
 type ScrollState = {
   scrollTop: number;
@@ -15,10 +17,14 @@ const INITIAL_SCROLL: ScrollState = {
 
 export const useScroll = (element?: HTMLElement) => {
   const [scroll, setScroll] = useState<ScrollState>(INITIAL_SCROLL);
+  const { scrollContainer } = useContext(StyleContext);
+  const container = element ?? scrollContainer;
 
   useEffect(() => {
-    const target = element ?? document.documentElement;
-    const eventTarget = element ?? window;
+    if (container === null) return undefined;
+
+    const target = container ?? document.documentElement;
+    const eventTarget = container ?? window;
 
     const updateScroll = () => {
       setScroll({
@@ -37,7 +43,7 @@ export const useScroll = (element?: HTMLElement) => {
       eventTarget.removeEventListener('scroll', listenToScroll);
       listenToScroll.cancel();
     };
-  }, [element]);
+  }, [container]);
 
   return scroll;
 };

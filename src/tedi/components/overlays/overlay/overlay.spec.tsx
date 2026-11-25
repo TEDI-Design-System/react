@@ -3,8 +3,10 @@ import { useContext } from 'react';
 
 import * as helpers from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
+import { StyleProvider } from '../../../providers/style-provider/style-provider';
 import { Icon } from '../../base/icon/icon';
 import Button from '../../buttons/button/button';
+import { Modal } from '../modal/modal';
 import Overlay, { OverlayContext } from './overlay';
 
 jest.mock('../../../providers/label-provider', () => ({
@@ -213,6 +215,133 @@ describe('Overlay component', () => {
 
       expect(document.documentElement.style.overflow).toBe('');
       expect(document.body.style.overflow).toBe('');
+    });
+
+    it('should lock the StyleProvider scroll container instead of the document', async () => {
+      const scrollContainer = document.createElement('div');
+
+      render(
+        <StyleProvider scrollContainer={scrollContainer}>
+          <Overlay scrollLock>
+            <Overlay.Trigger>Trigger</Overlay.Trigger>
+            <Overlay.Content>Content</Overlay.Content>
+          </Overlay>
+        </StyleProvider>
+      );
+
+      const trigger = screen.getByText('Trigger');
+
+      await act(async () => {
+        fireEvent.mouseEnter(trigger);
+      });
+
+      expect(scrollContainer.style.overflow).toBe('hidden');
+      expect(document.documentElement.style.overflow).toBe('');
+      expect(document.body.style.overflow).toBe('');
+
+      await act(async () => {
+        fireEvent.mouseLeave(trigger);
+      });
+
+      expect(scrollContainer.style.overflow).toBe('');
+    });
+
+    it('should release the document lock when the scroll container is set while the overlay is open', () => {
+      const scrollContainer = document.createElement('div');
+      const overlay = (
+        <Overlay open onToggle={jest.fn()} scrollLock>
+          <Overlay.Trigger>Trigger</Overlay.Trigger>
+          <Overlay.Content>Content</Overlay.Content>
+        </Overlay>
+      );
+
+      const { rerender, unmount } = render(<StyleProvider>{overlay}</StyleProvider>);
+      expect(document.documentElement.style.overflow).toBe('hidden');
+
+      rerender(<StyleProvider scrollContainer={scrollContainer}>{overlay}</StyleProvider>);
+      expect(document.documentElement.style.overflow).toBe('');
+      expect(scrollContainer.style.overflow).toBe('hidden');
+
+      unmount();
+      expect(scrollContainer.style.overflow).toBe('');
+      expect(document.documentElement.style.overflow).toBe('');
+    });
+
+    it('should keep the document locked until the last overlapping overlay closes', () => {
+      const overlay = (open: boolean) => (
+        <Overlay open={open} onToggle={jest.fn()} scrollLock>
+          <Overlay.Trigger>Trigger</Overlay.Trigger>
+          <Overlay.Content>Content</Overlay.Content>
+        </Overlay>
+      );
+      const Both = ({ a, b }: { a: boolean; b: boolean }) => (
+        <>
+          {overlay(a)}
+          {overlay(b)}
+        </>
+      );
+
+      const { rerender } = render(<Both a b={false} />);
+      rerender(<Both a b />);
+      expect(document.documentElement.style.overflow).toBe('hidden');
+
+      rerender(<Both a={false} b />);
+      expect(document.documentElement.style.overflow).toBe('hidden');
+
+      rerender(<Both a={false} b={false} />);
+      expect(document.documentElement.style.overflow).toBe('');
+    });
+
+    it('should release the document lock when the overlay unmounts while open', () => {
+      const { unmount } = render(
+        <Overlay open onToggle={jest.fn()} scrollLock>
+          <Overlay.Trigger>Trigger</Overlay.Trigger>
+          <Overlay.Content>Content</Overlay.Content>
+        </Overlay>
+      );
+      expect(document.documentElement.style.overflow).toBe('hidden');
+
+      unmount();
+      expect(document.documentElement.style.overflow).toBe('');
+    });
+
+    describe.each([
+      ['modal then overlay', ['modal', 'overlay']],
+      ['overlay then modal', ['overlay', 'modal']],
+    ])('with a modal and a scroll-locking overlay closed in the order %s', (_name, closeOrder) => {
+      it('leaves the body scrollable once both are closed', () => {
+        Object.defineProperty(document.documentElement, 'scrollHeight', {
+          value: window.innerHeight + 100,
+          configurable: true,
+        });
+
+        const Harness = ({ modalOpen, overlayOpen }: { modalOpen: boolean; overlayOpen: boolean }) => (
+          <>
+            <Modal open={modalOpen} onToggle={jest.fn()}>
+              <Modal.Content>
+                <Modal.Header title="Title" />
+              </Modal.Content>
+            </Modal>
+            <Overlay open={overlayOpen} onToggle={jest.fn()} scrollLock>
+              <Overlay.Trigger>Trigger</Overlay.Trigger>
+              <Overlay.Content>Content</Overlay.Content>
+            </Overlay>
+          </>
+        );
+
+        const view = render(<Harness modalOpen overlayOpen={false} />);
+        view.rerender(<Harness modalOpen overlayOpen />);
+
+        const state = { modalOpen: true, overlayOpen: true };
+        closeOrder.forEach((name) => {
+          if (name === 'modal') state.modalOpen = false;
+          else state.overlayOpen = false;
+          view.rerender(<Harness {...state} />);
+        });
+
+        expect(document.body.style.overflow).toBe('');
+        expect(document.documentElement.style.overflow).toBe('');
+      });
     });
 
     it('should lock scrolling and not modify body overflow when page has no scrollbar', async () => {

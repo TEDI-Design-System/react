@@ -23,10 +23,19 @@ export interface StyleProviderProps {
    * @default 'tedi'
    */
   cacheKey?: string;
+  /**
+   * Element that scrolls when the application does not scroll the host document, for example a micro frontend
+   * with its own scroll area. Scroll locking of overlays (Overlay, Modal, Sheet) and `useScroll` use it
+   * instead of the document. It is separate from `containerElement`, even when both are the same element.
+   * Pass `null` while the element is still mounting: scroll locking and scroll tracking wait until it is set.
+   * When omitted, the host document is used.
+   */
+  scrollContainer?: HTMLElement | null;
 }
 
 export interface IStyleContext {
   containerElement?: HTMLElement | null;
+  scrollContainer?: HTMLElement | null;
 }
 
 export const StyleContext = React.createContext<IStyleContext>({});
@@ -43,8 +52,8 @@ export const usePortalRoot = (): HTMLElement | null | undefined => {
 };
 
 export const StyleProvider = (props: StyleProviderProps): JSX.Element => {
-  const { children, containerElement, cacheKey = 'tedi' } = props;
-  const value = React.useMemo(() => ({ containerElement }), [containerElement]);
+  const { children, containerElement, scrollContainer, cacheKey = 'tedi' } = props;
+  const value = React.useMemo(() => ({ containerElement, scrollContainer }), [containerElement, scrollContainer]);
   const inheritedEmotionCache = useEmotionCache();
   const scopedEmotionCache = React.useMemo(
     () => (containerElement ? createCache({ key: cacheKey, container: containerElement }) : null),
