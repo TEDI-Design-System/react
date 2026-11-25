@@ -142,6 +142,16 @@ describe('TableCard', () => {
       expect(screen.getByRole('button', { name: 'Broneering 22.03' })).toBeInTheDocument();
     });
 
+    it.each(['button', 'combobox', 'link'])(
+      'does not toggle when an element with role %s in the end slot is clicked',
+      (role) => {
+        render(<TableCard rows={rows} title="Hambaarst" collapsible endSlot={<div role={role}>Valik</div>} />);
+
+        fireEvent.click(screen.getByText('Valik'));
+        expect(screen.getByRole('button', { name: /Hambaarst/ })).toHaveAttribute('aria-expanded', 'true');
+      }
+    );
+
     it('respects controlled `open` and calls onOpenChange without self-toggling', () => {
       const onOpenChange = jest.fn();
       render(
