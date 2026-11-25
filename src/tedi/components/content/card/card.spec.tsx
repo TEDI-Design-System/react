@@ -57,6 +57,18 @@ describe('Card Component', () => {
     expect(contextInfo).toBeInTheDocument();
   });
 
+  it('applies the Card backgroundColor to CardContent', () => {
+    render(
+      <Card backgroundColor="secondary">
+        <CardContent>Content</CardContent>
+      </Card>
+    );
+
+    const content = screen.getByText('Content');
+    expect(content).toHaveClass('tedi-card--background--secondary');
+    expect(content).not.toHaveClass('tedi-card--background--primary');
+  });
+
   it('applies border styles correctly', () => {
     render(
       <Card border="primary">
