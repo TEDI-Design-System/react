@@ -1179,6 +1179,23 @@
       ]
     },
     {
+      "id": "form/rating/rating",
+      "name": "Rating",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/rating/rating",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Accessible rating scale (native radiogroup) with star, number, or icon fill; supports controlled/uncontrolled, a read-only summary/scale variant, and breakpoint-aware orientation.",
+      "keyProps": [
+        "label",
+        "type",
+        "value",
+        "onChange",
+        "count"
+      ]
+    },
+    {
       "id": "layout/sidenav",
       "name": "SideNav",
       "category": "layout",

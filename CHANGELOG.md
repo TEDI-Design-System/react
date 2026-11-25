@@ -1,3 +1,37 @@
+# [21.0.0-rc.26](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.25...react-21.0.0-rc.26) (2026-11-24)
+
+
+### Bug Fixes
+
+* **sheet:** use a white handle on the brand header and align the stories [#1166](https://github.com/TEDI-Design-System/react/issues/1166) ([#1169](https://github.com/TEDI-Design-System/react/issues/1169)) ([8784c8e](https://github.com/TEDI-Design-System/react/commit/8784c8ee0ea06295520724a892fae52bd7e197e3))
+
+# [21.0.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.24...react-21.0.0-rc.25) (2026-11-24)
+
+
+### Bug Fixes
+
+* **calendar:** Shorten Day Labels [#1131](https://github.com/TEDI-Design-System/react/issues/1131) ([#1143](https://github.com/TEDI-Design-System/react/issues/1143)) ([68c8b11](https://github.com/TEDI-Design-System/react/commit/68c8b1144210a369b93ad8f31803f4a7351cfe6c))
+
+# [21.0.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.23...react-21.0.0-rc.24) (2026-11-20)
+
+
+### Features
+
+* **button:** remove large size, move it into search and category-search [#1113](https://github.com/TEDI-Design-System/react/issues/1113) ([#1160](https://github.com/TEDI-Design-System/react/issues/1160)) ([5eb169f](https://github.com/TEDI-Design-System/react/commit/5eb169fee5a501c9715eef8d5ed36acf93c5c983))
+
+
+### BREAKING CHANGES
+
+* **button:** Button `size` no longer accepts "large". Search's `button`
+prop no longer accepts `size`; Search sets the button size from its own `size`.
+
+# [21.0.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.22...react-21.0.0-rc.23) (2026-11-19)
+
+
+### Features
+
+* **rating:** new TEDI-Ready component [#531](https://github.com/TEDI-Design-System/react/issues/531) ([#958](https://github.com/TEDI-Design-System/react/issues/958)) ([3cf4193](https://github.com/TEDI-Design-System/react/commit/3cf419321d1d04da092a8f53ba24e94fdb01c8a2))
+
 # [21.0.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.21...react-21.0.0-rc.22) (2026-11-19)
 
 

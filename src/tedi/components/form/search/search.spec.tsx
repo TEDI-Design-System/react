@@ -122,6 +122,56 @@ describe('Search component', () => {
   });
 });
 
+describe('Search button size', () => {
+  it('uses the large icon size on the button when the search is large', () => {
+    render(<Search id="search-large" label="Search" size="large" button={{ icon: 'search', 'aria-label': 'Otsi' }} />);
+    expect(screen.getByRole('button', { name: 'Otsi' }).querySelector('.tedi-icon--size-24')).toBeInTheDocument();
+  });
+
+  it('keeps an explicit icon size given as an object when the search is large', () => {
+    render(
+      <Search
+        id="search-large-object"
+        label="Search"
+        size="large"
+        button={{ iconLeft: { name: 'search', size: 18 }, children: 'Otsi' }}
+      />
+    );
+    const button = screen.getByRole('button', { name: 'Otsi' });
+    expect(button.querySelector('.tedi-icon--size-18')).toBeInTheDocument();
+    expect(button.querySelector('.tedi-icon--size-24')).not.toBeInTheDocument();
+  });
+
+  it('applies the large icon size to an icon and keeps its size when set in a breakpoint', () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = jest.fn().mockImplementation((query: string) => ({
+      matches: /min-width: (36|48)rem/.test(query),
+      media: query,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+    }));
+    render(
+      <Search
+        id="search-large-breakpoint"
+        label="Search"
+        size="large"
+        button={{ 'aria-label': 'Otsi', md: { icon: 'search', size: 'small' } } as SearchProps['button']}
+      />
+    );
+    window.matchMedia = originalMatchMedia;
+    const button = screen.getByRole('button', { name: 'Otsi' });
+    expect(button.querySelector('.tedi-icon--size-24')).toBeInTheDocument();
+    expect(button).not.toHaveClass('tedi-btn--small');
+  });
+
+  it('keeps the default icon size on the button when the search is not large', () => {
+    render(<Search id="search-default" label="Search" button={{ icon: 'search', 'aria-label': 'Otsi' }} />);
+    expect(screen.getByRole('button', { name: 'Otsi' }).querySelector('.tedi-icon--size-18')).toBeInTheDocument();
+  });
+});
+
 describe('Search autocomplete (suggestions)', () => {
   const OPTIONS: SearchSuggestion[] = [
     { value: 'mari', label: 'Mari Maasikas' },
