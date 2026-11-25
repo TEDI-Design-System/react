@@ -1,9 +1,10 @@
-import { FloatingFocusManager, FloatingOverlay, FloatingPortal } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingOverlay } from '@floating-ui/react';
 import cn from 'classnames';
 import { ComponentProps, CSSProperties, ReactNode } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../../helpers';
 import { useLabels } from '../../../../providers/label-provider';
+import { StylePortal } from '../../../../providers/style-provider/style-portal';
 import styles from '../modal.module.scss';
 import { useModalContext } from '../modal-context';
 
@@ -161,7 +162,7 @@ export const ModalContent = (props: ModalContentProps): JSX.Element | null => {
   const fullscreenOverlayClass = fullscreen === 'edge' ? styles['tedi-modal__overlay--fullscreen-edge'] : undefined;
 
   return (
-    <FloatingPortal>
+    <StylePortal>
       <FloatingOverlay
         lockScroll={lockScroll}
         className={cn(
@@ -202,7 +203,7 @@ export const ModalContent = (props: ModalContentProps): JSX.Element | null => {
           </div>
         </FloatingFocusManager>
       </FloatingOverlay>
-    </FloatingPortal>
+    </StylePortal>
   );
 };
 

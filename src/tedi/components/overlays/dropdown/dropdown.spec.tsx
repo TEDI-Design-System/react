@@ -2,6 +2,7 @@ import * as FloatingUI from '@floating-ui/react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React, { ComponentProps } from 'react';
 
+import { StyleProvider } from '../../../providers/style-provider/style-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown, DropdownProps } from './dropdown';
 import styles from './dropdown.module.scss';
@@ -330,5 +331,36 @@ describe('Dropdown component', () => {
     });
     fireEvent.click(screen.getByText('Open menu'));
     expect(document.querySelector(`.${styles['tedi-dropdown__scroll']}`)).toHaveStyle({ maxHeight: '20rem' });
+  });
+});
+
+describe('Dropdown portal root', () => {
+  it('renders the content into the StyleProvider container element', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    render(
+      <StyleProvider containerElement={container}>
+        <Dropdown>
+          <Dropdown.Trigger>
+            <span>Open menu</span>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item index={0}>Item</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </StyleProvider>
+    );
+    fireEvent.click(screen.getByText('Open menu'));
+
+    expect(container).toContainElement(screen.getByText('Item'));
+    container.remove();
+  });
+
+  it('renders the content into document.body without a container element', () => {
+    renderDropdown({ children: <span>Open menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>);
+    fireEvent.click(screen.getByText('Open menu'));
+
+    expect(document.body).toContainElement(screen.getByText('Item'));
   });
 });

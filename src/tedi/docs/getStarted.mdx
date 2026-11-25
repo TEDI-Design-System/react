@@ -88,6 +88,8 @@ instead of `document.head`.
 
 - `containerElement` can be `null` while the element is still mounting, for example state set by a
   callback ref. Portals wait for it instead of rendering into `document.body`.
+- `Select` menus are positioned with `position: fixed` inside the container, so the container and its
+  ancestors must not have a CSS `transform`.
 - `cacheKey` is the prefix of the Emotion class names (default `tedi`). Use a different key for each
   application that is on the same page.
 - The library's stylesheet still has to be added to the shadow root yourself, because it is loaded
