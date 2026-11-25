@@ -1,3 +1,10 @@
+# [21.0.0-rc.31](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.30...react-21.0.0-rc.31) (2026-11-25)
+
+
+### Features
+
+* **skip-links:** add new TEDI-Ready component [#1021](https://github.com/TEDI-Design-System/react/issues/1021) ([#1101](https://github.com/TEDI-Design-System/react/issues/1101)) ([b99f01e](https://github.com/TEDI-Design-System/react/commit/b99f01ee8a4564497c69f352059438839f4356e3))
+
 # [21.0.0-rc.30](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.29...react-21.0.0-rc.30) (2026-11-25)
 
 
