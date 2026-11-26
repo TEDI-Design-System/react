@@ -247,11 +247,8 @@ export const Dropdown = (props: DropdownProps) => {
                 },
                 ...(navigation
                   ? { id: contentId }
-                  : {
-                      role: 'menu',
-                      'aria-orientation': 'vertical',
-                      'aria-activedescendant': activeIndex !== null ? `dropdown-item-${activeIndex}` : undefined,
-                    }),
+                  : // No aria-activedescendant: list navigation moves real focus onto the items.
+                    { role: 'menu', 'aria-orientation': 'vertical' }),
               })}
               data-placement={placement}
               data-state={open ? 'open' : 'closed'}
