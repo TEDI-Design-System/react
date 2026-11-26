@@ -22,13 +22,7 @@ import Check from '../form/check/check';
 import Status from '../status/status';
 import Tag from '../tag/tag';
 import { CustomExpandRowExample } from './components/examples/custom-expand-row';
-import {
-  CustomizeTableCell,
-  getExpandColumn,
-  getRowSelectionColumn,
-  useDefaultPagination,
-  useDefaultSorting,
-} from './index';
+import { CustomizeTableCell, getExpandColumn, getRowSelectionColumn } from './index';
 import Table from './table';
 import { TableProps } from './table.types';
 
@@ -419,27 +413,6 @@ export const WithClickableRows: Story = {
     columns: clickableRowColumns,
     id: 'clickable-rows-table',
   },
-};
-
-export const ServerSidePaginationAndSorting = (): JSX.Element => {
-  const { page, pagination, setPagination, size } = useDefaultPagination();
-  const { sorting, setSorting } = useDefaultSorting();
-
-  const currentData = data(500);
-  const getData = React.useMemo(() => currentData.slice((page - 1) * size, page * size), [currentData, page, size]);
-
-  return (
-    <Table<Person>
-      columns={columns}
-      data={getData}
-      id="table-pagination"
-      pagination={pagination}
-      sorting={sorting}
-      totalRows={currentData.length}
-      onPaginationChange={setPagination}
-      onSortingChange={setSorting}
-    />
-  );
 };
 
 export const Small: Story = {

@@ -51,7 +51,7 @@ InternalAnchor.displayName = 'Anchor';
  * By default, the navigation is performed with a native `<a>` element. You can customize it to use your own router. For instance, using Next.js's Link or react-router.<br />
  * Inherits all props from the component passed into `as`. If `as` is omitted, then the default is native `<a>` tag
  *
- * To allow Customized Anchor usage as direct children of Header you need to add displayName to it. <a href="/docs/components-layout-header-header-overview--header-overview#settings">See more.</a>
+ * For a custom Anchor wrapper used directly inside Community Header, set `AppAnchor.displayName = 'Anchor'`.
  * @deprecated Use `Link` from `@tedi-design-system/react/tedi` instead.
  */
 
