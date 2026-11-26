@@ -722,10 +722,6 @@ export const OpenItemsForVisualTest: Story = {
           // `data-floating-ui-focus-guard` spans that carry tabindex="0" with aria-hidden="true"
           // by its own design. Pre-existing in every open dropdown.
           { id: 'aria-hidden-focus', enabled: false },
-          // `aria-valid-attr-value`: the open menu sets aria-activedescendant="dropdown-item-N"
-          // once an item takes focus, but no `Dropdown.Item` renders that id. A component bug,
-          // reported separately; these are the first stories that render a focused open menu.
-          { id: 'aria-valid-attr-value', enabled: false },
         ],
       },
     },
@@ -821,10 +817,6 @@ export const OpenChromeForVisualTest: Story = {
           // `data-floating-ui-focus-guard` spans that carry tabindex="0" with aria-hidden="true"
           // by its own design. Pre-existing in every open dropdown.
           { id: 'aria-hidden-focus', enabled: false },
-          // `aria-valid-attr-value`: the open menu sets aria-activedescendant="dropdown-item-N"
-          // once an item takes focus, but no `Dropdown.Item` renders that id. A component bug,
-          // reported separately; these are the first stories that render a focused open menu.
-          { id: 'aria-valid-attr-value', enabled: false },
         ],
       },
     },
@@ -909,10 +901,6 @@ export const OpenControlItemsForVisualTest: Story = {
           // `data-floating-ui-focus-guard` spans that carry tabindex="0" with aria-hidden="true"
           // by its own design. Pre-existing in every open dropdown.
           { id: 'aria-hidden-focus', enabled: false },
-          // `aria-valid-attr-value`: the open menu sets aria-activedescendant="dropdown-item-N"
-          // once an item takes focus, but no `Dropdown.Item` renders that id. A component bug,
-          // reported separately; these are the first stories that render a focused open menu.
-          { id: 'aria-valid-attr-value', enabled: false },
           // `aria-required-children`: with `closeOnSelect={false}` the item wraps the control in a
           // `div` without a menu item role. Moving the role and focus onto the control is #1006.
           { id: 'aria-required-children', enabled: false },
