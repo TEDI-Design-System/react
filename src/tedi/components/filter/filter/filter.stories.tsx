@@ -991,6 +991,7 @@ export const RestrictedHeight: Story = {
           showClear
           maxHeight={280}
         />
+        <Filter text="Raviasutus (single)" options={manyOptions} defaultSelectedValue="4" maxHeight={280} />
       </div>
     );
   },

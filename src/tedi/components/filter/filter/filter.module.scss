@@ -245,4 +245,10 @@
     min-height: 0;
     overflow-y: auto;
   }
+
+  // Dropdown items are buttons; they stack only inside a flex column, like the dropdown's own scroll container.
+  &__option-list {
+    display: flex;
+    flex-direction: column;
+  }
 }
