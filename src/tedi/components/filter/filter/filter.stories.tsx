@@ -975,6 +975,17 @@ export const Examples: Story = {
  * while the search input and "Clear selection" stay pinned to the top and bottom of the dropdown.
  */
 export const RestrictedHeight: Story = {
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          // `aria-hidden-focus`: @floating-ui/react wraps the open dropdown in `data-floating-ui-focus-guard`
+          // spans with tabindex="0" and aria-hidden="true" by its own design, as in the open Dropdown stories.
+          { id: 'aria-hidden-focus', enabled: false },
+        ],
+      },
+    },
+  },
   // Opens the single-select filter, so Chromatic captures its option list stacked in a column.
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
