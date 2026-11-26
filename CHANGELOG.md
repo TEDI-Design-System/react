@@ -1,3 +1,10 @@
+# [21.0.0-rc.34](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.33...react-21.0.0-rc.34) (2026-11-26)
+
+
+### Features
+
+* **skills:** add tedi-react-migrate consumer skill [#1165](https://github.com/TEDI-Design-System/react/issues/1165) ([#1167](https://github.com/TEDI-Design-System/react/issues/1167)) ([a1b2bc6](https://github.com/TEDI-Design-System/react/commit/a1b2bc67933027d61dc500c28ca60c9bdd1a97dc))
+
 # [21.0.0-rc.33](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.32...react-21.0.0-rc.33) (2026-11-25)
 
 
