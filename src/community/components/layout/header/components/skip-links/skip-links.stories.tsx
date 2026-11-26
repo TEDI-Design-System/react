@@ -1,0 +1,22 @@
+import { Meta, StoryObj } from '@storybook/react-vite';
+
+import SkipLinks from './skip-links';
+
+const meta: Meta<typeof SkipLinks> = {
+  component: SkipLinks,
+  title: 'Community/Layout/SkipLinks',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof SkipLinks>;
+
+export const Default: Story = {
+  args: {
+    links: [{ children: 'Skip to main content', href: '#main-content' }],
+  },
+};
