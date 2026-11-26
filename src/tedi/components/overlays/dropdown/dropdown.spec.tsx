@@ -167,7 +167,7 @@ describe('Dropdown component', () => {
     expect(dropdownContainer).toHaveClass(styles['tedi-dropdown--tree']);
   });
 
-  it('sets aria-activedescendant when activeIndex is set', () => {
+  it('leaves aria-activedescendant off the menu, since focus moves onto the items', () => {
     renderDropdown(
       { children: <span>Trigger</span> },
       <>
@@ -178,7 +178,7 @@ describe('Dropdown component', () => {
     );
 
     fireEvent.click(screen.getByText('Trigger'));
-    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-0');
+    expect(screen.getByRole('menu')).not.toHaveAttribute('aria-activedescendant');
   });
 
   it('focuses the item at defaultActiveIndex on open', () => {
@@ -193,7 +193,8 @@ describe('Dropdown component', () => {
     );
 
     fireEvent.click(screen.getByText('Trigger'));
-    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-2');
+    expect(screen.getByRole('menuitem', { name: 'Third' })).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('menuitem', { name: 'First' })).toHaveAttribute('tabindex', '-1');
   });
 
   it('resets the active index when the dropdown closes', () => {
@@ -208,13 +209,14 @@ describe('Dropdown component', () => {
 
     // Open → close → reopen. Ensure the seeded index is reapplied cleanly.
     fireEvent.click(screen.getByText('Trigger'));
-    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-1');
+    expect(screen.getByRole('menuitem', { name: 'Second' })).toHaveAttribute('tabindex', '0');
 
     fireEvent.click(screen.getByText('Trigger'));
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Trigger'));
-    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-1');
+    expect(screen.getByRole('menuitem', { name: 'Second' })).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('menuitem', { name: 'First' })).toHaveAttribute('tabindex', '-1');
   });
 
   it('exposes asChild buttons as focusable menuitems with roving tabindex', () => {
@@ -243,7 +245,6 @@ describe('Dropdown component', () => {
     expect(actionA).toHaveAttribute('tabindex', '0');
     expect(actionB).toHaveAttribute('tabindex', '-1');
     expect(result).toHaveAttribute('tabindex', '-1');
-    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-1');
   });
 
   it('applies pixel width when width is a number', () => {
