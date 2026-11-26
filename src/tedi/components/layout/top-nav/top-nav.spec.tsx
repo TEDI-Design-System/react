@@ -23,11 +23,11 @@ describe('TopNav', () => {
 
   it('renders a nav landmark with the supplied aria-label', () => {
     render(
-      <TopNav ariaLabel="Primary navigation">
+      <TopNav ariaLabel="Primary">
         <TopNav.Item href="/">Dashboard</TopNav.Item>
       </TopNav>
     );
-    expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
   });
 
   it('renders an <li> per TopNav.Item and ignores non-item children', () => {
@@ -216,12 +216,12 @@ describe('TopNav', () => {
   it('falls through to the shared Sidenav mobile drawer below the breakpoint', () => {
     setBreakpoint('sm');
     render(
-      <TopNav ariaLabel="Primary navigation" isMobileOpen>
+      <TopNav ariaLabel="Primary" isMobileOpen>
         <TopNav.Item href="/">Home</TopNav.Item>
         <TopNav.Item href="/docs">Docs</TopNav.Item>
       </TopNav>
     );
-    expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Docs' })).toBeInTheDocument();
   });
@@ -359,6 +359,36 @@ describe('TopNav', () => {
     expect(screen.getByRole('link', { name: 'Item' })).toBeInTheDocument();
     fireEvent.mouseDown(screen.getByRole('button', { name: 'Outside' }));
     expect(screen.queryByRole('link', { name: 'Item' })).not.toBeInTheDocument();
+  });
+
+  it.each(['open', 'closed'] as const)('keeps the submenu open on a click inside a %s shadow root', (mode) => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const shadowContainer = document.createElement('div');
+    host.attachShadow({ mode }).appendChild(shadowContainer);
+
+    const { getByRole } = render(
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
+          isActive
+          submenu={
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+            </TopNav.Group>
+          }
+        >
+          Family
+        </TopNav.Item>
+      </TopNav>,
+      { container: shadowContainer }
+    );
+
+    fireEvent.mouseDown(getByRole('link', { name: 'Item' }));
+    expect(getByRole('link', { name: 'Item' })).toBeInTheDocument();
+
+    fireEvent.mouseDown(document.body);
+    expect(shadowContainer.querySelector('a[href="/m"]')).not.toBeInTheDocument();
+    host.remove();
   });
 
   it('links the toggle button to its submenu via matching id / aria-controls', () => {

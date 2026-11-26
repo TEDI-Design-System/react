@@ -2,7 +2,8 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { useEffect, useState } from 'react';
 
-import type { TableState } from './table';
+import { StyleProvider } from '../../../providers/style-provider/style-provider';
+import type { TableColumnMeta, TableState } from './table';
 import { groupRowSpan, Table } from './table';
 import { useTableContext } from './table-context';
 
@@ -18,6 +19,7 @@ jest.mock('../../../providers/printing-provider/printing-provider', () => ({
 // 'lg' so the existing assertions on the numbered list keep working;
 // breakpoint-specific behaviour is covered by Pagination's own tests.
 jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
   useBreakpoint: () => 'lg',
   isBreakpointBelow: () => false,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,14 +31,14 @@ jest.mock('../../../providers/label-provider', () => ({
     getLabel: (key: string, ...args: unknown[]) => {
       switch (key) {
         case 'pagination.title':
-          return 'Pagination';
+          return 'Pages';
         case 'pagination.prev-page':
           return 'Previous page';
         case 'pagination.next-page':
           return 'Next page';
         case 'pagination.page': {
-          const [page, isCurrent] = args as [number, boolean];
-          return isCurrent ? `Current page, page ${page}` : `Go to page ${page}`;
+          const [page] = args as [number];
+          return `Page ${page}`;
         }
         case 'pagination.results': {
           const [count] = args as [number];
@@ -50,12 +52,38 @@ jest.mock('../../../providers/label-provider', () => ({
         }
         case 'table.row-details':
           return 'Row details';
+        case 'table.filter': {
+          const [columnLabel] = args as [string | undefined];
+          return `Filter ${columnLabel}`;
+        }
+        case 'table.filter-applied':
+          return 'applied';
+        case 'table.filter-apply':
+          return 'Apply';
+        case 'table.filter-clear':
+          return 'Clear';
+        case 'table.filter-cancel':
+          return 'Cancel';
+        case 'table.sort': {
+          const [direction, columnLabel] = args as ['asc' | 'desc' | false, string | undefined];
+          return `Sort by ${columnLabel} ${
+            direction === 'asc' ? 'descending' : direction === 'desc' ? 'off' : 'ascending'
+          }`;
+        }
         case 'table.drag-column': {
           const [columnLabel] = args as [string];
           return `Drag column ${columnLabel}`;
         }
         case 'table.drag-row':
           return 'Drag row';
+        case 'table.select-all':
+          return 'Select all rows';
+        case 'table.select-row':
+          return 'Select row';
+        case 'table.reorder.instructions':
+          return 'Column reorder instructions';
+        case 'table.row-reorder.instructions':
+          return 'Row reorder instructions';
         default:
           return key;
       }
@@ -115,7 +143,7 @@ describe('Table', () => {
     expect(nameHeader).toHaveAttribute('aria-label', 'Name');
   });
 
-  it('falls back the leaf header accessible name to the column id when no label is provided', () => {
+  it('names a custom header from its content, not the column id, when no label is provided', () => {
     const customColumns: ColumnDef<Person>[] = [
       {
         id: 'name',
@@ -134,8 +162,8 @@ describe('Table', () => {
 
     render(<Table<Person> id="t-fallback" data={data} columns={customColumns} />);
 
-    const nameHeader = screen.getByRole('columnheader', { name: 'name' });
-    expect(nameHeader).toHaveAttribute('aria-label', 'name');
+    const nameHeader = screen.getByRole('columnheader', { name: /^Name/ });
+    expect(nameHeader).not.toHaveAttribute('aria-label');
   });
 
   it('renders the empty state when data is empty', () => {
@@ -318,7 +346,7 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Anna' })).toBeInTheDocument();
       expect(screen.queryByRole('cell', { name: 'Jüri' })).not.toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
 
       expect(screen.queryByRole('cell', { name: 'Anna' })).not.toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
@@ -353,7 +381,7 @@ describe('Table', () => {
     it('keeps the current page across data changes when autoResetPageIndex is false', () => {
       render(<EditableHarness autoResetPageIndex={false} />);
 
-      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
       expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
 
       // Same save, but the user stays on page 2 with the saved value.
@@ -378,7 +406,7 @@ describe('Table', () => {
       scroll.scrollTop = 120;
       expect(scroll.scrollTop).toBe(120);
 
-      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
 
       expect(scroll.scrollTop).toBe(0);
     });
@@ -549,6 +577,45 @@ describe('Table', () => {
       expect(checkboxes[1]).toBeChecked();
     });
 
+    it('keeps stable selection labels; state comes from checked', () => {
+      render(<Table<Person> id="t-sel-labels" data={data} columns={columns} enableRowSelection />);
+
+      const selectAll = screen.getByRole('checkbox', { name: 'Select all rows' });
+      const rowBoxes = screen.getAllByRole('checkbox', { name: 'Select row' });
+      expect(rowBoxes).toHaveLength(data.length);
+
+      fireEvent.click(selectAll);
+      expect(selectAll).toBeChecked();
+      expect(selectAll).toHaveAccessibleName('Select all rows');
+      rowBoxes.forEach((box) => expect(box).toHaveAccessibleName('Select row'));
+    });
+
+    it('names row selection controls with rowSelectionLabel', () => {
+      const { rerender } = render(
+        <Table<Person>
+          id="t-sel-custom"
+          data={data}
+          columns={columns}
+          enableRowSelection
+          rowSelectionLabel={(row) => `Select ${row.original.name}`}
+        />
+      );
+      expect(screen.getByRole('checkbox', { name: 'Select Anna' })).toBeInTheDocument();
+      expect(screen.getByRole('checkbox', { name: 'Select Jüri' })).toBeInTheDocument();
+
+      rerender(
+        <Table<Person>
+          id="t-sel-custom"
+          data={data}
+          columns={columns}
+          enableRowSelection
+          selectionMode="single"
+          rowSelectionLabel={(row) => `Select ${row.original.name}`}
+        />
+      );
+      expect(screen.getByRole('radio', { name: 'Select Anna' })).toBeInTheDocument();
+    });
+
     it('select-all toggles every row', () => {
       render(<Table<Person> id="t-sel-all" data={data} columns={columns} enableRowSelection />);
 
@@ -629,15 +696,15 @@ describe('Table', () => {
         />
       );
 
-      // Without a `LabelProvider` wrapping the render, `getLabel` returns the
-      // i18n key verbatim, which is what the accessible name resolves to.
-      const toggle = screen.getAllByRole('button', { name: /table\.expand-row/i })[0];
+      const toggle = screen.getAllByRole('button', { name: 'Row details' })[0];
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
       fireEvent.click(toggle);
 
       expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
+      expect(toggle).toHaveAccessibleName('Row details');
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
 
-      const collapse = screen.getByRole('button', { name: /table\.collapse-row/i });
-      fireEvent.click(collapse);
+      fireEvent.click(toggle);
       expect(screen.queryByText(/details for Anna/)).not.toBeInTheDocument();
     });
 
@@ -777,14 +844,28 @@ describe('Table', () => {
   });
 
   describe('accessibility', () => {
-    it('gives a blank utility header an accessible name (falls back to the column id)', () => {
+    it('names a blank header from meta.label', () => {
+      const withActions: ColumnDef<Person>[] = [
+        ...columns,
+        { id: 'actions', header: '', meta: { label: 'Tegevused' }, cell: () => <button>Edit</button> },
+      ];
+      render(<Table<Person> id="t-blank-header" data={data} columns={withActions} />);
+
+      expect(screen.getByRole('columnheader', { name: 'Tegevused' })).toBeInTheDocument();
+    });
+
+    it('leaves a blank header without meta.label unnamed instead of using the column id', () => {
       const withActions: ColumnDef<Person>[] = [
         ...columns,
         { id: 'actions', header: '', cell: () => <button>Edit</button> },
       ];
-      render(<Table<Person> id="t-blank-header" data={data} columns={withActions} />);
+      render(<Table<Person> id="t-blank-header-unnamed" data={data} columns={withActions} />);
 
-      expect(screen.getByRole('columnheader', { name: 'actions' })).toBeInTheDocument();
+      const headers = screen.getAllByRole('columnheader');
+      const actionsHeader = headers[headers.length - 1];
+      expect(actionsHeader).not.toHaveAttribute('aria-label');
+      expect(actionsHeader).toBeEmptyDOMElement();
+      expect(screen.queryByRole('columnheader', { name: 'actions' })).not.toBeInTheDocument();
     });
 
     it('names the built-in expand column header', () => {
@@ -799,6 +880,90 @@ describe('Table', () => {
 
       // `getLabel` returns the i18n key verbatim without a LabelProvider, so the resolved name is the key.
       expect(screen.getByRole('columnheader', { name: 'table.expand-column' })).toBeInTheDocument();
+    });
+
+    describe('meta.rowHeader', () => {
+      const rowHeaderColumns: ColumnDef<Person>[] = [
+        { id: 'name', header: 'Name', accessorKey: 'name', meta: { rowHeader: true } },
+        { id: 'role', header: 'Role', accessorKey: 'role' },
+      ];
+
+      it('renders the row-header column body cells as th scope=row and the rest as td', () => {
+        const { container } = render(<Table<Person> id="t-row-header" data={data} columns={rowHeaderColumns} />);
+
+        const rows = container.querySelectorAll('tbody > tr');
+        expect(rows).toHaveLength(data.length);
+        rows.forEach((row) => {
+          const [nameCell, roleCell] = Array.from(row.children);
+          expect(nameCell.tagName).toBe('TH');
+          expect(nameCell).toHaveAttribute('scope', 'row');
+          expect(nameCell).toHaveClass('tedi-table__cell');
+          expect(roleCell.tagName).toBe('TD');
+          expect(roleCell).not.toHaveAttribute('scope');
+        });
+        expect(screen.getAllByRole('rowheader').map((cell) => cell.textContent)).toEqual(['Anna', 'Jüri']);
+      });
+
+      it('keeps the row-header column header cell a column header', () => {
+        render(<Table<Person> id="t-row-header-col" data={data} columns={rowHeaderColumns} />);
+
+        expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute('scope', 'col');
+      });
+
+      it('renders every body cell as td without the option', () => {
+        render(<Table<Person> id="t-no-row-header" data={data} columns={columns} />);
+
+        expect(screen.queryAllByRole('rowheader')).toHaveLength(0);
+      });
+
+      it('keeps the select column as td', () => {
+        const { container } = render(
+          <Table<Person> id="t-row-header-sel" data={data} columns={rowHeaderColumns} enableRowSelection />
+        );
+
+        const [selectCell, nameCell] = Array.from(container.querySelector('tbody > tr')?.children ?? []);
+        expect(selectCell.tagName).toBe('TD');
+        expect(nameCell.tagName).toBe('TH');
+      });
+
+      it('gives a sticky row-header th the body-cell classes the sticky styles target', () => {
+        const { container } = render(
+          <Table<Person> id="t-row-header-sticky" data={data} columns={rowHeaderColumns} stickyFirstColumn />
+        );
+
+        expect(container.querySelector('[data-name="tedi-table"]')?.className).toContain('--sticky-first-column');
+        const nameCell = container.querySelector('tbody > tr')?.firstElementChild;
+        expect(nameCell?.tagName).toBe('TH');
+        expect(nameCell).toHaveClass('tedi-table__cell');
+        expect(nameCell).not.toHaveClass('tedi-table__header-cell');
+      });
+
+      it('renders one spanning th for a grouped row-header column', () => {
+        const grouped: Person[] = [
+          { id: 'a', name: 'Anna', role: 'Engineer' },
+          { id: 'b', name: 'Anna', role: 'Designer' },
+          { id: 'c', name: 'Bob', role: 'Designer' },
+        ];
+        const groupedColumns: ColumnDef<Person>[] = [
+          {
+            id: 'name',
+            header: 'Name',
+            accessorKey: 'name',
+            meta: { rowHeader: true, rowSpan: groupRowSpan(grouped, (row) => row.name) },
+          },
+          { id: 'role', header: 'Role', accessorKey: 'role' },
+        ];
+        const { container } = render(<Table<Person> id="t-row-header-span" data={grouped} columns={groupedColumns} />);
+
+        const rows = container.querySelectorAll('tbody > tr');
+        const rowHeaders = Array.from(rows).map((row) => row.querySelectorAll('th'));
+        expect(rowHeaders[0]).toHaveLength(1);
+        expect(rowHeaders[0][0]).toHaveAttribute('scope', 'row');
+        expect(rowHeaders[0][0]).toHaveAttribute('rowspan', '2');
+        expect(rowHeaders[1]).toHaveLength(0);
+        expect(rows[1].children).toHaveLength(1);
+        expect(rowHeaders[2][0]).not.toHaveAttribute('rowspan');
+      });
     });
 
     it('makes the scroll wrapper keyboard-focusable', () => {
@@ -842,7 +1007,7 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Alpha' })).toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Bravo' })).toBeInTheDocument();
 
-      fireEvent.click(screen.getAllByRole('button', { name: /table\.expand-row/i })[0]);
+      fireEvent.click(screen.getAllByRole('button', { name: 'Row details' })[0]);
 
       // Both children render on the same page and Bravo is NOT pushed to page 2.
       expect(screen.getByRole('cell', { name: 'Alpha-1' })).toBeInTheDocument();
@@ -862,7 +1027,7 @@ describe('Table', () => {
         />
       );
 
-      fireEvent.click(screen.getAllByRole('button', { name: /table\.expand-row/i })[0]);
+      fireEvent.click(screen.getAllByRole('button', { name: 'Row details' })[0]);
 
       // Children now occupy page slots: only the first child fits, the second
       // child and Bravo are pushed to page 2.
@@ -938,8 +1103,8 @@ describe('Table', () => {
     it('renders the pagination bar with the next button and current page marker', () => {
       render(<Table<Person> id="t-page" data={many} columns={columns} pagination={{ pageSize: 3 }} />);
 
-      expect(screen.getByRole('navigation', { name: /Pagination/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Current page, page 1/i })).toHaveAttribute('aria-current', 'page');
+      expect(screen.getByRole('navigation', { name: 'Pages' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Page 1' })).toHaveAttribute('aria-current', 'page');
       // The Table does not set `showPrevNextButtons`, so the disabled Previous arrow is
       // dropped on the first page (compact default); only the enabled Next arrow renders.
       expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
@@ -953,12 +1118,12 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Person 1' })).toBeInTheDocument();
 
       fireEvent.click(screen.getByRole('button', { name: /Next page/i }));
-      expect(screen.getByRole('button', { name: /Current page, page 2/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Page 2' })).toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Person 4' })).toBeInTheDocument();
       expect(screen.queryByRole('cell', { name: 'Person 1' })).not.toBeInTheDocument();
 
       fireEvent.click(screen.getByRole('button', { name: /Previous page/i }));
-      expect(screen.getByRole('button', { name: /Current page, page 1/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Page 1' })).toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Person 1' })).toBeInTheDocument();
     });
 
@@ -1003,7 +1168,7 @@ describe('Table', () => {
 
     it('omits the pagination bar when pagination is not enabled', () => {
       render(<Table<Person> id="t-no-page" data={data} columns={columns} />);
-      expect(screen.queryByRole('navigation', { name: /Pagination/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('navigation', { name: 'Pages' })).not.toBeInTheDocument();
     });
   });
 
@@ -1053,6 +1218,419 @@ describe('Table', () => {
       expect(cells[0]).toHaveTextContent('Charlie');
       expect(cells[1]).toHaveTextContent('Alice');
       expect(cells[2]).toHaveTextContent('Bob');
+    });
+  });
+
+  describe('meta.sortable shorthand', () => {
+    const sortData: Person[] = [
+      { id: '1', name: 'Charlie', role: 'Engineer' },
+      { id: '2', name: 'Alice', role: 'Designer' },
+      { id: '3', name: 'Bob', role: 'Manager' },
+    ];
+    const firstName = () =>
+      screen.getAllByRole('cell').filter((c) => /Charlie|Alice|Bob/.test(c.textContent ?? ''))[0].textContent;
+
+    it('makes a string header the sort button and cycles asc, desc, off', () => {
+      render(
+        <Table<Person>
+          id="t-short"
+          data={sortData}
+          columns={[
+            { id: 'name', header: 'Name', accessorKey: 'name', meta: { sortable: true } },
+            { id: 'role', header: 'Role', accessorKey: 'role' },
+          ]}
+        />
+      );
+      const th = screen.getByRole('columnheader', { name: 'Name' });
+      const button = within(th).getByRole('button', { name: 'Name' });
+      expect(th).toHaveAttribute('aria-sort', 'none');
+      expect(screen.queryByRole('button', { name: 'Role' })).not.toBeInTheDocument();
+
+      fireEvent.click(button);
+      expect(th).toHaveAttribute('aria-sort', 'ascending');
+      expect(firstName()).toBe('Alice');
+      fireEvent.click(button);
+      expect(th).toHaveAttribute('aria-sort', 'descending');
+      expect(firstName()).toBe('Charlie');
+      fireEvent.click(button);
+      expect(th).toHaveAttribute('aria-sort', 'none');
+    });
+
+    it('keeps a custom header and adds an icon-only sort button named by table.sort', () => {
+      render(
+        <Table<Person>
+          id="t-short-custom"
+          data={sortData}
+          columns={[
+            {
+              id: 'name',
+              header: () => <span>Name</span>,
+              accessorKey: 'name',
+              meta: { sortable: true, label: 'Name' },
+            },
+          ]}
+        />
+      );
+      const button = screen.getByRole('button', { name: 'Sort by Name ascending' });
+      fireEvent.click(button);
+      expect(firstName()).toBe('Alice');
+      expect(screen.getByRole('button', { name: 'Sort by Name descending' })).toBeInTheDocument();
+    });
+
+    it('falls back to the column id for the icon-only button name', () => {
+      render(
+        <Table<Person>
+          id="t-short-id"
+          data={sortData}
+          columns={[{ id: 'name', header: () => <span>Name</span>, accessorKey: 'name', meta: { sortable: true } }]}
+        />
+      );
+      expect(screen.getByRole('button', { name: 'Sort by name ascending' })).toBeInTheDocument();
+    });
+
+    it('starts a numeric column in ascending order', () => {
+      const numeric = [
+        { id: '1', name: 'A', role: '10' },
+        { id: '2', name: 'B', role: '30' },
+        { id: '3', name: 'C', role: '20' },
+      ].map((row) => ({ ...row, age: Number(row.role) }));
+      render(
+        <Table<(typeof numeric)[number]>
+          id="t-short-num"
+          data={numeric}
+          columns={[
+            { id: 'name', header: 'Name', accessorKey: 'name' },
+            { id: 'age', header: 'Age', accessorKey: 'age', meta: { sortable: true } },
+          ]}
+        />
+      );
+      const order = () =>
+        screen
+          .getAllByRole('cell')
+          .map((c) => c.textContent)
+          .filter((t) => /^[ABC]$/.test(t ?? ''));
+      expect(order()).toEqual(['A', 'B', 'C']);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Age' }));
+      expect(screen.getByRole('columnheader', { name: 'Age' })).toHaveAttribute('aria-sort', 'ascending');
+      expect(order()).toEqual(['A', 'C', 'B']);
+    });
+
+    it('names the sort button of a blank header from the sort label', () => {
+      render(
+        <Table<Person>
+          id="t-short-blank"
+          data={sortData}
+          columns={[{ id: 'name', header: '', accessorKey: 'name', meta: { sortable: true, label: 'Name' } }]}
+        />
+      );
+      const button = screen.getByRole('button', { name: 'Sort by Name ascending' });
+      fireEvent.click(button);
+      expect(firstName()).toBe('Alice');
+    });
+
+    it('renders no sort button when sorting is disabled for the column', () => {
+      render(
+        <Table<Person>
+          id="t-short-off"
+          data={sortData}
+          columns={[
+            { id: 'name', header: 'Name', accessorKey: 'name', enableSorting: false, meta: { sortable: true } },
+          ]}
+        />
+      );
+      expect(screen.queryByRole('button', { name: 'Name' })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('meta.filterable popover', () => {
+    const filterData: Person[] = [
+      { id: '1', name: 'Charlie', role: 'Engineer' },
+      { id: '2', name: 'Alice', role: 'Designer' },
+      { id: '3', name: 'Bob', role: 'Manager' },
+    ];
+    const nameCol = (meta: TableColumnMeta<Person>): ColumnDef<Person>[] => [
+      { id: 'name', header: 'Name', accessorKey: 'name', filterFn: 'includesString', meta },
+    ];
+    const names = () =>
+      screen
+        .getAllByRole('cell')
+        .map((c) => c.textContent)
+        .filter((t) => /Charlie|Alice|Bob/.test(t ?? ''));
+    const trigger = () => screen.getByRole('button', { name: /^Filter Name/ });
+    const openPopover = () => fireEvent.click(trigger());
+    const type = (value: string) => fireEvent.change(screen.getByRole('textbox'), { target: { value } });
+    const apply = () => fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+
+    it('opens a popover from an icon-only button and filters on apply', () => {
+      render(<Table<Person> id="t-pop" data={filterData} columns={nameCol({ filterable: true })} />);
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+
+      openPopover();
+      type('ali');
+      expect(names()).toHaveLength(3);
+      apply();
+
+      expect(names()).toEqual(['Alice']);
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
+
+    it('names the popover dialog after the column', () => {
+      render(<Table<Person> id="t-pop-dialog" data={filterData} columns={nameCol({ filterable: true })} />);
+      openPopover();
+      expect(screen.getByRole('dialog', { name: 'Filter Name' })).toBeInTheDocument();
+    });
+
+    it('clear removes the applied filter and closes', () => {
+      render(<Table<Person> id="t-pop-clear" data={filterData} columns={nameCol({ filterable: true })} />);
+      openPopover();
+      type('ali');
+      apply();
+      expect(names()).toEqual(['Alice']);
+
+      openPopover();
+      fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
+
+      expect(names()).toHaveLength(3);
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
+
+    it('cancel keeps the applied filter and discards the draft', () => {
+      render(
+        <Table<Person>
+          id="t-pop-cancel"
+          data={filterData}
+          columns={nameCol({ filterable: true })}
+          filterActions={['cancel', 'apply']}
+        />
+      );
+      openPopover();
+      type('ali');
+      apply();
+      openPopover();
+      type('bob');
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      expect(names()).toEqual(['Alice']);
+
+      openPopover();
+      expect(screen.getByRole('textbox')).toHaveValue('ali');
+    });
+
+    it('keeps an unapplied draft between visits unless clearOnClose is set', () => {
+      const { unmount } = render(
+        <Table<Person> id="t-pop-keep" data={filterData} columns={nameCol({ filterable: true })} />
+      );
+      openPopover();
+      type('bob');
+      openPopover();
+      openPopover();
+      expect(screen.getByRole('textbox')).toHaveValue('bob');
+      unmount();
+
+      render(
+        <Table<Person> id="t-pop-reset" data={filterData} columns={nameCol({ filterable: { clearOnClose: true } })} />
+      );
+      openPopover();
+      type('bob');
+      openPopover();
+      openPopover();
+      expect(screen.getByRole('textbox')).toHaveValue('');
+    });
+
+    it('orders footer buttons per column and hides the footer for an empty list', () => {
+      const { unmount } = render(
+        <Table<Person>
+          id="t-pop-actions"
+          data={filterData}
+          columns={nameCol({ filterable: { actions: ['apply', 'cancel', 'apply'] } })}
+        />
+      );
+      openPopover();
+      const footer = within(screen.getByRole('dialog')).getAllByRole('button');
+      expect(footer.map((b) => b.textContent)).toEqual(['Apply', 'Cancel']);
+      unmount();
+
+      render(<Table<Person> id="t-pop-none" data={filterData} columns={nameCol({ filterable: { actions: [] } })} />);
+      openPopover();
+      expect(within(screen.getByRole('dialog')).queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('hands apply, clear and cancel to custom filter content', () => {
+      render(
+        <Table<Person>
+          id="t-pop-custom"
+          data={filterData}
+          columns={nameCol({
+            filterable: { actions: [] },
+            filterContent: ({ setValue, apply: applyDraft }) => (
+              <button
+                type="button"
+                onClick={() => {
+                  setValue('bob');
+                  applyDraft();
+                }}
+              >
+                Only Bob
+              </button>
+            ),
+          })}
+        />
+      );
+      openPopover();
+      fireEvent.click(screen.getByRole('button', { name: 'Only Bob' }));
+      expect(names()).toEqual(['Bob']);
+      expect(screen.queryByRole('button', { name: 'Only Bob' })).not.toBeInTheDocument();
+    });
+
+    it('stores a function-valued filter instead of calling it', () => {
+      const onlyBob = (name: string) => name === 'Bob';
+      render(
+        <Table<Person>
+          id="t-pop-fn"
+          data={filterData}
+          columns={[
+            {
+              id: 'name',
+              header: 'Name',
+              accessorKey: 'name',
+              filterFn: (row, id, value: (name: string) => boolean) => value(row.getValue(id)),
+              meta: {
+                filterable: { actions: [] },
+                filterContent: ({ setValue, apply: applyDraft }) => (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setValue(onlyBob);
+                      applyDraft();
+                    }}
+                  >
+                    Predicate
+                  </button>
+                ),
+              } satisfies TableColumnMeta<Person>,
+            },
+          ]}
+        />
+      );
+      openPopover();
+      fireEvent.click(screen.getByRole('button', { name: 'Predicate' }));
+      expect(names()).toEqual(['Bob']);
+    });
+
+    it('realigns the draft when a controlled filter value changes to an equal-looking value', () => {
+      const columns: ColumnDef<Person>[] = [
+        {
+          id: 'role',
+          header: 'Role',
+          accessorKey: 'role',
+          filterFn: () => true,
+          meta: {
+            filterable: true,
+            label: 'Name',
+            filterContent: ({ value }) => <span>{Array.from(value as Set<string>).join(',')}</span>,
+          } satisfies TableColumnMeta<Person>,
+        },
+      ];
+      const stateWith = (...statuses: string[]) => ({
+        columnFilters: [{ id: 'role', value: new Set(statuses) }],
+      });
+      const { rerender } = render(
+        <Table<Person> id="t-pop-set" data={filterData} columns={columns} state={stateWith('Open')} />
+      );
+      openPopover();
+      expect(screen.getByText('Open')).toBeInTheDocument();
+      openPopover();
+
+      rerender(<Table<Person> id="t-pop-set" data={filterData} columns={columns} state={stateWith('Closed')} />);
+      openPopover();
+      expect(screen.getByText('Closed')).toBeInTheDocument();
+    });
+
+    it('filters a numeric column by the typed text with the default text popover', () => {
+      const ages = [
+        { id: '1', name: 'A', age: 1 },
+        { id: '2', name: 'B', age: 2 },
+        { id: '3', name: 'C', age: 12 },
+      ];
+      render(
+        <Table<(typeof ages)[number]>
+          id="t-pop-num"
+          data={ages}
+          columns={[
+            { id: 'name', header: 'Name', accessorKey: 'name' },
+            { id: 'age', header: 'Age', accessorKey: 'age', meta: { filterable: true } },
+          ]}
+        />
+      );
+      fireEvent.click(screen.getByRole('button', { name: /^Filter Age/ }));
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: '12' } });
+      apply();
+      expect(
+        screen
+          .getAllByRole('cell')
+          .map((c) => c.textContent)
+          .filter((t) => /^[ABC]$/.test(t ?? ''))
+      ).toEqual(['C']);
+    });
+
+    it('does not reuse an existing element id for the default filter field', () => {
+      render(
+        <>
+          <input id="name-filter" aria-label="Unrelated" />
+          <Table<Person> id="t-pop-id" data={filterData} columns={nameCol({ filterable: true })} />
+        </>
+      );
+      openPopover();
+      const field = screen.getByRole('textbox', { name: 'Filter Name' });
+      expect(field.id).not.toBe('name-filter');
+    });
+
+    it('shows the applied filter on the trigger, in its fill, class and accessible name', () => {
+      render(<Table<Person> id="t-pop-active" data={filterData} columns={nameCol({ filterable: true })} />);
+      const filledIcon = () => trigger().querySelector('[class*="filled"]');
+      expect(trigger().className).not.toMatch(/selected/);
+      expect(filledIcon()).toBeNull();
+      expect(trigger()).toHaveAccessibleName('Filter Name');
+
+      openPopover();
+      type('ali');
+      apply();
+
+      expect(trigger().className).toMatch(/selected/);
+      expect(filledIcon()).not.toBeNull();
+      expect(trigger()).toHaveAccessibleName('Filter Name, applied');
+    });
+
+    it('sits next to the sort button for the same column', () => {
+      render(
+        <Table<Person> id="t-pop-sort" data={filterData} columns={nameCol({ filterable: true, sortable: true })} />
+      );
+      expect(screen.getByRole('button', { name: 'Name' })).toBeInTheDocument();
+      expect(trigger()).toBeInTheDocument();
+    });
+
+    it('keeps the filter button on a blank header that has a label', () => {
+      render(
+        <Table<Person>
+          id="t-pop-blank"
+          data={filterData}
+          columns={[{ id: 'name', header: '', accessorKey: 'name', meta: { filterable: true, label: 'Name' } }]}
+        />
+      );
+      expect(trigger()).toBeInTheDocument();
+    });
+
+    it('renders no filter button when filtering is disabled for the column', () => {
+      render(
+        <Table<Person>
+          id="t-pop-off"
+          data={filterData}
+          columns={[
+            { id: 'name', header: 'Name', accessorKey: 'name', enableColumnFilter: false, meta: { filterable: true } },
+          ]}
+        />
+      );
+      expect(within(screen.getByRole('columnheader')).queryByRole('button')).not.toBeInTheDocument();
     });
   });
 
@@ -1122,6 +1700,17 @@ describe('Table', () => {
       expect(container.querySelector('[aria-live="polite"]')).toBeInTheDocument();
     });
 
+    it('describes the drag handles with the reorder instructions', () => {
+      render(<Table<Person> id="t-kb-desc" data={data} columns={columns} reorderableColumns reorderableRows />);
+
+      expect(screen.getByRole('button', { name: 'Drag column Name' })).toHaveAccessibleDescription(
+        'Column reorder instructions'
+      );
+      screen
+        .getAllByRole('button', { name: 'Drag row' })
+        .forEach((handle) => expect(handle).toHaveAccessibleDescription('Row reorder instructions'));
+    });
+
     it('reorders a column with the keyboard (pick up → ArrowRight → drop)', () => {
       const onStateChange = jest.fn();
       render(
@@ -1170,6 +1759,42 @@ describe('Table', () => {
     });
   });
 
+  describe('drag preview placement', () => {
+    const dragRowAndGetPreviewParent = (tableId: string, container?: HTMLElement) => {
+      let previewParent: Node | null = null;
+      const dataTransfer = {
+        setData: jest.fn(),
+        setDragImage: jest.fn((element: Element) => {
+          previewParent = element.parentNode;
+        }),
+        effectAllowed: '',
+      };
+      const table = <Table<Person> id={tableId} data={data} columns={columns} reorderableRows />;
+
+      const view = render(container ? <StyleProvider containerElement={container}>{table}</StyleProvider> : table);
+      const handle = within(view.container).getAllByRole('button', { name: 'Drag row' })[0];
+      fireEvent.mouseDown(handle);
+      fireEvent.dragStart(handle.closest('tr') as HTMLElement, { dataTransfer });
+      fireEvent.dragEnd(handle.closest('tr') as HTMLElement, { dataTransfer });
+
+      return previewParent;
+    };
+
+    it('appends the drag preview to document.body by default', () => {
+      expect(dragRowAndGetPreviewParent('t-drag-body')).toBe(document.body);
+    });
+
+    it('appends the drag preview inside the StyleProvider container element', () => {
+      const host = document.createElement('div');
+      document.body.appendChild(host);
+      const container = document.createElement('div');
+      host.attachShadow({ mode: 'open' }).appendChild(container);
+
+      expect(dragRowAndGetPreviewParent('t-drag-container', container)).toBe(container);
+      host.remove();
+    });
+  });
+
   describe('expand column wrapper', () => {
     it('handles Enter / Space keydown on the toggle without crashing (stopPropagation path)', () => {
       render(
@@ -1181,7 +1806,7 @@ describe('Table', () => {
         />
       );
 
-      const toggle = screen.getAllByRole('button', { name: /table\.expand-row/i })[0];
+      const toggle = screen.getAllByRole('button', { name: 'Row details' })[0];
       fireEvent.keyDown(toggle, { key: 'Enter', bubbles: true });
       fireEvent.keyDown(toggle, { key: ' ', bubbles: true });
       // Pressing a non-Enter/Space key bubbles through the span without

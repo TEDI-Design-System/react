@@ -74,6 +74,16 @@ describe('Button component', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
+  it('renders an extra small icon-only button', () => {
+    render(
+      <Button size="extra-small" icon="close">
+        Close
+      </Button>
+    );
+    const button = screen.getByRole('button', { name: 'Close' });
+    expect(button).toHaveClass('tedi-btn--extra-small', 'tedi-btn--icon-only');
+  });
+
   it('keeps the button focusable and its name unchanged while loading', () => {
     render(<Button {...defaultProps} isLoading />);
     const button = screen.getByRole('button');

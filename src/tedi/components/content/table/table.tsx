@@ -34,7 +34,9 @@ import {
   useState,
 } from 'react';
 
+import { getBodyOrShadowRoot, getElementByIdInRoot } from '../../../helpers/shadow-dom';
 import { useLabels } from '../../../providers/label-provider';
+import { usePortalRoot } from '../../../providers/style-provider/style-provider';
 import { Icon } from '../../base/icon/icon';
 import { CollapseButton, CollapseButtonProps } from '../../buttons/collapse-button/collapse-button';
 import { Checkbox, CheckboxProps } from '../../form/checkbox/checkbox';
@@ -44,7 +46,14 @@ import { Pagination, type PaginationProps } from '../../navigation/pagination';
 import styles from './table.module.scss';
 import { TableColumnsMenu } from './table-columns-menu/table-columns-menu';
 import { TableContext } from './table-context';
+import type {
+  TableFilterAction,
+  TableFilterContent,
+  TableFilterOptions,
+  TableFilterPopoverWidth,
+} from './table-filter-popover';
 import { TableHeaderButton } from './table-header-button/table-header-button';
+import { TableHeaderContent } from './table-header-content/table-header-content';
 import { TableToolbar } from './table-toolbar/table-toolbar';
 import { useTablePersistence } from './use-table-persistence';
 
@@ -53,15 +62,37 @@ import { useTablePersistence } from './use-table-persistence';
  *
  * - drive the column-filter aria-label when the header is non-textual (`label`),
  * - align the column's `<th>` / `<td>` content horizontally (`align`) or vertically
- *   (`vAlign`) without wrapping every cell render in a styled span.
+ *   (`vAlign`) without wrapping every cell render in a styled span,
+ * - mark the column whose body cells head their row (`rowHeader`).
  *
  * Wrapper spans still work for the "I want this *one* cell to be different" case;
  * `meta` covers the common "every cell in the column lines up the same way".
  */
-export interface TableColumnMeta {
-  /** Accessible label used when the column header isn't a plain string. */
+export interface TableColumnMeta<TData = unknown> {
+  /**
+   * Names a blank or non-text header (e.g. an actions column) for screen readers and in filter,
+   * column drag and reorder labels; without it a blank header has no name and those labels use the
+   * column id, a developer string such as "actions" (filter and reorder get `''` for `header: ''`).
+   */
   label?: string;
   /**
+   * Adds a built-in sort control to a sortable column header.
+   * @default false
+   */
+  sortable?: boolean;
+  /**
+   * Adds a filter popover button to the column header; pass options to set its footer actions or width.
+   * @default false
+   */
+  filterable?: boolean | TableFilterOptions;
+  /**
+   * Custom input for the filter popover, receiving the draft value and `apply`, `clear` and `cancel`.
+   */
+  filterContent?: TableFilterContent<TData>;
+  /**
+   * @deprecated Use `filterable` and `filterContent` for the filter popover instead; the inline
+   * filter row is removed in a future major release.
+   *
    * Props forwarded to the built-in per-column filter input (the `TextField`
    * rendered for this column when `enableColumnFilters` is set). Use it to
    * constrain or tweak the filter field without replacing it — e.g. cap the
@@ -82,6 +113,13 @@ export interface TableColumnMeta {
    * table's stylesheet.
    */
   vAlign?: 'top' | 'middle' | 'bottom';
+  /**
+   * Renders the column's body cells as `<th scope="row">`, so screen readers
+   * announce the cell as the row's header when moving through the row. Styled
+   * the same as other body cells. Set it on the one column that names the row.
+   * @default false
+   */
+  rowHeader?: boolean;
   /**
    * Per-cell `rowSpan` resolver. Lets a column collapse consecutive rows that
    * share a value into a single vertically-spanning cell ("grouped rows").
@@ -355,6 +393,11 @@ export interface TableProps<TData> {
    */
   selectionMode?: TableSelectionMode;
   /**
+   * Accessible name of each row's selection checkbox or radio, e.g. `(row) => row.original.name`.
+   * @default 'Vali rida'
+   */
+  rowSelectionLabel?: (row: Row<TData>) => string;
+  /**
    * Paints the `--table-active` background tint on every selected row. Turn
    * off when checkboxes are used purely for "pick some rows for a bulk
    * action" and the row-level highlight would be visually noisy. The
@@ -363,6 +406,19 @@ export interface TableProps<TData> {
    */
   highlightSelectedRows?: boolean;
   /**
+   * Footer buttons of the column filter popovers, in display order.
+   * @default ['clear', 'apply']
+   */
+  filterActions?: TableFilterAction[];
+  /**
+   * Width of the column filter popovers.
+   * @default 'small'
+   */
+  filterPopoverWidth?: TableFilterPopoverWidth;
+  /**
+   * @deprecated Use `meta.filterable` for a filter popover in the column header instead; the
+   * inline filter row is removed in a future major release.
+   *
    * Enables per-column filter inputs rendered below the header row.
    * Only columns whose `columnDef.enableColumnFilter !== false` render an input.
    */
@@ -598,6 +654,7 @@ interface TableDataRowProps<TData> {
   columnProps: ((columnId: string) => { className?: string; style?: CSSProperties } | undefined) | undefined;
   draggable: boolean;
   dragHandleLabel: string;
+  dragHandleDescribedBy?: string;
   dragHandlers?: {
     onDragStart: (event: ReactDragEvent<HTMLTableRowElement>) => void;
     onDragOver: (event: ReactDragEvent<HTMLTableRowElement>) => void;
@@ -616,12 +673,14 @@ const DRAG_HANDLE_ATTR = 'data-tedi-drag-handle';
 
 const DragHandleCell = ({
   label,
+  describedBy,
   onHandlePointerDown,
   id,
   pickedUp,
   onKeyDown,
 }: {
   label: string;
+  describedBy?: string;
   onHandlePointerDown: () => void;
   id?: string;
   pickedUp?: boolean;
@@ -634,6 +693,7 @@ const DragHandleCell = ({
       [styles['tedi-table__drag-handle--picked-up']]: pickedUp,
     })}
     aria-label={label}
+    aria-describedby={describedBy}
     aria-pressed={pickedUp}
     onClick={(event) => event.stopPropagation()}
     onMouseDown={onHandlePointerDown}
@@ -660,6 +720,7 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
     columnProps,
     draggable,
     dragHandleLabel,
+    dragHandleDescribedBy,
     dragHandlers,
     dragHandleId,
     dragHandlePickedUp,
@@ -692,9 +753,12 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
         const isDragOverThisCol = !!dragOverColumnId && cell.column.id === dragOverColumnId;
         const resolvedRowSpan = cellMeta?.rowSpan?.(cell.row as Row<unknown>);
         if (resolvedRowSpan === 0) return null;
+        const isRowHeader = !!cellMeta?.rowHeader;
+        const CellTag = isRowHeader ? 'th' : 'td';
         return (
-          <td
+          <CellTag
             key={cell.id}
+            scope={isRowHeader ? 'row' : undefined}
             rowSpan={resolvedRowSpan && resolvedRowSpan > 1 ? resolvedRowSpan : undefined}
             className={cn(
               styles['tedi-table__cell'],
@@ -711,6 +775,7 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
             {isDragCell ? (
               <DragHandleCell
                 label={dragHandleLabel}
+                describedBy={dragHandleDescribedBy}
                 onHandlePointerDown={dragHandlers?.onHandlePointerDown ?? (() => undefined)}
                 onKeyDown={dragHandlers?.onKeyDown}
                 id={dragHandleId}
@@ -719,7 +784,7 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
             ) : (
               flexRender(cell.column.columnDef.cell, cell.getContext())
             )}
-          </td>
+          </CellTag>
         );
       })}
     </tr>
@@ -743,6 +808,29 @@ export interface TableRowDropEvent {
   fromIndex: number;
   toIndex: number;
 }
+
+/**
+ * Fills in column defaults that follow from `meta`:
+ * - `meta.sortable` columns cycle ascending, descending, off (TanStack starts numeric columns
+ *   descending), unless the column sets `sortDescFirst` itself.
+ * - `meta.filterable` columns with the default text popover use `includesString` (TanStack infers
+ *   `inNumberRange` for numeric columns), unless the column sets `filterFn` itself.
+ * Hand-built sort headers and custom filter content keep TanStack's behaviour.
+ */
+const applyMetaDefaults = <TData,>(column: ColumnDef<TData>): ColumnDef<TData> => {
+  const children = (column as { columns?: ColumnDef<TData>[] }).columns;
+  const result = (children ? { ...column, columns: children.map(applyMetaDefaults) } : column) as ColumnDef<TData>;
+  const meta = column.meta as TableColumnMeta<TData> | undefined;
+  const defaults: Partial<ColumnDef<TData>> = {};
+  if (meta?.sortable === true && column.sortDescFirst === undefined) defaults.sortDescFirst = false;
+  if (meta?.filterable && !meta.filterContent && column.filterFn === undefined) defaults.filterFn = 'includesString';
+  return Object.keys(defaults).length ? ({ ...result, ...defaults } as ColumnDef<TData>) : result;
+};
+
+const resolveFilterOptions = (filterable: TableColumnMeta['filterable']): TableFilterOptions | undefined => {
+  if (!filterable) return undefined;
+  return filterable === true ? {} : filterable;
+};
 
 const passthroughFilter: FilterFn<unknown> = () => true;
 const DEFAULT_FILTER_FNS = {
@@ -786,8 +874,11 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     rowHover,
     enableRowSelection,
     selectionMode = 'multiple',
+    rowSelectionLabel,
     highlightSelectedRows = true,
     enableColumnFilters = false,
+    filterActions,
+    filterPopoverWidth,
     renderSubComponent,
     getRowCanExpand,
     getSubRows,
@@ -815,6 +906,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const resolvedEmptyState = emptyState ?? getLabel('table.no-data');
   const getLabelRef = useRef(getLabel);
   getLabelRef.current = getLabel;
+  const rowSelectionLabelRef = useRef(rowSelectionLabel);
+  rowSelectionLabelRef.current = rowSelectionLabel;
 
   const generatedId = useId();
   const resolvedId = id ?? generatedId;
@@ -971,7 +1064,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 {...checkboxProps}
                 id={`${resolvedId}-select-all`}
                 name={`${resolvedId}-select-all`}
-                label={getLabelRef.current('table.select-all', table.getIsAllPageRowsSelected())}
+                label={getLabelRef.current('table.select-all')}
                 hideLabel
                 value="all"
                 checked={table.getIsAllPageRowsSelected()}
@@ -985,7 +1078,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               {...radioProps}
               id={`${resolvedId}-select-${row.id}`}
               name={radioGroupName}
-              label={getLabelRef.current('table.select-row', row.getIsSelected())}
+              label={rowSelectionLabelRef.current?.(row) ?? getLabelRef.current('table.select-row')}
               hideLabel
               value={row.id}
               checked={row.getIsSelected()}
@@ -999,7 +1092,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               {...checkboxProps}
               id={`${resolvedId}-select-${row.id}`}
               name={`${resolvedId}-select-${row.id}`}
-              label={getLabelRef.current('table.select-row', row.getIsSelected())}
+              label={rowSelectionLabelRef.current?.(row) ?? getLabelRef.current('table.select-row')}
               hideLabel
               value={row.id}
               checked={row.getIsSelected()}
@@ -1046,8 +1139,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 hideText
                 id={`${resolvedId}-expand-${row.id}`}
                 aria-controls={renderSubComponent ? subRowId : undefined}
-                openText={getLabelRef.current('table.expand-row')}
-                closeText={getLabelRef.current('table.collapse-row')}
+                openText={getLabelRef.current('table.row-details')}
+                closeText={getLabelRef.current('table.row-details')}
                 open={row.getIsExpanded()}
                 onOpenChange={() => row.toggleExpanded()}
               />
@@ -1057,7 +1150,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       });
     }
 
-    return [...leading, ...columns];
+    return [...leading, ...columns.map(applyMetaDefaults)];
   }, [
     columns,
     hasSelection,
@@ -1096,7 +1189,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     },
     enableRowSelection,
     enableMultiRowSelection: selectionMode !== 'single',
-    enableColumnFilters,
+    // Always on for TanStack so `column.getCanFilter()` works for `meta.filterable` popovers; the
+    // deprecated inline filter row is still gated by the `enableColumnFilters` prop.
+    enableColumnFilters: true,
     autoResetPageIndex: autoResetPageIndex ?? !manualPagination,
     paginateExpandedRows: paginationEnabled && !manualPagination ? paginateExpandedRows : true,
     manualPagination,
@@ -1129,6 +1224,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   );
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const portalRoot = usePortalRoot();
 
   const [scrollOverflow, setScrollOverflow] = useState({ left: false, right: false });
   const stickyColumnsEnabled = stickyFirstColumn || stickyLastColumn;
@@ -1313,7 +1409,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           ghostBody.appendChild(ghostRow);
           ghostTable.appendChild(ghostBody);
           ghost.appendChild(ghostTable);
-          document.body.appendChild(ghost);
+          (portalRoot ?? getBodyOrShadowRoot(event.currentTarget)).appendChild(ghost);
           event.dataTransfer.setDragImage(ghost, 24, rowRect.height / 2);
           window.setTimeout(() => ghost.remove(), 0);
         }
@@ -1397,7 +1493,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         ghostHead.appendChild(ghostRow);
         ghostTable.appendChild(ghostHead);
         ghost.appendChild(ghostTable);
-        document.body.appendChild(ghost);
+        (portalRoot ?? getBodyOrShadowRoot(event.currentTarget)).appendChild(ghost);
         event.dataTransfer.setDragImage(ghost, rect.width / 2, rect.height / 2);
         window.setTimeout(() => ghost.remove(), 0);
 
@@ -1599,7 +1695,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       const row = rows.find((r) => r.original === pending.original);
       handleId = row ? `${resolvedId}-row-reorder-${row.id}` : null;
     }
-    if (handleId) document.getElementById(handleId)?.focus();
+    if (handleId && scrollRef.current) getElementByIdInRoot(scrollRef.current, handleId)?.focus();
   }, [reorderFocusTick, rows, resolvedId]);
 
   return (
@@ -1610,6 +1706,16 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           <div className={styles['tedi-table__sr-only']} aria-live="polite" aria-atomic="true">
             {reorderAnnouncement}
           </div>
+        )}
+        {reorderableColumns && (
+          <span id={`${resolvedId}-reorder-hint`} hidden>
+            {getLabel('table.reorder.instructions')}
+          </span>
+        )}
+        {reorderableRows && (
+          <span id={`${resolvedId}-row-reorder-hint`} hidden>
+            {getLabel('table.row-reorder.instructions')}
+          </span>
         )}
         <div
           ref={scrollRef}
@@ -1654,18 +1760,31 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         ? 'descending'
                         : 'none'
                       : undefined;
-                    const headerMeta = header.column.columnDef.meta as TableColumnMeta | undefined;
+                    const headerMeta = header.column.columnDef.meta as TableColumnMeta<TData> | undefined;
                     const rawHeaderLabel =
                       headerMeta?.label ??
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
                     const headerLabel = rawHeaderLabel?.trim() ? rawHeaderLabel : undefined;
                     const headerDef = header.column.columnDef.header;
+                    const hasBuiltInControls =
+                      (headerMeta?.sortable === true && header.column.getCanSort()) ||
+                      (!!resolveFilterOptions(headerMeta?.filterable) && header.column.getCanFilter());
+                    const headerContent = (
+                      <TableHeaderContent
+                        header={header}
+                        label={headerLabel}
+                        sortable={headerMeta?.sortable === true}
+                        filterOptions={resolveFilterOptions(headerMeta?.filterable)}
+                        filterContent={headerMeta?.filterContent}
+                        filterActions={filterActions}
+                        filterPopoverWidth={filterPopoverWidth}
+                      />
+                    );
                     const headerIsBlank =
                       !columnHasChildren &&
                       (headerDef === null ||
                         headerDef === undefined ||
                         (typeof headerDef === 'string' && headerDef.trim() === ''));
-                    const headerFallbackLabel = headerLabel ?? (columnHasChildren ? undefined : header.column.id);
                     const userColumnProps = columnProps?.(header.column.id);
                     const headerSize = header.column.getSize();
                     const isBuiltInColumn =
@@ -1703,7 +1822,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         )}
                         scope="col"
                         aria-sort={ariaSort}
-                        aria-label={headerLabel ?? (columnHasChildren ? undefined : header.column.id)}
+                        aria-label={headerLabel}
                         style={
                           headerSize || userColumnProps?.style
                             ? { ...(headerSize ? { width: headerSize } : null), ...userColumnProps?.style }
@@ -1719,6 +1838,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                                 [styles['tedi-table__drag-handle--picked-up']]: isPickedUpThisCol,
                               })}
                               aria-label={getLabel('table.drag-column', headerLabel ?? header.column.id)}
+                              aria-describedby={`${resolvedId}-reorder-hint`}
                               aria-pressed={isPickedUpThisCol}
                               onClick={(event) => event.stopPropagation()}
                               onMouseDown={colHandlers.onHandlePointerDown}
@@ -1728,12 +1848,12 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             >
                               <Icon name="drag_indicator" size={18} color="inherit" />
                             </button>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {headerContent}
                           </span>
-                        ) : headerIsBlank && headerFallbackLabel ? (
-                          <span className={styles['tedi-table__sr-only']}>{headerFallbackLabel}</span>
+                        ) : headerIsBlank && headerLabel && !hasBuiltInControls ? (
+                          <span className={styles['tedi-table__sr-only']}>{headerLabel}</span>
                         ) : (
-                          flexRender(header.column.columnDef.header, header.getContext())
+                          headerContent
                         )}
                       </th>
                     );
@@ -1829,6 +1949,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     columnProps,
                     draggable: reorderableRows,
                     dragHandleLabel: getLabel('table.drag-row'),
+                    dragHandleDescribedBy: reorderableRows ? `${resolvedId}-row-reorder-hint` : undefined,
                     dragHandlers: reorderableRows
                       ? { ...buildRowDragHandlers(row.id), onKeyDown: (event) => handleRowReorderKeydown(event, row) }
                       : undefined,

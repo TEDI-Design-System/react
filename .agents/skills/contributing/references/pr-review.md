@@ -56,6 +56,13 @@ breaks.
 - [ ] Interactive components or changed ARIA/keyboard behaviour pass [a11y-review.md](a11y-review.md).
 - [ ] Changed stories pass the [stories.md](stories.md) checklist (section 6).
 
+### Other TEDI libraries
+
+- [ ] A feature or fix in an existing component links an issue in every other TEDI library that has
+      the same component and needs the same change (search
+      `gh issue list -R TEDI-Design-System/<repo> --search <component>` first). Flag it if the PR
+      doesn't link one.
+
 ### Labels (`src/tedi/providers/label-provider/labels-map.ts`)
 
 - [ ] Each new label lists only components that use it.

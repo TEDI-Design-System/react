@@ -5,6 +5,11 @@ import SkipLinks from './skip-links';
 const meta: Meta<typeof SkipLinks> = {
   component: SkipLinks,
   title: 'Community/Layout/Header/SkipLinks',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

@@ -1,6 +1,7 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
-:root {
+:root,
+:host {
   --tedi-accordion-header-start-gap: var(--layout-grid-gutters-08);
   --tedi-accordion-item-gap: var(--layout-grid-gutters-08);
 }

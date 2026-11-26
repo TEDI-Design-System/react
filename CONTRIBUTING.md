@@ -47,6 +47,12 @@ In an existing clone, run `git config core.symlinks true`, delete the files unde
 
 Components live in two tiers: `src/tedi/` (TEDI-READY, must meet the [Definition of Done](https://github.com/TEDI-Design-System/general/wiki/Definition-of-Done)) and `src/community/` (looser requirements).
 
+## Visual tests
+
+Chromatic snapshots each component through one hidden `VisualTest` story, at mobile and desktop width (`VISUAL_TEST_VIEWPORTS`). The docs stories themselves are not snapshotted. When you add a story to a component that has `VisualTest`, add a block for it there too. The block renders the docs story through `<VisualTestStory>` from `.storybook/visual-test-story`, so later changes to the story reach Chromatic. Don't copy the story's markup.
+
+`npm run test` fails when a docs story has no block. A story that only demonstrates behaviour (form integration, a controlled-state demo) opts out with `parameters: { visualTest: false }`. The full rules are in section 9 of [stories.md](.agents/skills/contributing/references/stories.md).
+
 ## Accessibility check
 
 Every pull request to `rc` or `main` runs an automated accessibility check (axe, through the Storybook test runner) on all `src/tedi/` stories. Violations in components the pull request changes fail the check. Violations elsewhere are reported as warnings.

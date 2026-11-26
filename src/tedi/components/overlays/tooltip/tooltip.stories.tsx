@@ -193,7 +193,7 @@ const TriggerTemplate: StoryFn<TooltipProps> = (args) => {
       <Col>
         <Tooltip {...args}>
           <Tooltip.Trigger>
-            <Toggle ariaLabel="Some toggle" label="Some toggle" />
+            <Toggle ariaLabel="Notifications" label="Notifications" />
           </Tooltip.Trigger>
           <Tooltip.Content>This tooltip trigger is toggle.</Tooltip.Content>
         </Tooltip>

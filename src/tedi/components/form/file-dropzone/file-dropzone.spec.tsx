@@ -7,6 +7,10 @@ import { useLabels } from '../../../providers/label-provider';
 import FileDropzone from './file-dropzone';
 
 jest.mock('../../../helpers/hooks/use-file-upload');
+// The icon-only tooltip opens on hover only off touch devices, and jsdom is not one.
+jest.mock('../../../helpers/hooks/use-is-touch-device', () => ({
+  useIsTouchDevice: () => false,
+}));
 jest.mock('../../../providers/label-provider');
 
 jest.mock('react-dropzone', () => ({
@@ -248,6 +252,13 @@ describe('FileDropzone', () => {
     expect(screen.getByText('PDF only')).toHaveAttribute('id', 'role-test-helper');
   });
 
+  it('names the dropzone button with its visible label only', () => {
+    render(<FileDropzone id="name-test" name="file" label="Upload File" />);
+    const dropzone = screen.getByRole('button');
+    expect(dropzone).toHaveAccessibleName('Upload File');
+    expect(dropzone).not.toHaveAttribute('aria-label');
+  });
+
   it('exposes an invalid file status to screen readers', () => {
     mockUseFileUpload.mockReturnValue({
       innerFiles: [{ id: '1', name: 'big.pdf', isValid: false }],
@@ -309,6 +320,28 @@ describe('FileDropzone', () => {
     fireEvent.click(removeButton);
 
     expect(onFileRemove).toHaveBeenCalledWith(file);
+  });
+
+  it('gives the remove button a tooltip without naming it twice', async () => {
+    const file = { id: '1', name: 'file.png', isValid: true };
+    mockUseFileUpload.mockReturnValue({
+      innerFiles: [file],
+      uploadErrorHelper: undefined,
+      onFileChange: jest.fn(),
+      onFileRemove: jest.fn(),
+      handleClear: jest.fn(),
+      fileInputRef: { current: null },
+    });
+
+    render(<FileDropzone id="test-file-dropzone" name="file" label="Upload File" />);
+    const removeButton = screen.getByRole('button', { name: /remove/i });
+
+    fireEvent.mouseEnter(removeButton);
+
+    // Visual only: a tooltip repeating the button's own text would have the
+    // name announced twice.
+    const content = await screen.findByTestId('overlay-content');
+    expect(content).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('disables the dropzone when disabled prop is true', () => {

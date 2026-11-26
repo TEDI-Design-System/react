@@ -3,6 +3,10 @@
     max-width: 1200px;
   }
 
+  /* When a story is taller than a sized viewport, the element the backgrounds addon colours
+     (.sb-show-main) can be shorter than the content, exposing the iframe's default grey behind it.
+     Painting <html> makes the surface propagate across the whole scroll area; !important beats
+     Storybook's own preview body background. The token resolves per the theme class on <html>. */
   html.tedi-theme--default,
   html.tedi-theme--dark {
     background-color: var(--general-surface-primary) !important;
@@ -16,6 +20,12 @@
     background-color: var(--general-surface-primary) !important;
   }
 
+  /* Stories with `docs.story.inline: false` render in an inline iframe; its
+     baseline gap overflows the docs wrapper and adds a stray scrollbar. */
+  .docs-story iframe {
+    display: block;
+  }
+
   /* The global styles set `html, body { height: 100% }`, which caps the canvas body at the
      viewport height: taller stories then overflow past it and lose the bottom padding. */
   body.sb-show-main {
@@ -23,5 +33,11 @@
     min-height: 100vh !important;
     margin: 0 !important;
     box-sizing: border-box !important;
+  }
+
+  /* A story shown in its own iframe (docs.story.inline: false) sits on the text baseline,
+     which makes the scrolling docs block a few pixels taller than the iframe. */
+  .docs-story iframe {
+    display: block;
   }
 </style>

@@ -25,6 +25,7 @@ Check against WAI-ARIA Authoring Practices for the component pattern:
 - [ ] Semantic HTML elements used where possible (`<button>`, `<input>`, `<nav>`, `<dialog>`) instead of ARIA on `<div>`/`<span>`
 - [ ] No redundant ARIA (e.g., `role="button"` on `<button>`)
 - [ ] `aria-hidden={true}` on decorative elements
+- [ ] Accessible names (built-in labels, translations and story examples) contain neither the role nor the state: the screen reader already announces both. "Primary" on a `<nav>`, not "Primary navigation"; "Terviseandmed" on a tablist, not "Tervise sakid"; state goes in `aria-checked`/`aria-expanded`/`aria-selected`/`aria-current`, not in the label
 
 ### 3. Keyboard Navigation
 

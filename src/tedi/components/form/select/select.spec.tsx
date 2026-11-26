@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
+import { StyleProvider } from '../../../providers/style-provider/style-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import InputGroup from '../input-group/input-group';
 import { SelectMultiValueRemove } from './components/select-multi-value-remove';
@@ -74,6 +75,109 @@ describe('Select component', () => {
     fireEvent.click(option);
 
     expect(handleChange).toHaveBeenCalledWith(expect.objectContaining({ value: 'banana', label: 'Banana' }));
+  });
+
+  describe('touch inside a shadow root', () => {
+    const renderInShadowRoot = (props: Partial<SelectProps> = {}) => {
+      const host = document.createElement('div');
+      document.body.appendChild(host);
+      const container = document.createElement('div');
+      host.attachShadow({ mode: 'open' }).appendChild(container);
+      const view = render(<Select {...defaultProps} {...props} />, { container });
+
+      return { ...view, host, shadowRoot: host.shadowRoot as ShadowRoot };
+    };
+
+    const touchEnd = (target: Element) =>
+      target.dispatchEvent(new Event('touchend', { bubbles: true, composed: true, cancelable: true }));
+
+    it('keeps the select focused when its control is tapped', async () => {
+      const { host, shadowRoot } = renderInShadowRoot();
+      const input = shadowRoot.querySelector('input') as HTMLInputElement;
+      const control = shadowRoot.querySelector('[class*="control"]') as HTMLElement;
+
+      await act(async () => {
+        input.focus();
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+      });
+      await act(async () => {
+        touchEnd(control);
+      });
+
+      expect(shadowRoot.activeElement).toBe(input);
+      host.remove();
+    });
+
+    it('keeps the select focused when the tap is inside a shadow root within an option', async () => {
+      const { host, shadowRoot } = renderInShadowRoot();
+      const input = shadowRoot.querySelector('input') as HTMLInputElement;
+
+      await act(async () => {
+        input.focus();
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+      });
+
+      const optionHost = document.createElement('span');
+      const inner = document.createElement('span');
+      optionHost.attachShadow({ mode: 'open' }).appendChild(inner);
+      (screen.getByText('Banana').parentElement as HTMLElement).appendChild(optionHost);
+
+      await act(async () => {
+        touchEnd(inner);
+      });
+
+      expect(shadowRoot.activeElement).toBe(input);
+      host.remove();
+    });
+
+    it('still closes the menu when the tap is outside the select', async () => {
+      const { host, shadowRoot } = renderInShadowRoot();
+      const input = shadowRoot.querySelector('input') as HTMLInputElement;
+      const outside = document.createElement('button');
+      document.body.appendChild(outside);
+
+      await act(async () => {
+        input.focus();
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+      });
+      await act(async () => {
+        touchEnd(outside);
+      });
+
+      expect(shadowRoot.activeElement).not.toBe(input);
+      host.remove();
+      outside.remove();
+    });
+  });
+
+  it('renders the menu into the StyleProvider container element', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    render(
+      <StyleProvider containerElement={container}>
+        <Select {...defaultProps} />
+      </StyleProvider>
+    );
+    const selectInput = screen.getByRole('combobox');
+    fireEvent.focus(selectInput);
+    fireEvent.keyDown(selectInput, { key: 'ArrowDown' });
+
+    expect(container).toContainElement(screen.getByText('Banana'));
+    container.remove();
+  });
+
+  it('keeps the menu closed while the StyleProvider container element is pending', () => {
+    render(
+      <StyleProvider containerElement={null}>
+        <Select {...defaultProps} />
+      </StyleProvider>
+    );
+    const selectInput = screen.getByRole('combobox');
+    fireEvent.focus(selectInput);
+    fireEvent.keyDown(selectInput, { key: 'ArrowDown' });
+
+    expect(screen.queryByText('Banana')).not.toBeInTheDocument();
   });
 
   it('renders with a placeholder', () => {
@@ -771,6 +875,48 @@ describe('Select component', () => {
       expect(combobox).toHaveAccessibleDescription('Only ripe fruit');
       // react-select's placeholder must not describe the field.
       expect(combobox.getAttribute('aria-describedby') ?? '').not.toMatch(/-placeholder/);
+    });
+
+    it('lists external aria-describedby ids on the combobox', () => {
+      render(
+        <>
+          <p id="external-error">Pick a fruit</p>
+          <Select {...defaultProps} aria-describedby="external-error" />
+        </>
+      );
+
+      const combobox = screen.getByRole('combobox');
+      expect(combobox.getAttribute('aria-describedby')).toBe('external-error');
+      expect(combobox).toHaveAccessibleDescription('Pick a fruit');
+    });
+
+    it('lists external aria-describedby ids before the helper id', () => {
+      render(
+        <Select
+          {...defaultProps}
+          aria-describedby="external-error other"
+          helper={{ id: 'fruit-help', text: 'Only ripe fruit', type: 'error' }}
+        />
+      );
+
+      expect(screen.getByRole('combobox').getAttribute('aria-describedby')).toBe('external-error other fruit-help');
+    });
+
+    it('does not repeat an external id that is also the helper id', () => {
+      render(
+        <Select
+          {...defaultProps}
+          aria-describedby="fruit-help"
+          helper={{ id: 'fruit-help', text: 'Only ripe fruit', type: 'error' }}
+        />
+      );
+
+      expect(screen.getByRole('combobox').getAttribute('aria-describedby')).toBe('fruit-help');
+    });
+
+    it('has no aria-describedby without external ids or helper', () => {
+      render(<Select {...defaultProps} />);
+      expect(screen.getByRole('combobox')).not.toHaveAttribute('aria-describedby');
     });
 
     it('gives each tag remove button an accessible name including the option label', () => {

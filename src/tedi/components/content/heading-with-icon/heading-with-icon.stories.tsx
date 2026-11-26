@@ -1,5 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import HeadingWithIcon, { HeadingWithIconProps } from './heading-with-icon';
 
@@ -12,6 +14,7 @@ export default {
   title: 'Tedi-Ready/Content/HeadingWithIcon',
   component: HeadingWithIcon,
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2137-19827&mode=dev',
@@ -48,4 +51,22 @@ export const Colors: Story = {
     children: 'My family physician',
     name: 'assignment_ind',
   },
+};
+
+/** Chromatic snapshot for HeadingWithIcon: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Colors</Text>
+        <VisualTestStory story={Colors} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

@@ -1,4 +1,4 @@
-import { FloatingFocusManager, FloatingOverlay, FloatingPortal, useTransitionStatus } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingOverlay, useTransitionStatus } from '@floating-ui/react';
 import cn from 'classnames';
 import {
   ComponentProps,
@@ -14,7 +14,9 @@ import {
 } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../../../helpers';
+import { useScrollContainerLock } from '../../../../../helpers/hooks/use-scroll-container-lock';
 import { useLabels } from '../../../../../providers/label-provider';
+import { StylePortal } from '../../../../../providers/style-provider/style-portal';
 import styles from '../../sheet.module.scss';
 import { useSheetContext } from '../../sheet-context';
 
@@ -80,7 +82,8 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
    */
   returnFocus?: boolean;
   /**
-   * Render the dimmed backdrop. `false` keeps portal + focus management but no overlay.
+   * Render the dimmed backdrop. `false` keeps portal + focus management but no overlay. Hidden while
+   * the sheet is collapsed.
    *
    * On its own this only removes the backdrop: scroll stays locked and a click on the page still
    * closes the sheet. For a non-modal sheet the page stays usable behind (docked peek), also set
@@ -194,6 +197,9 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   const { open, floating, getFloatingProps, context, labelId, onOpenChange, collapsed, onCollapsedChange } =
     useSheetContext();
   const { isMounted, status } = useTransitionStatus(context, { duration: { open: 350, close: 300 } });
+  const isScrollContainerLocked = useScrollContainerLock(lockScroll && isMounted);
+  // The page stays undimmed while the sheet is collapsed, so it can still be used.
+  const showBackdrop = showOverlay && !collapsed;
 
   const { snapPoints, defaultSnapPoint, onSnapPointChange } = props;
   const snaps = useMemo(() => (snapPoints ? [...snapPoints].sort((a, b) => a - b) : []), [snapPoints]);
@@ -368,16 +374,16 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   }
 
   return (
-    <FloatingPortal>
+    <StylePortal>
       <FloatingOverlay
-        lockScroll={lockScroll && active}
+        lockScroll={lockScroll && active && !isScrollContainerLocked}
         // `FloatingOverlay` sets `overflow: auto` inline, so overriding it needs an inline style too.
         style={{ overflow: 'clip' }}
         data-status={status}
         // Out of the Tab order, the accessibility tree and pointer input while it animates out.
         {...(status === 'close' && { inert: '' })}
         className={cn(styles['tedi-sheet__overlay'], {
-          [styles['tedi-sheet__overlay--no-overlay']]: !showOverlay,
+          [styles['tedi-sheet__overlay--no-overlay']]: !showBackdrop,
           [styles['tedi-sheet__overlay--hidden']]: !active,
         })}
       >
@@ -418,7 +424,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
           </div>
         </FloatingFocusManager>
       </FloatingOverlay>
-    </FloatingPortal>
+    </StylePortal>
   );
 };
 

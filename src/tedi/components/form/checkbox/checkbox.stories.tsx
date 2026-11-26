@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -30,6 +31,7 @@ const meta: Meta<typeof Checkbox> = {
     controls: {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -396,6 +398,8 @@ export const Controlled = () => {
   );
 };
 
+Controlled.parameters = { visualTest: false };
+
 /** `variant="card"` renders each checkbox as a card. `cardVariant` sets primary / secondary. */
 export const CardsDefault: StoryObj = {
   render: () => (
@@ -698,4 +702,56 @@ export const CardStatesPrimary: StoryObj = {
 export const CardStatesSecondary: StoryObj = {
   parameters: { pseudo: cardStatesPseudo('secondary') },
   render: () => renderCardStates('secondary'),
+};
+
+const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
+  { label: 'Default', content: <VisualTestStory story={Default as StoryObj} /> },
+  { label: 'Sizes', content: <VisualTestStory story={Sizes as StoryObj} /> },
+  { label: 'Hidden label', content: <VisualTestStory story={HiddenLabel as StoryObj} /> },
+  { label: 'With helper', content: <VisualTestStory story={WithHelper as StoryObj} /> },
+  { label: 'With tooltip', content: <VisualTestStory story={WithTooltip as StoryObj} /> },
+  { label: 'With long title', content: <VisualTestStory story={{ render: WithLongTitle }} /> },
+  { label: 'Group', content: <VisualTestStory story={Group} /> },
+  { label: 'Group required', content: <VisualTestStory story={GroupRequired} /> },
+  { label: 'Group invalid', content: <VisualTestStory story={GroupInvalid} /> },
+  { label: 'With select all', content: <VisualTestStory story={WithSelectAll} /> },
+  { label: 'Cards default', content: <VisualTestStory story={CardsDefault} /> },
+  { label: 'Cards with label', content: <VisualTestStory story={CardsWithLabel} /> },
+  { label: 'Cards with description', content: <VisualTestStory story={CardsWithDescription} /> },
+  { label: 'Cards with icons', content: <VisualTestStory story={CardsWithIcons} /> },
+  { label: 'States', content: <VisualTestStory story={{ render: States }} /> },
+  { label: 'Card states primary', content: <VisualTestStory story={CardStatesPrimary} /> },
+  { label: 'Card states secondary', content: <VisualTestStory story={CardStatesSecondary} /> },
+  { label: 'Responsive variant', content: <VisualTestStory story={ResponsiveVariant} /> },
+];
+
+/** Chromatic snapshot for Checkbox: add every new visual variant here too. */
+export const VisualTest: StoryObj = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
+    pseudo: {
+      hover: [...cardStatesPseudo('primary').hover, ...cardStatesPseudo('secondary').hover],
+      active: [
+        ...STATE_COLUMNS.map(({ suffix }) => `#check-active-${suffix} + *`),
+        ...cardStatesPseudo('primary').active,
+        ...cardStatesPseudo('secondary').active,
+      ],
+      focusVisible: [
+        ...STATE_COLUMNS.map(({ suffix }) => `#check-focus-${suffix}`),
+        ...cardStatesPseudo('primary').focusVisible,
+        ...cardStatesPseudo('secondary').focusVisible,
+      ],
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestBlocks.map(({ label, content }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          {content}
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
 };

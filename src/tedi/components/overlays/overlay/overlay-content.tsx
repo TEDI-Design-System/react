@@ -1,6 +1,8 @@
-import { FloatingArrow, FloatingFocusManager, FloatingPortal } from '@floating-ui/react';
+import { FloatingArrow, FloatingFocusManager } from '@floating-ui/react';
 import { CSSProperties, ReactNode, useContext, useEffect } from 'react';
 
+import { lockElementScroll, useScrollContainerLock } from '../../../helpers/hooks/use-scroll-container-lock';
+import { StylePortal } from '../../../providers/style-provider/style-portal';
 import { OverlayContext } from './overlay';
 
 export interface OverlayContentProps {
@@ -36,6 +38,12 @@ export interface OverlayContentProps {
   labelledBy?: string;
 
   /**
+   * Accessible name for the overlay container, for overlays without a visible heading to point
+   * `labelledBy` at.
+   */
+  ariaLabel?: string;
+
+  /**
    * ID of the element that describes the overlay content.
    *
    * This is used to set the `aria-describedby` attribute on the overlay container,
@@ -53,7 +61,7 @@ export interface OverlayContentProps {
 }
 
 export const OverlayContent = (props: OverlayContentProps) => {
-  const { children, classNames, labelledBy, describedBy, contentStyle } = props;
+  const { children, classNames, labelledBy, ariaLabel, describedBy, contentStyle } = props;
   const {
     open,
     x,
@@ -72,21 +80,21 @@ export const OverlayContent = (props: OverlayContentProps) => {
     ariaHidden,
   } = useContext(OverlayContext);
 
-  useEffect(() => {
-    if (scrollLock) {
-      if (open) {
-        document.documentElement.style.overflow = 'hidden';
-        const hasScrollbar = document.documentElement.scrollHeight > window.innerHeight;
+  const isScrollContainerLocked = useScrollContainerLock(!!scrollLock && open);
 
-        if (hasScrollbar) {
-          document.body.style.overflow = 'scroll';
-        }
-      } else {
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
-      }
-    }
-  }, [open, scrollLock]);
+  useEffect(() => {
+    if (!scrollLock || !open || isScrollContainerLocked) return undefined;
+
+    const { documentElement, body } = document;
+    const unlockDocument = lockElementScroll(documentElement);
+    const hasScrollbar = documentElement.scrollHeight > window.innerHeight;
+    const unlockBody = hasScrollbar ? lockElementScroll(body, 'scroll') : undefined;
+
+    return () => {
+      unlockDocument();
+      unlockBody?.();
+    };
+  }, [open, scrollLock, isScrollContainerLocked]);
 
   if (!open) return null;
 
@@ -98,6 +106,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
         id: contentId,
         'aria-hidden': ariaHidden || undefined,
         'aria-labelledby': labelledBy,
+        'aria-label': labelledBy ? undefined : ariaLabel,
         'aria-describedby': describedBy,
         style: {
           position: strategy,
@@ -126,7 +135,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
   );
 
   return (
-    <FloatingPortal>
+    <StylePortal>
       {role === 'tooltip' ? (
         floatingNode
       ) : (
@@ -134,6 +143,6 @@ export const OverlayContent = (props: OverlayContentProps) => {
           {floatingNode}
         </FloatingFocusManager>
       )}
-    </FloatingPortal>
+    </StylePortal>
   );
 };

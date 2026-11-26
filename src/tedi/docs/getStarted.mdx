@@ -65,6 +65,15 @@ Only `default` and `dark` ship with the library's CSS. Any other theme name is a
 yourself. The prop is not validated, so an unknown name fails silently. See
 [Custom theming](/docs/documentation-custom-theming--docs).
 
+Inside a Shadow DOM the class is applied to the `StyleProvider` `containerElement` instead, so
+`ThemeProvider` has to be rendered inside `StyleProvider`:
+
+```tsx
+<StyleProvider containerElement={shadowRootElement}>
+  <ThemeProvider>{children}</ThemeProvider>
+</StyleProvider>
+```
+
 #### LabelProvider
 
 Provides the labels components use, mostly for accessibility. Every application should be wrapped
@@ -74,6 +83,41 @@ component documentation under [components](/docs/components-labelprovider--docs)
 #### StyleProvider
 
 Provides the global styles the library depends on.
+
+When the application renders inside a Shadow DOM, pass the element inside the shadow root as
+`containerElement`. Components that render in a portal (overlays, dropdowns, tooltips, modals, select
+menus) render into it instead of `document.body`, and the Emotion styles of `Select` are added to it
+instead of `document.head`.
+
+```tsx
+<StyleProvider containerElement={shadowRootElement} cacheKey="my-app">
+  {children}
+</StyleProvider>
+```
+
+- `containerElement` can be `null` while the element is still mounting, for example state set by a
+  callback ref. Portals wait for it instead of rendering into `document.body`.
+- `Select` menus are positioned with `position: fixed` inside the container, so the container and its
+  ancestors must not have a CSS `transform`.
+- `cacheKey` is the prefix of the Emotion class names (default `tedi`). Use a different key for each
+  application that is on the same page.
+- The library's stylesheet still has to be added to the shadow root yourself, because it is loaded
+  into the document by default.
+
+By default, locking the page scroll while an overlay (Overlay, Modal, Sheet) is open, and `useScroll`,
+use the host document. If the application scrolls inside its own element instead of the page, pass
+that element as `scrollContainer`. It is separate from `containerElement`, even when both are the same
+element:
+
+```tsx
+<StyleProvider containerElement={shadowRootElement} scrollContainer={scrollElement}>
+  {children}
+</StyleProvider>
+```
+
+The overlays then lock `scrollContainer` and restore its previous `overflow` when they close, and leave the host
+page scrollable. Like `containerElement`, it can be `null` while the element is still mounting: nothing is locked until
+it is set.
 
 #### AccessibilityProvider
 

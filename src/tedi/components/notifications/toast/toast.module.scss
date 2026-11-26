@@ -1,6 +1,11 @@
 :root,
+:host,
 .Toastify__toast-theme--light {
   --toastify-color-progress-light: transparent !important;
+}
+
+.tedi-toast-container {
+  display: contents;
 }
 
 .tedi-toast {

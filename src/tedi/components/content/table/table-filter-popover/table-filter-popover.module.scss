@@ -1,0 +1,16 @@
+.tedi-table-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tedi-dimensions-12);
+  width: 100%;
+}
+
+.tedi-table-filter__actions {
+  display: flex;
+  gap: var(--button-gutter-x-sm);
+
+  > * {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+}

@@ -1,3 +1,203 @@
+# [21.0.0-rc.33](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.32...react-21.0.0-rc.33) (2026-11-25)
+
+
+### Bug Fixes
+
+* **table-card:** skip role-based controls on header click, use the small collapse arrow [#1197](https://github.com/TEDI-Design-System/react/issues/1197) ([#1198](https://github.com/TEDI-Design-System/react/issues/1198)) ([2fe8cea](https://github.com/TEDI-Design-System/react/commit/2fe8cea646a1fbac1b0f501ad2d9c21df716ac5e))
+
+# [21.0.0-rc.32](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.31...react-21.0.0-rc.32) (2026-11-25)
+
+
+### Bug Fixes
+
+* **sheet:** align header defaults, button gap and collapsed overlay with Figma [#1188](https://github.com/TEDI-Design-System/react/issues/1188) ([#1194](https://github.com/TEDI-Design-System/react/issues/1194)) ([6f007a7](https://github.com/TEDI-Design-System/react/commit/6f007a7852984c13df2a26cf71e41f155e479bb8))
+
+
+### BREAKING CHANGES
+
+* **sheet:** the header defaults changed. Set `variant="brand"` and `closeButton` to keep the previous look.
+
+# [21.0.0-rc.31](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.30...react-21.0.0-rc.31) (2026-11-25)
+
+
+### Features
+
+* **skip-links:** add new TEDI-Ready component [#1021](https://github.com/TEDI-Design-System/react/issues/1021) ([#1101](https://github.com/TEDI-Design-System/react/issues/1101)) ([b99f01e](https://github.com/TEDI-Design-System/react/commit/b99f01ee8a4564497c69f352059438839f4356e3))
+
+# [21.0.0-rc.30](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.29...react-21.0.0-rc.30) (2026-11-25)
+
+
+### Features
+
+* **inline-edit:** new TEDI-Ready component [#199](https://github.com/TEDI-Design-System/react/issues/199) ([#904](https://github.com/TEDI-Design-System/react/issues/904)) ([f11fd3c](https://github.com/TEDI-Design-System/react/commit/f11fd3cdc184682d12801c38bf666890b6bb36ad))
+
+# [21.0.0-rc.29](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.28...react-21.0.0-rc.29) (2026-11-25)
+
+
+### Bug Fixes
+
+* **dock-panel:** stop redefining the core sheet header height variable [#1191](https://github.com/TEDI-Design-System/react/issues/1191) ([#1192](https://github.com/TEDI-Design-System/react/issues/1192)) ([2d45832](https://github.com/TEDI-Design-System/react/commit/2d4583247ac532a5a04cafec2a88fb459ef641bc))
+
+# [21.0.0-rc.28](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.27...react-21.0.0-rc.28) (2026-11-25)
+
+
+### Bug Fixes
+
+* **shadow-dom:** avoid document lookups inside shadow roots [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1096](https://github.com/TEDI-Design-System/react/issues/1096)) ([2f867d2](https://github.com/TEDI-Design-System/react/commit/2f867d2758afe7ae93ebc27c9c2bd6f4baef1fc9))
+
+
+### Features
+
+* **overlays:** render portals into the style provider container [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1094](https://github.com/TEDI-Design-System/react/issues/1094)) ([dafcd74](https://github.com/TEDI-Design-System/react/commit/dafcd7431b71b7eb453cf242f4b6a4a5c68114db))
+* **style-provider:** add containerElement for shadow dom support [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1092](https://github.com/TEDI-Design-System/react/issues/1092)) ([478cf80](https://github.com/TEDI-Design-System/react/commit/478cf80dceb2893ca268b6e37e3392b7c48bc80b))
+* **style-provider:** add scrollContainer for shadow dom scroll locking [#825](https://github.com/TEDI-Design-System/react/issues/825) ([#1097](https://github.com/TEDI-Design-System/react/issues/1097)) ([285c480](https://github.com/TEDI-Design-System/react/commit/285c480d35ce35a328cd266c413948f7c05e8517))
+
+# [21.0.0-rc.27](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.26...react-21.0.0-rc.27) (2026-11-24)
+
+
+### Bug Fixes
+
+* **check,choice-group:** update deprecation annotations and warnings [#1174](https://github.com/TEDI-Design-System/react/issues/1174) ([#1175](https://github.com/TEDI-Design-System/react/issues/1175)) ([c33e573](https://github.com/TEDI-Design-System/react/commit/c33e573cfb3cac1bbdb1f674f0e3614682f8acc1))
+
+# [21.0.0-rc.26](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.25...react-21.0.0-rc.26) (2026-11-24)
+
+
+### Bug Fixes
+
+* **sheet:** use a white handle on the brand header and align the stories [#1166](https://github.com/TEDI-Design-System/react/issues/1166) ([#1169](https://github.com/TEDI-Design-System/react/issues/1169)) ([8784c8e](https://github.com/TEDI-Design-System/react/commit/8784c8ee0ea06295520724a892fae52bd7e197e3))
+
+# [21.0.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.24...react-21.0.0-rc.25) (2026-11-24)
+
+
+### Bug Fixes
+
+* **calendar:** Shorten Day Labels [#1131](https://github.com/TEDI-Design-System/react/issues/1131) ([#1143](https://github.com/TEDI-Design-System/react/issues/1143)) ([68c8b11](https://github.com/TEDI-Design-System/react/commit/68c8b1144210a369b93ad8f31803f4a7351cfe6c))
+
+# [21.0.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.23...react-21.0.0-rc.24) (2026-11-20)
+
+
+### Features
+
+* **button:** remove large size, move it into search and category-search [#1113](https://github.com/TEDI-Design-System/react/issues/1113) ([#1160](https://github.com/TEDI-Design-System/react/issues/1160)) ([5eb169f](https://github.com/TEDI-Design-System/react/commit/5eb169fee5a501c9715eef8d5ed36acf93c5c983))
+
+
+### BREAKING CHANGES
+
+* **button:** Button `size` no longer accepts "large". Search's `button`
+prop no longer accepts `size`; Search sets the button size from its own `size`.
+
+# [21.0.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.22...react-21.0.0-rc.23) (2026-11-19)
+
+
+### Features
+
+* **rating:** new TEDI-Ready component [#531](https://github.com/TEDI-Design-System/react/issues/531) ([#958](https://github.com/TEDI-Design-System/react/issues/958)) ([3cf4193](https://github.com/TEDI-Design-System/react/commit/3cf419321d1d04da092a8f53ba24e94fdb01c8a2))
+
+# [21.0.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.21...react-21.0.0-rc.22) (2026-11-19)
+
+
+### Features
+
+* **table:** add column filter popover with configurable actions [#1112](https://github.com/TEDI-Design-System/react/issues/1112) ([#1163](https://github.com/TEDI-Design-System/react/issues/1163)) ([17f12f1](https://github.com/TEDI-Design-System/react/commit/17f12f1d0f0d92f7f1ca865d3c5e7db52fcbdaef))
+* **table:** add meta.sortable shorthand for sort buttons [#1111](https://github.com/TEDI-Design-System/react/issues/1111) ([#1161](https://github.com/TEDI-Design-System/react/issues/1161)) ([07fe986](https://github.com/TEDI-Design-System/react/commit/07fe986ae692368e062e0fff86084d301b11e07d))
+
+# [21.0.0-rc.21](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.20...react-21.0.0-rc.21) (2026-11-19)
+
+
+### Bug Fixes
+
+* **scroll-fade:** recompute fade when content changes [#1170](https://github.com/TEDI-Design-System/react/issues/1170) ([#1171](https://github.com/TEDI-Design-System/react/issues/1171)) ([efc4c59](https://github.com/TEDI-Design-System/react/commit/efc4c596cdc8108cddf627b9dc84f235a2961d09))
+
+# [21.0.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.19...react-21.0.0-rc.20) (2026-11-18)
+
+
+### Features
+
+* **button:** add extra-small size for icon-only buttons [#1004](https://github.com/TEDI-Design-System/react/issues/1004) ([#1100](https://github.com/TEDI-Design-System/react/issues/1100)) ([c8b5ce4](https://github.com/TEDI-Design-System/react/commit/c8b5ce45be2d3b2be08c2e961d3909d19f783012))
+
+# [21.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.18...react-21.0.0-rc.19) (2026-11-18)
+
+
+### Bug Fixes
+
+* **file-dropzone:** apply new state colours and lead the list with rejected files [#1026](https://github.com/TEDI-Design-System/react/issues/1026) ([#1058](https://github.com/TEDI-Design-System/react/issues/1058)) ([a5733f9](https://github.com/TEDI-Design-System/react/commit/a5733f9ab41f56111463b1e702fb2f97c00171e0))
+
+# [21.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.17...react-21.0.0-rc.18) (2026-11-18)
+
+
+### Bug Fixes
+
+* **feedback-text:** use polite live region for valid and error texts [#1137](https://github.com/TEDI-Design-System/react/issues/1137) ([#1159](https://github.com/TEDI-Design-System/react/issues/1159)) ([7ffe9e9](https://github.com/TEDI-Design-System/react/commit/7ffe9e97ff414c4d5127b088f773e4dfdae49e26))
+* **select:** accept external aria-describedby ids [#1157](https://github.com/TEDI-Design-System/react/issues/1157) ([#1158](https://github.com/TEDI-Design-System/react/issues/1158)) ([90a1631](https://github.com/TEDI-Design-System/react/commit/90a1631d8ceeb52f59cbd785b1136abb9a63c081))
+
+# [21.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.16...react-21.0.0-rc.17) (2026-11-17)
+
+
+### Bug Fixes
+
+* **split-pane:** move close button out of the separator [#1155](https://github.com/TEDI-Design-System/react/issues/1155) ([#1156](https://github.com/TEDI-Design-System/react/issues/1156)) ([a1d8e34](https://github.com/TEDI-Design-System/react/commit/a1d8e34bba7cdfffbe9413077e1015f1b0a2ad96))
+
+# [21.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.15...react-21.0.0-rc.16) (2026-11-17)
+
+
+### Bug Fixes
+
+* **mobile-nav:** trap focus and close on Escape in the open menu [#1102](https://github.com/TEDI-Design-System/react/issues/1102) ([#1153](https://github.com/TEDI-Design-System/react/issues/1153)) ([4011c40](https://github.com/TEDI-Design-System/react/commit/4011c4021796665898e29b3e79c22bb58e6dbe4e))
+
+# [21.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.14...react-21.0.0-rc.15) (2026-11-17)
+
+
+### Bug Fixes
+
+* **button:** use per-state text tokens for every button state [#1089](https://github.com/TEDI-Design-System/react/issues/1089) ([#1106](https://github.com/TEDI-Design-System/react/issues/1106)) ([5fc3f42](https://github.com/TEDI-Design-System/react/commit/5fc3f421bdda28e5e015dea131751dc155d096cb))
+
+# [21.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.13...react-21.0.0-rc.14) (2026-11-17)
+
+
+### Bug Fixes
+
+* **table:** Keep Control Labels Stable [#1129](https://github.com/TEDI-Design-System/react/issues/1129) [#1130](https://github.com/TEDI-Design-System/react/issues/1130) ([#1142](https://github.com/TEDI-Design-System/react/issues/1142)) ([a01fecb](https://github.com/TEDI-Design-System/react/commit/a01fecbb02e01041afaa27fd0def507310c99271))
+
+# [21.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.12...react-21.0.0-rc.13) (2026-11-17)
+
+
+### Bug Fixes
+
+* **alert:** Keep Close And Action Buttons Outside The Live Region [#1134](https://github.com/TEDI-Design-System/react/issues/1134) ([#1145](https://github.com/TEDI-Design-System/react/issues/1145)) ([1380cae](https://github.com/TEDI-Design-System/react/commit/1380caefb341ccb034fe24a4438e0f407bd6fb36))
+* **carousel:** Announce Role Once And Shorten Indicator Labels [#1125](https://github.com/TEDI-Design-System/react/issues/1125) ([#1138](https://github.com/TEDI-Design-System/react/issues/1138)) ([270a8ca](https://github.com/TEDI-Design-System/react/commit/270a8ca358734f69a6fdb9ec5cffd82523543a55))
+* **closing-button:** Render Label Once [#1136](https://github.com/TEDI-Design-System/react/issues/1136) ([#1147](https://github.com/TEDI-Design-System/react/issues/1147)) ([2595aaa](https://github.com/TEDI-Design-System/react/commit/2595aaa3b3aa31b84008408cc1ea3c1c3d4a731d))
+* **number-field:** Shorten Number Field Announcements [#1132](https://github.com/TEDI-Design-System/react/issues/1132) ([#1144](https://github.com/TEDI-Design-System/react/issues/1144)) ([618a805](https://github.com/TEDI-Design-System/react/commit/618a805e41bfe3b5fbb49bf0dda33cf4d6cbaf03))
+* **vertical-stepper:** Give Step Actions Link Context [#1103](https://github.com/TEDI-Design-System/react/issues/1103) ([#1148](https://github.com/TEDI-Design-System/react/issues/1148)) ([b43ab79](https://github.com/TEDI-Design-System/react/commit/b43ab7924e7aa4a9c3764a10389c4b9e6fc75945))
+
+
+### Features
+
+* **table:** Add Row Header Column Option [#1105](https://github.com/TEDI-Design-System/react/issues/1105) ([#1150](https://github.com/TEDI-Design-System/react/issues/1150)) ([616ebf8](https://github.com/TEDI-Design-System/react/commit/616ebf829b23a548e0f8b39083614c528fae8f6c))
+
+# [21.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.11...react-21.0.0-rc.12) (2026-11-17)
+
+
+### Bug Fixes
+
+* **pagination:** Shorten Page Labels And Drop Current Page Text [#1128](https://github.com/TEDI-Design-System/react/issues/1128) ([#1141](https://github.com/TEDI-Design-System/react/issues/1141)) ([48d6516](https://github.com/TEDI-Design-System/react/commit/48d6516cc90d8d8ac155ac34b3b60ecaa0fa2b0e))
+* **progress-bar:** Hide Visible Value From Screen Readers [#1126](https://github.com/TEDI-Design-System/react/issues/1126) ([#1139](https://github.com/TEDI-Design-System/react/issues/1139)) ([1cdbc3e](https://github.com/TEDI-Design-System/react/commit/1cdbc3e87f335fa3bde028bc09c557ced868c1cd))
+* **search:** Leave Search Landmark Unnamed By Default [#1127](https://github.com/TEDI-Design-System/react/issues/1127) ([#1140](https://github.com/TEDI-Design-System/react/issues/1140)) ([55a59e5](https://github.com/TEDI-Design-System/react/commit/55a59e50f9e781940dae558f10eaccce56608a70))
+* **table:** Stop Naming Blank Headers By Column Id [#1104](https://github.com/TEDI-Design-System/react/issues/1104) ([#1149](https://github.com/TEDI-Design-System/react/issues/1149)) ([4d85c22](https://github.com/TEDI-Design-System/react/commit/4d85c2227b96e9803efcb6ec3f104436aaa42ce9))
+
+# [21.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.10...react-21.0.0-rc.11) (2026-11-16)
+
+
+### Bug Fixes
+
+* **select:** keep select working on touch inside shadow dom [#1081](https://github.com/TEDI-Design-System/react/issues/1081) ([#1098](https://github.com/TEDI-Design-System/react/issues/1098)) ([66a1ada](https://github.com/TEDI-Design-System/react/commit/66a1ada2cd34b86ac9750ca2e14c958cf729a3f2))
+
+# [21.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.9...react-21.0.0-rc.10) (2026-11-16)
+
+
+### Features
+
+* **dock-panel:** Add Short Title And Presentation Change Callback [#1108](https://github.com/TEDI-Design-System/react/issues/1108) ([#1109](https://github.com/TEDI-Design-System/react/issues/1109)) ([eb662c1](https://github.com/TEDI-Design-System/react/commit/eb662c1799888c2161a867489c59744b766f0f1b))
+
 # [21.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.8...react-21.0.0-rc.9) (2026-11-13)
 
 

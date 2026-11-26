@@ -172,9 +172,11 @@ Rules:
 - [ ] Compound component? Sub-component props are live controls on the primary story via `subcomponentArgTypes` (not a separate `Playground`)
 - [ ] States story covers all visual states shown in Figma (default, hover, active, focus, disabled)
 - [ ] Controlled example included if the component is a form control
+- [ ] Example `ariaLabel`/`aria-label`/`label` values name the content only, never the role or the state ("Main", not "Main navigation"; "Notifications", not "Toggle button"). Consumers copy them, and the screen reader announces role and state itself
 - [ ] Figma link is in the meta `parameters.design` and in the JSDoc comment above `export default`,
       and only when it points to the TEDI Figma file (see section 4)
 - [ ] When multiple instances of the same component appear in one story, use unique IDs per instance to avoid conflicts
+- [ ] Component has a `VisualTest` story? Every new visual story adds its variant there too, unless it keeps its own snapshot (`play` function, open overlay, scrolling, sticky / fixed positioning; see §9)
 - [ ] Use `CardContent` with `padding` prop to add content padding in story examples (components should not hardcode content padding)
 - [ ] No inline `style` in story markup, and no story docblock that restates what renders (see section 8)
 - [ ] Disabled, loading, error and empty states the component supports have a story, even if Figma omits them; place these after the Figma-ordered stories
@@ -201,7 +203,71 @@ meta docblock holds the Figma link and only what a consumer can't learn from the
 Prop descriptions in the controls table come from the props' JSDoc, so fix them there
 ([best-practices.md → Comments and JSDoc](best-practices.md#comments-and-jsdoc)), not in `argTypes`.
 
-### 9. Verify
+### 9. Chromatic Snapshots (`VisualTest`)
+
+Chromatic bills per story, not per pixel. A simple component therefore keeps its snapshots in one
+hidden `VisualTest` story instead of one per docs story.
+
+- **Meta** sets `chromatic: { disableSnapshot: true }` in `parameters`, so docs stories are not snapshotted.
+- **`VisualTest`** comes after the docs stories. It has `tags: ['!dev', '!autodocs']` (hidden from
+  sidebar and docs, still run by Chromatic and the test-runner; never add `!test`) and
+  `parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } }`. It
+  renders every visual variant of the docs stories, each block under a bold `Text` label.
+  `VISUAL_TEST_VIEWPORTS` (375 and 1200) captures every block at mobile and desktop width, because
+  core changes tokens (text, buttons, form fields, cards) below 48rem as well as layouts at
+  breakpoints.
+- **Reuse the docs stories, never copy them**, so a later change to a docs story reaches Chromatic.
+  Render a docs story with `<VisualTestStory story={X} />` from `.storybook/visual-test-story`:
+  pass `component={Component}` for an args-only story, and `props={{ 'aria-label': '…' }}` to give
+  a repeated landmark a unique label. It throws when a story has nothing to render. Where ids
+  collide, extract the story's markup into a template with an `idPrefix` prop and render that.
+- **Separate snapshots** stay separate: stories that need a `play` function, an open overlay,
+  JS-driven animation (timers, intervals), scrolling, a fullscreen layout or sticky/fixed
+  positioning. Give them `chromatic: { disableSnapshot: false }` and keep them out of `VisualTest`;
+  add `viewports: VISUAL_TEST_VIEWPORTS` only when such a story also changes at a breakpoint. Breakpoints alone
+  are not a reason for a separate snapshot. Chromatic does not pause JS
+  timers, so a timer-driven story starts from a fixed value and skips its timer when
+  `isChromatic()` (from `chromatic/isChromatic`) is true.
+- **CSS animations are fine in `VisualTest`**: Chromatic pauses them before capture, so a `Spinner`
+  or a loading state snapshots deterministically.
+- **Behaviour-only stories** (form integration, a controlled-state demo, deep links) opt out with
+  `parameters: { visualTest: false }`. A story that only seems to look like another block still
+  gets its own block, so a later change to it reaches Chromatic.
+- **Unique within the story**: every `id`, `htmlFor`, `aria-labelledby` and radio `name`, and an
+  `aria-label` on each repeated landmark. Pass an id prefix into shared templates.
+- **Pseudo states** target selectors that only match inside their block, e.g.
+  `hover: ['#vt-states-Hover', '#vt-inverted-Hover']`.
+- **Inverted variants** sit on `<Card background="brand-primary" borderless>`, since story `globals`
+  apply to the whole composite.
+
+```tsx
+/** Chromatic snapshot for Button: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
+    pseudo: { hover: ['#vt-primary-Hover'] },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Primary</Text>
+        <TemplateColumn idPrefix="vt-primary-" visualType="primary" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={ResponsiveButton} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};
+```
+
+**A new visual story on a component with `VisualTest` adds its variant to `VisualTest` too**;
+otherwise Chromatic never sees it. A story that keeps its own snapshot (see above) is the exception. `.storybook/visual-test-coverage.spec.ts` (run by `npm run test`) fails when a docs story
+has no block and no opt-out, or `VisualTest` lacks `VISUAL_TEST_VIEWPORTS`.
+
+### 10. Verify
 
 Run Storybook to visually confirm stories render correctly:
 ```

@@ -96,6 +96,18 @@ Install it into your agent (Claude Code, Cursor, Codex and others) with the [`sk
 npx skills add https://github.com/TEDI-Design-System/react --skill tedi-react
 ```
 
+### For consumers: the `tedi-react-migrate` skill
+
+Upgrades your app to a newer `@tedi-design-system/react` version. It finds the version you use, reads every release note up to the latest version, writes a migration plan to `.tedi-migrate/migration-plan.md`, applies the changes it can, and checks them with your typecheck, build and tests. Whatever it can't migrate is listed for you to decide. It also updates your overrides of core CSS variables that were renamed or removed.
+
+```bash
+npx skills add https://github.com/TEDI-Design-System/react --skill tedi-react-migrate
+```
+
+Then ask your agent to "upgrade TEDI to the latest version".
+
+npm projects are fully supported. With pnpm, Yarn or Bun the skill reads the lockfile where it can and asks you for any version it can't determine.
+
 ### For AI-driven design and UI generation: `DESIGN.md`
 
 [`DESIGN.md`](./DESIGN.md) is the machine-readable description of the design system, semantic tokens and TEDI-Ready component rules, that AI agents read to ground generated UI in real TEDI tokens and components. It ships in the npm package.

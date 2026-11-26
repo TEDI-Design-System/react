@@ -93,6 +93,24 @@
   }
 }
 
+/* A block inside the heading, so it carries its own ellipsis and clips the measuring copy. */
+.tedi-dock-panel__fitting-title {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tedi-dock-panel__title-measure {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  visibility: hidden;
+  inline-size: max-content;
+  pointer-events: none;
+}
+
 .tedi-dock-panel__body {
   display: flex;
   flex: 1 1 auto;
@@ -395,22 +413,9 @@
   margin-bottom: var(--tedi-dimensions-05);
 }
 
-/* Sheet's action group never shrinks, so wide header actions would clip the toggle and close button. */
-.tedi-dock-panel__sheet-header {
-  flex-wrap: wrap;
-
-  > :last-child {
-    flex-shrink: 1;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    min-width: 0;
-    margin-inline-start: auto;
-  }
-}
-
+/* One line like Sheet's own header: actions keep their size and only the title truncates. */
 .tedi-dock-panel__sheet-actions {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--tedi-dimensions-04);
   align-items: center;
 

@@ -2,7 +2,6 @@ import {
   autoUpdate,
   flip,
   FloatingFocusManager,
-  FloatingPortal,
   offset,
   shift,
   size,
@@ -25,6 +24,7 @@ import {
   useBreakpointProps,
 } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
+import { StylePortal } from '../../../providers/style-provider/style-portal';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar, DayStatusFn } from '../../content/calendar/calendar';
 import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
@@ -973,7 +973,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
       )}
 
       {enableCalendar && !shouldUseNativePicker && !useModalPicker && (
-        <FloatingPortal>
+        <StylePortal>
           {open && (
             <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
               <div
@@ -1021,7 +1021,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
               </div>
             </FloatingFocusManager>
           )}
-        </FloatingPortal>
+        </StylePortal>
       )}
     </>
   );

@@ -87,7 +87,7 @@ export const Default: Story = {
   render: Template,
   args: {
     navItems: exampleNavItems,
-    ariaLabel: 'Menu title',
+    ariaLabel: 'Main',
   },
   decorators: [mobileViewportDecorator],
 };
@@ -196,7 +196,7 @@ export const SecondLevelMenuItems: Story = {
   render: Template,
   args: {
     navItems: exampleNavCollapsibleItems,
-    ariaLabel: 'Menu title',
+    ariaLabel: 'Main',
   },
   decorators: [mobileViewportDecorator],
 };
@@ -205,7 +205,7 @@ export const SecondLevelMenuItemsParentsAreLinks: Story = {
   render: Template,
   args: {
     navItems: exampleNavCollapsibleItemsWithLinks,
-    ariaLabel: 'Menu title',
+    ariaLabel: 'Main',
   },
   decorators: [mobileViewportDecorator],
 };
@@ -214,7 +214,7 @@ export const ThirdLevelMenuItems: Story = {
   render: Template,
   args: {
     navItems: exampleThirdLevelMenuItems,
-    ariaLabel: 'Menu title',
+    ariaLabel: 'Main',
   },
   decorators: [mobileViewportDecorator],
 };
@@ -223,7 +223,7 @@ export const ThirdLevelMenuItemsParentsAreLinks: Story = {
   render: Template,
   args: {
     navItems: exampleThirdLevelMenuItemsLinks,
-    ariaLabel: 'Menu title',
+    ariaLabel: 'Main',
   },
   decorators: [mobileViewportDecorator],
 };
@@ -239,7 +239,7 @@ export const CollapsibleToggle: StoryFn<typeof SideNav> = (_args, { viewMode }) 
         </Header>
       </HideAt>
       <SideNav
-        ariaLabel="Collapsible menu"
+        ariaLabel="Main"
         navItems={exampleThirdLevelMenuItems}
         isCollapsed={true}
         isMobileOpen={isOpen}
@@ -257,7 +257,7 @@ export const DefaultOpen: Story = {
   render: Template,
   args: {
     navItems: exampleDefaultOpen,
-    ariaLabel: 'Default open menu',
+    ariaLabel: 'Main',
     isMobileOpen: true,
   },
   decorators: [mobileViewportDecorator],
@@ -267,7 +267,7 @@ export const MediumSideNavItems: Story = {
   render: Template,
   args: {
     navItems: exampleThirdLevelMenuItems,
-    ariaLabel: 'Default open menu',
+    ariaLabel: 'Main',
     sideNavItemSize: 'medium',
   },
   decorators: [mobileViewportDecorator],
@@ -277,7 +277,7 @@ export const SmallSideNavItems: Story = {
   render: Template,
   args: {
     navItems: exampleThirdLevelMenuItems,
-    ariaLabel: 'Default open menu',
+    ariaLabel: 'Main',
     sideNavItemSize: 'small',
   },
   decorators: [mobileViewportDecorator],

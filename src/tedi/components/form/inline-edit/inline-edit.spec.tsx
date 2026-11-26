@@ -1,0 +1,693 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
+
+import { Radio } from '../radio';
+import { ISelectOption, Select } from '../select/select';
+import { TextField } from '../textfield/textfield';
+import { InlineEdit } from './inline-edit';
+
+import '@testing-library/jest-dom';
+
+const TextEditor = (props: Partial<React.ComponentProps<typeof InlineEdit<string>>> & { outside?: boolean }) => {
+  const [value, setValue] = useState('John Mets');
+  return (
+    <>
+      <InlineEdit<string>
+        label="Name"
+        value={props.value ?? value}
+        onChange={props.onChange ?? setValue}
+        renderValue={(v) => v || '—'}
+        {...props}
+      >
+        {({ value: draft, onChange }) => (
+          <TextField id="name-edit" label="Name" hideLabel value={draft} onChange={onChange} />
+        )}
+      </InlineEdit>
+      {props.outside && <button type="button">outside</button>}
+    </>
+  );
+};
+
+describe('InlineEdit', () => {
+  it('shows the value as a read trigger by default', () => {
+    render(<TextEditor />);
+    const trigger = screen.getByRole('button', { name: /name/i });
+    expect(trigger).toHaveTextContent('John Mets');
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('the trigger accessible name includes the label', () => {
+    render(<TextEditor />);
+    expect(screen.getByRole('button', { name: /name/i })).toHaveAccessibleName(/name/i);
+  });
+
+  it('enters edit mode on click and focuses the control', async () => {
+    const user = userEvent.setup();
+    render(<TextEditor />);
+    await user.click(screen.getByRole('button', { name: /name/i }));
+
+    const input = screen.getByRole('textbox');
+    expect(input).toBeInTheDocument();
+    expect(input).toHaveFocus();
+  });
+
+  it('commits the draft when focus leaves the editor', async () => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    render(<TextEditor onChange={onChange} outside />);
+
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, 'Mari Maasikas');
+
+    await user.click(screen.getByRole('button', { name: 'outside' }));
+
+    await waitFor(() => expect(onChange).toHaveBeenLastCalledWith('Mari Maasikas'));
+    await waitFor(() => expect(screen.queryByRole('textbox')).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: 'outside' })).toHaveFocus();
+  });
+
+  describe('helper text on the editor control', () => {
+    const helper = { text: 'Vigane väärtus', type: 'error' as const };
+
+    it('links the helper text and invalid state to a text field editor', async () => {
+      const user = userEvent.setup();
+      render(<TextEditor id="field" helper={helper} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveAttribute('aria-describedby', 'field-helper');
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      expect(document.getElementById('field-helper')).toHaveTextContent('Vigane väärtus');
+    });
+
+    it('links every message of a list of helper texts to the editor control', async () => {
+      const user = userEvent.setup();
+      render(
+        <TextEditor
+          id="field"
+          helper={[
+            { text: 'Esimene teade', type: 'hint' },
+            { text: 'Teine teade', type: 'error' },
+          ]}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveAttribute('aria-describedby', 'field-helper-0 field-helper-1');
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      expect(document.getElementById('field-helper-0')).toHaveTextContent('Esimene teade');
+      expect(document.getElementById('field-helper-1')).toHaveTextContent('Teine teade');
+    });
+
+    it('keeps description ids the control already has', async () => {
+      const user = userEvent.setup();
+      render(
+        <InlineEdit<string> id="own" label="Name" defaultValue="Mari" helper={helper}>
+          {({ value, onChange }) => (
+            <input aria-label="Name" aria-describedby="hint" value={value} onChange={(e) => onChange(e.target.value)} />
+          )}
+        </InlineEdit>
+      );
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+
+      expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', 'hint own-helper');
+    });
+
+    it('links the helper text to a select editor', async () => {
+      const user = userEvent.setup();
+      render(
+        <InlineEdit<ISelectOption | null>
+          id="sel"
+          label="Riik"
+          defaultValue={{ value: 'ee', label: 'Eesti' }}
+          renderValue={(v) => (v ? (v.label as string) : '')}
+          helper={helper}
+        >
+          {({ value, onChange }) => (
+            <Select
+              id="country-helper"
+              label="Riik"
+              hideLabel
+              options={[{ value: 'ee', label: 'Eesti' }]}
+              value={value}
+              onChange={(next) => onChange(next as ISelectOption | null)}
+            />
+          )}
+        </InlineEdit>
+      );
+
+      await user.click(screen.getByRole('button', { name: /riik/i }));
+
+      expect(screen.getByRole('combobox').getAttribute('aria-describedby')?.split(' ')).toContain('sel-helper');
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('describes a radio group as a whole, not one radio', async () => {
+      const user = userEvent.setup();
+      render(
+        <InlineEdit<string> id="grp" label="Transport" defaultValue="bus" renderValue={(v) => v} helper={helper}>
+          {({ value, onChange }) => (
+            <Radio.Group id="transport" label="Transport" hideLabel value={value} onChange={onChange}>
+              <Radio value="bus" label="Buss" />
+              <Radio value="train" label="Rong" />
+            </Radio.Group>
+          )}
+        </InlineEdit>
+      );
+
+      await user.click(screen.getByRole('button', { name: /transport/i }));
+
+      const radios = screen.getAllByRole('radio');
+      radios.forEach((radio) => expect(radio).not.toHaveAttribute('aria-describedby', 'grp-helper'));
+      expect(document.querySelector('[aria-describedby~="grp-helper"]')).toBeInTheDocument();
+    });
+
+    it('adds nothing without helper text', async () => {
+      const user = userEvent.setup();
+      render(<TextEditor />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+
+      expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-describedby');
+      expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-invalid');
+    });
+  });
+
+  it('activates a button inside the editor on Enter instead of committing', async () => {
+    const onChange = jest.fn();
+    const onClick = jest.fn();
+    const user = userEvent.setup();
+    render(
+      <InlineEdit<string> label="Name" defaultValue="Mari" onChange={onChange} renderValue={(v) => v}>
+        {({ value, onChange: setDraft }) => (
+          <>
+            <input aria-label="Name" value={value} onChange={(e) => setDraft(e.target.value)} />
+            <button type="button" onClick={onClick}>
+              Pick
+            </button>
+          </>
+        )}
+      </InlineEdit>
+    );
+
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    screen.getByRole('button', { name: 'Pick' }).focus();
+    await user.keyboard('{Enter}');
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+  });
+
+  it('keeps the id on the visible element in every mode', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<TextEditor id="row" />);
+    expect(document.getElementById('row')).toHaveRole('button');
+
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    expect(document.getElementById('row')).toBeInTheDocument();
+    expect(document.getElementById('row')).toContainElement(screen.getByRole('textbox'));
+
+    await user.keyboard('{Escape}');
+    rerender(<TextEditor id="row" readOnly />);
+    expect(document.getElementById('row')).toHaveTextContent('John Mets');
+  });
+
+  describe('edit lifecycle callbacks', () => {
+    it('calls onEditStart when the user opens the editor and onEditCancel when they cancel', async () => {
+      const onEditStart = jest.fn();
+      const onEditCancel = jest.fn();
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(<TextEditor onEditStart={onEditStart} onEditCancel={onEditCancel} onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      expect(onEditStart).toHaveBeenCalledTimes(1);
+
+      await user.keyboard('{Escape}');
+      expect(onEditCancel).toHaveBeenCalledTimes(1);
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('does not call onEditCancel when the edit is committed', async () => {
+      const onEditCancel = jest.fn();
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(<TextEditor onEditCancel={onEditCancel} onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      await user.keyboard('{Enter}');
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onEditCancel).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('controlled editing', () => {
+    const Controlled = (props: { onEditStart?: () => void; onEditCancel?: () => void; initial?: boolean }) => {
+      const [editing, setEditing] = useState(props.initial ?? false);
+      const [value, setValue] = useState('Mari');
+      return (
+        <InlineEdit<string>
+          label="Name"
+          value={value}
+          editing={editing}
+          onEditStart={() => {
+            setEditing(true);
+            props.onEditStart?.();
+          }}
+          onEditCancel={() => {
+            setEditing(false);
+            props.onEditCancel?.();
+          }}
+          onChange={(next) => {
+            setValue(next);
+            setEditing(false);
+          }}
+          renderValue={(v) => v}
+        >
+          {({ value: draft, onChange }) => (
+            <TextField id="ctl" label="Name" hideLabel value={draft} onChange={onChange} />
+          )}
+        </InlineEdit>
+      );
+    };
+
+    it('opens and closes through the parent state', async () => {
+      const onEditStart = jest.fn();
+      const onEditCancel = jest.fn();
+      const user = userEvent.setup();
+      render(<Controlled onEditStart={onEditStart} onEditCancel={onEditCancel} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      expect(onEditStart).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('textbox')).toHaveValue('Mari');
+
+      await user.keyboard('{Escape}');
+      expect(onEditCancel).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
+
+    it('stays in the mode the parent sets, whatever the user does', async () => {
+      const user = userEvent.setup();
+      render(
+        <InlineEdit<string> label="Name" value="Mari" editing renderValue={(v) => v}>
+          {({ value, onChange }) => <TextField id="fixed" label="Name" hideLabel value={value} onChange={onChange} />}
+        </InlineEdit>
+      );
+
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+
+    it('starts the draft from the committed value when the parent opens the editor', () => {
+      const { rerender } = render(
+        <InlineEdit<string> label="Name" value="Mari" editing={false} renderValue={(v) => v}>
+          {({ value, onChange }) => <TextField id="out" label="Name" hideLabel value={value} onChange={onChange} />}
+        </InlineEdit>
+      );
+
+      rerender(
+        <InlineEdit<string> label="Name" value="Mari" editing renderValue={(v) => v}>
+          {({ value, onChange }) => <TextField id="out" label="Name" hideLabel value={value} onChange={onChange} />}
+        </InlineEdit>
+      );
+
+      expect(screen.getByRole('textbox')).toHaveValue('Mari');
+    });
+  });
+
+  describe('closeOnEnter, closeOnEscape and closeOnBlur', () => {
+    it('does not commit on Enter with closeOnEnter off', async () => {
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(<TextEditor closeOnEnter={false} onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      await user.keyboard('{Enter}');
+
+      expect(onChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+
+    it('does not cancel on Escape with closeOnEscape off', async () => {
+      const onEditCancel = jest.fn();
+      const user = userEvent.setup();
+      render(<TextEditor closeOnEscape={false} onEditCancel={onEditCancel} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      await user.keyboard('{Escape}');
+
+      expect(onEditCancel).not.toHaveBeenCalled();
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+
+    it('does not commit when focus leaves with closeOnBlur off', async () => {
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(<TextEditor outside closeOnBlur={false} onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: /name/i }));
+      await user.click(screen.getByRole('button', { name: 'outside' }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+
+      expect(onChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+  });
+
+  describe('Escape in a select editor', () => {
+    const options: ISelectOption[] = [
+      { value: 'ee', label: 'Eesti' },
+      { value: 'fi', label: 'Soome' },
+    ];
+
+    const SelectEditor = () => {
+      const [value, setValue] = useState<ISelectOption | null>(options[0]);
+      return (
+        <InlineEdit<ISelectOption | null>
+          label="Riik"
+          value={value}
+          onChange={setValue}
+          renderValue={(v) => (v ? (v.label as string) : '')}
+        >
+          {({ value: draft, onChange }) => (
+            <Select
+              id="country"
+              label="Riik"
+              hideLabel
+              options={options}
+              value={draft}
+              onChange={(next) => onChange(next as ISelectOption | null)}
+            />
+          )}
+        </InlineEdit>
+      );
+    };
+
+    it('closes the open menu on the first Escape and cancels on the second', async () => {
+      const user = userEvent.setup();
+      render(<SelectEditor />);
+
+      await user.click(screen.getByRole('button', { name: /riik/i }));
+      const combobox = screen.getByRole('combobox');
+      await user.keyboard('{ArrowDown}');
+      expect(combobox).toHaveAttribute('aria-expanded', 'true');
+
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'false');
+      expect(screen.queryByRole('button', { name: /riik/i })).not.toBeInTheDocument();
+
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('button', { name: /riik/i })).toBeInTheDocument();
+    });
+  });
+
+  it('cancels on Escape without committing', async () => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    render(<TextEditor onChange={onChange} />);
+
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    await user.type(screen.getByRole('textbox'), 'xyz');
+    await user.keyboard('{Escape}');
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: /name/i })).toHaveTextContent('John Mets');
+    expect(screen.getByRole('button', { name: /name/i })).toHaveFocus();
+  });
+
+  it('commits the draft on Enter from a single-line control', async () => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    render(<TextEditor onChange={onChange} />);
+
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, 'Mari Maasikas{Enter}');
+
+    expect(onChange).toHaveBeenLastCalledWith('Mari Maasikas');
+    await waitFor(() => expect(screen.queryByRole('textbox')).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /name/i })).toHaveFocus();
+  });
+
+  it('supports uncontrolled use via defaultValue', async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <InlineEdit<string> label="Name" defaultValue="Kalle" renderValue={(v) => v || '—'}>
+          {({ value, onChange }) => <TextField id="u" label="Name" hideLabel value={value} onChange={onChange} />}
+        </InlineEdit>
+        <button type="button">outside</button>
+      </>
+    );
+
+    expect(screen.getByRole('button', { name: /name/i })).toHaveTextContent('Kalle');
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    await user.clear(screen.getByRole('textbox'));
+    await user.type(screen.getByRole('textbox'), 'Tõnu');
+    await user.click(screen.getByRole('button', { name: 'outside' }));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /name/i })).toHaveTextContent('Tõnu'));
+  });
+
+  it.each(['Enter', 'Escape'])('keeps editing when %s is used during IME composition', async (key) => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    render(<TextEditor onChange={onChange} />);
+    await user.click(screen.getByRole('button', { name: /name/i }));
+
+    fireEvent.keyDown(screen.getByRole('textbox'), { key, isComposing: true });
+
+    expect(screen.getByRole('textbox')).toHaveFocus();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('renders the placeholder when the value is empty', () => {
+    render(
+      <InlineEdit<string> label="Name" value="" renderValue={(v) => v} placeholder="Add name">
+        {({ value, onChange }) => <TextField id="e" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    expect(screen.getByRole('button', { name: /name/i })).toHaveTextContent('Add name');
+  });
+
+  it('commit() uses the latest draft when called right after onChange (commit-on-change controls)', async () => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    const CommitOnChange = () => {
+      const [v, setV] = useState('off');
+      return (
+        <InlineEdit<string>
+          label="State"
+          value={v}
+          onChange={(next) => {
+            setV(next);
+            onChange(next);
+          }}
+          renderValue={(x) => x}
+        >
+          {({ onChange: setDraft, commit }) => (
+            <button
+              type="button"
+              onClick={() => {
+                setDraft('on');
+                commit();
+              }}
+            >
+              flip
+            </button>
+          )}
+        </InlineEdit>
+      );
+    };
+    render(<CommitOnChange />);
+
+    await user.click(screen.getByRole('button', { name: /state/i }));
+    await user.click(screen.getByRole('button', { name: 'flip' }));
+
+    await waitFor(() => expect(onChange).toHaveBeenLastCalledWith('on'));
+    expect(screen.getByRole('button', { name: /state/i })).toHaveTextContent('on');
+  });
+
+  it('keeps editing (no commit) when focus moves into a floating-ui popover the editor opened', async () => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    render(
+      <>
+        <InlineEdit<string> label="Date" value="x" onChange={onChange} renderValue={(v) => v}>
+          {({ value, onChange: setDraft }) => (
+            <input aria-label="Date" value={value} onChange={(e) => setDraft(e.target.value)} />
+          )}
+        </InlineEdit>
+        <div data-floating-ui-portal>
+          <button type="button">day</button>
+        </div>
+      </>
+    );
+
+    await user.click(screen.getByRole('button', { name: /date/i }));
+    screen.getByLabelText('Date').focus();
+    await user.click(screen.getByRole('button', { name: 'day' }));
+    await waitFor(() => expect(screen.getByLabelText('Date')).toBeInTheDocument());
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('shows the edit icon', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v}>
+        {({ value, onChange }) => <TextField id="i" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    expect(screen.getByRole('button', { name: /name/i }).textContent).toContain('edit');
+  });
+
+  it('hides the edit icon while invalid', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v} invalid>
+        {({ value, onChange }) => <TextField id="i" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    expect(screen.getByRole('button', { name: /name/i }).querySelector('.tedi-inline-edit__icon')).toBeNull();
+  });
+
+  it('starts open with defaultEditing without taking focus', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v} defaultEditing>
+        {({ value, onChange }) => <TextField id="open" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    const input = screen.getByRole('textbox', { name: /name/i });
+    expect(input).toHaveValue('Mari');
+    expect(input).not.toHaveFocus();
+  });
+
+  it('renders static text (no button) when readOnly', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Locked" readOnly>
+        {({ value, onChange }) => <TextField id="d" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.getByText('Locked')).toBeInTheDocument();
+  });
+
+  it('keeps the trigger (disabled) but blocks editing when disabled', async () => {
+    const user = userEvent.setup();
+    render(
+      <InlineEdit<string> label="Name" value="Locked" disabled>
+        {({ value, onChange }) => <TextField id="dis" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+
+    const trigger = screen.getByRole('button', { name: /name/i });
+    // Unlike readOnly, the trigger still renders — just disabled (so it's out of the tab order).
+    expect(trigger).toBeDisabled();
+
+    await user.click(trigger);
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('applies the small size class without shrinking the edit icon', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" size="small" renderValue={(v) => v}>
+        {({ value, onChange }) => <TextField id="s" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    const trigger = screen.getByRole('button', { name: /name/i });
+    expect(trigger).toHaveClass('tedi-inline-edit--small');
+    // Both variants use the same edit icon size.
+    expect(trigger.querySelector('.tedi-inline-edit__icon')).toHaveClass('tedi-icon--size-18');
+  });
+
+  it('exposes its size to the editor render function so a small field opens a small control', async () => {
+    const user = userEvent.setup();
+    let receivedSize: string | undefined;
+    render(
+      <InlineEdit<string> label="Name" value="Mari" size="small" renderValue={(v) => v}>
+        {({ value, onChange, size }) => {
+          receivedSize = size;
+          return <TextField id="sz" label="Name" hideLabel value={value} onChange={onChange} size={size} />;
+        }}
+      </InlineEdit>
+    );
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    expect(receivedSize).toBe('small');
+  });
+
+  it('keeps the edit icon beside the value with editIconPosition="inline"', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" editIconPosition="inline" renderValue={(v) => v}>
+        {({ value, onChange }) => <TextField id="a" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    expect(screen.getByRole('button', { name: /name/i })).not.toHaveClass('tedi-inline-edit--icon-end');
+  });
+
+  it('fills its container until fitContent is set', () => {
+    const { rerender } = render(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v}>
+        {({ value, onChange }) => <TextField id="fc" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    expect(screen.getByRole('button', { name: /name/i })).not.toHaveClass('tedi-inline-edit--fit-content');
+
+    rerender(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v} fitContent>
+        {({ value, onChange }) => <TextField id="fc" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    expect(screen.getByRole('button', { name: /name/i })).toHaveClass('tedi-inline-edit--fit-content');
+  });
+
+  it('defaults to the end icon position and default size', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v}>
+        {({ value, onChange }) => <TextField id="def" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    const trigger = screen.getByRole('button', { name: /name/i });
+    expect(trigger).not.toHaveClass('tedi-inline-edit--small');
+    expect(trigger).toHaveClass('tedi-inline-edit--icon-end');
+    expect(trigger.querySelector('.tedi-inline-edit__icon')).toHaveClass('tedi-icon--size-18');
+  });
+
+  describe('invalid / helper', () => {
+    it('marks the read trigger invalid via the invalid prop', () => {
+      render(<TextEditor invalid />);
+      expect(screen.getByRole('button', { name: /name/i })).toHaveClass('tedi-inline-edit--invalid');
+    });
+
+    it('renders helper feedback and links it to the trigger via aria-describedby', () => {
+      render(<TextEditor helper={{ text: 'Feedback text', type: 'error' }} />);
+
+      const trigger = screen.getByRole('button', { name: /name/i });
+      const describedBy = trigger.getAttribute('aria-describedby');
+      expect(describedBy).toBeTruthy();
+      expect(document.getElementById(describedBy as string)).toHaveTextContent('Feedback text');
+    });
+
+    it('derives the invalid state from a helper item with type "error"', () => {
+      render(<TextEditor helper={{ text: 'Required', type: 'error' }} />);
+      expect(screen.getByRole('button', { name: /name/i })).toHaveClass('tedi-inline-edit--invalid');
+    });
+
+    it('does not mark the trigger invalid for a non-error helper', () => {
+      render(<TextEditor helper={{ text: 'Looks good', type: 'valid' }} />);
+      expect(screen.getByRole('button', { name: /name/i })).not.toHaveClass('tedi-inline-edit--invalid');
+    });
+
+    it('has no aria-describedby when there is no helper', () => {
+      render(<TextEditor />);
+      expect(screen.getByRole('button', { name: /name/i })).not.toHaveAttribute('aria-describedby');
+    });
+  });
+});

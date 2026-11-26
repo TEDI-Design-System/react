@@ -1,6 +1,8 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+
+import { StyleContext } from '../style-provider/style-provider';
 
 type TEDITheme = 'default' | 'dark';
 export type Theme = TEDITheme | string;
@@ -19,6 +21,15 @@ const ThemeContext = createContext<ThemeContextValue>({
 });
 
 export const useTheme = () => useContext(ThemeContext);
+
+function removeThemeClasses(element: HTMLElement) {
+  for (let i = element.classList.length - 1; i >= 0; i--) {
+    const cls = element.classList.item(i);
+    if (cls?.startsWith(THEME_CLASS_PREFIX)) {
+      element.classList.remove(cls);
+    }
+  }
+}
 
 function getInitialTheme(initialTheme?: Theme): Theme {
   if (typeof window === 'undefined') {
@@ -41,23 +52,35 @@ function getInitialTheme(initialTheme?: Theme): Theme {
 export const ThemeProvider = ({ theme: initialTheme, children }: { theme?: Theme; children: React.ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => getInitialTheme(initialTheme));
 
+  const { containerElement } = useContext(StyleContext);
+
+  const themedRootRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (typeof document === 'undefined') return;
-
-    const root = document.documentElement;
-
-    for (let i = root.classList.length - 1; i >= 0; i--) {
-      const cls = root.classList.item(i);
-      if (cls?.startsWith(THEME_CLASS_PREFIX)) {
-        root.classList.remove(cls);
-      }
-    }
-
-    root.classList.add(`${THEME_CLASS_PREFIX}${theme}`);
 
     localStorage.setItem(STORAGE_KEY, theme);
     document.cookie = `${STORAGE_KEY}=${theme}; path=/; max-age=31536000; SameSite=Lax`;
   }, [theme]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (containerElement === null) return;
+
+    const root = containerElement ?? document.documentElement;
+
+    if (themedRootRef.current && themedRootRef.current !== root) {
+      removeThemeClasses(themedRootRef.current);
+    }
+    themedRootRef.current = root;
+
+    removeThemeClasses(root);
+    root.classList.add(`${THEME_CLASS_PREFIX}${theme}`);
+
+    return () => {
+      if (containerElement) root.classList.remove(`${THEME_CLASS_PREFIX}${theme}`);
+    };
+  }, [theme, containerElement]);
 
   return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };

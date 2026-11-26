@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useRef, useState } from 'react';
 
+import { StyleProvider } from '../../../providers/style-provider/style-provider';
 import { Modal } from './modal';
 import { useModal } from './modal-context';
 
@@ -341,5 +342,43 @@ describe('Modal', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0]).toBeInstanceOf(HTMLButtonElement);
+  });
+
+  it('locks the StyleProvider scroll container instead of the document while open', () => {
+    const scrollContainer = document.createElement('div');
+
+    const { unmount } = render(
+      <StyleProvider scrollContainer={scrollContainer}>
+        <Modal defaultOpen>
+          <Modal.Content>
+            <Modal.Header title="Title" />
+            <Modal.Body>Body</Modal.Body>
+          </Modal.Content>
+        </Modal>
+      </StyleProvider>
+    );
+
+    expect(scrollContainer.style.overflow).toBe('hidden');
+    expect(document.body.style.overflow).not.toBe('hidden');
+
+    unmount();
+    expect(scrollContainer.style.overflow).toBe('');
+  });
+
+  it('does not lock the StyleProvider scroll container when lockScroll is false', () => {
+    const scrollContainer = document.createElement('div');
+
+    render(
+      <StyleProvider scrollContainer={scrollContainer}>
+        <Modal defaultOpen>
+          <Modal.Content lockScroll={false}>
+            <Modal.Header title="Title" />
+            <Modal.Body>Body</Modal.Body>
+          </Modal.Content>
+        </Modal>
+      </StyleProvider>
+    );
+
+    expect(scrollContainer.style.overflow).toBe('');
   });
 });

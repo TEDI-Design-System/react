@@ -43,6 +43,8 @@ $sheet-fade-duration: 200ms;
   --tedi-sheet-radius: var(--sheet-header-radius-md);
   --tedi-sheet-padding-x: var(--sheet-header-padding-md);
   --tedi-sheet-padding-y: var(--sheet-header-padding-sm);
+  --tedi-sheet-body-padding: var(--sheet-body-padding-md);
+  --tedi-sheet-footer-padding: var(--sheet-footer-padding-md);
   --tedi-sheet-header-min-height: var(--sheet-header-height);
 
   position: relative;
@@ -66,6 +68,8 @@ $sheet-fade-duration: 200ms;
 .tedi-sheet__panel--padding-small {
   // Header, body and footer all read these panel-level custom properties, so the whole sheet shrinks together.
   --tedi-sheet-padding-x: var(--sheet-header-padding-sm);
+  --tedi-sheet-body-padding: var(--sheet-body-padding-sm);
+  --tedi-sheet-footer-padding: var(--sheet-footer-padding-sm);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -93,10 +97,14 @@ $sheet-fade-duration: 200ms;
 }
 
 .tedi-sheet__handle {
-  width: 2rem;
-  height: var(--tedi-borders-04);
+  width: var(--sheet-header-drag-indicator-width);
+  height: var(--sheet-header-drag-indicator-height);
   background: var(--drag-indicator-light);
   border-radius: var(--tedi-dimensions-13);
+}
+
+.tedi-sheet__panel:has(.tedi-sheet__header--brand) .tedi-sheet__handle {
+  background: var(--tedi-alpha-white-50);
 }
 
 .tedi-sheet__header {
@@ -162,7 +170,6 @@ $sheet-fade-duration: 200ms;
 .tedi-sheet__header-actions {
   display: flex;
   flex-shrink: 0;
-  gap: var(--layout-grid-gutters-08);
   align-items: center;
 }
 
@@ -184,7 +191,7 @@ $sheet-fade-duration: 200ms;
 
 .tedi-sheet__body {
   flex: 1 1 auto;
-  padding: var(--tedi-sheet-padding-x);
+  padding: var(--tedi-sheet-body-padding);
   overflow-y: auto;
   background: var(--sheet-body-default);
 
@@ -201,7 +208,7 @@ $sheet-fade-duration: 200ms;
   display: flex;
   gap: var(--button-gutter-x);
   align-items: center;
-  padding: var(--tedi-sheet-padding-x);
+  padding: var(--tedi-sheet-footer-padding);
   background: var(--sheet-footer-background);
   border-top: var(--tedi-borders-01) solid var(--sheet-border);
 

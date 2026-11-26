@@ -70,8 +70,10 @@ export type SideNavProps<C extends React.ElementType = 'a'> = ConditionalTypes<C
    * const [isOpen, setIsOpen] = useState(true);
    *
    * <SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />
-   * <SideNav isMobileOpen={isOpen} ariaLabel="Mobile menu" navItems={...} />
+   * <SideNav isMobileOpen={isOpen} onMenuToggle={setIsOpen} ariaLabel="Main" navItems={...} />
    * ```
+   *
+   * Always pass `onMenuToggle` as well: the open overlay closes itself (Escape, choosing a link) through it.
    *
    * If not provided, the mobile menu manages its open state internally based on viewport size.
    */
