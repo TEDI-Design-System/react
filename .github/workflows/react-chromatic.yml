@@ -42,9 +42,15 @@ jobs:
     # `pull_request_review` has no `branches:` filter, so the base branch is
     # checked here. Note the dependabot check reads the PR author, not
     # `github.actor`, which on a review event is the reviewer.
+    #
+    # The `skip-chromatic` label opts a PR out for changes with no visual
+    # effect (a11y attributes, logic, tests), which the a11y and unit test
+    # jobs already cover. The `rc` build in react-release.yml honours it too.
+    # A manual run of this workflow still builds.
     if: |
       github.event_name == 'workflow_dispatch' || (
         github.event.review.state == 'approved' &&
+        !contains(github.event.pull_request.labels.*.name, 'skip-chromatic') &&
         (github.event.pull_request.base.ref == 'rc' || github.event.pull_request.base.ref == 'main') &&
         github.event.pull_request.head.repo.full_name == github.repository &&
         github.event.pull_request.draft == false &&
