@@ -1,3 +1,11 @@
+# [21.0.0-rc.35](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.34...react-21.0.0-rc.35) (2026-11-26)
+
+
+### Bug Fixes
+
+* **dropdown:** remove invalid aria-activedescendant from menu [#1207](https://github.com/TEDI-Design-System/react/issues/1207) ([#1208](https://github.com/TEDI-Design-System/react/issues/1208)) ([8214516](https://github.com/TEDI-Design-System/react/commit/82145161bb1a2fbfccb784a4e918fbb305f4a6bd))
+* **filter:** stack options vertically when max height is set [#1200](https://github.com/TEDI-Design-System/react/issues/1200) ([#1205](https://github.com/TEDI-Design-System/react/issues/1205)) ([33846d7](https://github.com/TEDI-Design-System/react/commit/33846d700f7777f4a5c39df7fa41a74acabf0eae))
+
 # [21.0.0-rc.34](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.33...react-21.0.0-rc.34) (2026-11-26)
 
 
