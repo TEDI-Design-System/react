@@ -53,14 +53,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-      - name: Install dependencies
-        run: |
-          npm ci --cache .npm --prefer-offline
 
+      # A merged PR labelled `skip-chromatic` (a non-visual change, see the
+      # `guard` job in react-chromatic.yml) gets no build here either; this
+      # step sets `skip` and every step after it is skipped.
+      #
       # After a squash merge Chromatic also uses the pull request's last build
       # as a baseline. That build's commit is not in this clone (the branch was
       # squashed and deleted, or force-pushed), so Chromatic logs "Missing
@@ -82,6 +79,11 @@ jobs:
               core.info('No pull request is associated with this commit.');
               return;
             }
+            if (pr.labels?.some((l) => l.name === 'skip-chromatic')) {
+              core.notice(`#${pr.number} is labelled skip-chromatic; no Chromatic build for this push.`);
+              core.setOutput('skip', 'true');
+              return;
+            }
             const baseline = require('./.github/scripts/chromatic-baseline.cjs');
             const { previous } = await baseline({ github, context, core }, pr.number);
             core.setOutput('pr', String(pr.number));
@@ -99,6 +101,16 @@ jobs:
             git fetch --no-tags origin "$sha" || echo "::warning::Could not fetch ${sha}"
           done
 
+      - name: Setup Node.js
+        if: steps.baseline.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+      - name: Install dependencies
+        if: steps.baseline.outputs.skip != 'true'
+        run: |
+          npm ci --cache .npm --prefer-offline
+
       # chromaui/action rather than the raw CLI: it surfaces the build result
       # as step outputs (change count, build URL, capture counts), which the
       # two steps below need. exitZeroOnChanges keeps the release green: a
@@ -106,6 +118,7 @@ jobs:
       # built by the CLI itself via buildScriptName in chromatic.config.json.
       - name: Publish to Chromatic
         id: chromatic
+        if: steps.baseline.outputs.skip != 'true'
         uses: chromaui/action@v18
         with:
           projectToken: ${{ secrets.CHROMATIC_TOKEN }}
@@ -159,7 +172,7 @@ jobs:
       # what TurboSnap copied at 0.2x, so this is the real per-build cost
       # against the monthly quota rather than an estimate.
       - name: Record the snapshot usage
-        if: always()
+        if: always() && steps.baseline.outputs.skip != 'true'
         env:
           CAPTURED: ${{ steps.chromatic.outputs.actualCaptureCount }}
           INHERITED: ${{ steps.chromatic.outputs.inheritedCaptureCount }}
