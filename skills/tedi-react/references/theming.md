@@ -16,21 +16,21 @@ Or in SCSS:
 @use '@tedi-design-system/core/scss' as tedi;
 ```
 
-Wrap your app with the three TEDI providers, in this order — `ThemeProvider` (theme tokens), `LabelProvider` (translatable component labels), `StyleProvider` (runtime style injection):
+Wrap your app with the TEDI providers, in this order: `ThemeProvider` (theme class), `PrintingProvider` (print state), `LabelProvider` (translatable component labels):
 
 ```tsx
-import { ThemeProvider, LabelProvider, StyleProvider } from '@tedi-design-system/react/tedi';
+import { ThemeProvider, PrintingProvider, LabelProvider } from '@tedi-design-system/react/tedi';
 
 <ThemeProvider theme="default">
-  <LabelProvider>
-    <StyleProvider>
+  <PrintingProvider>
+    <LabelProvider locale="et">
       <App />
-    </StyleProvider>
-  </LabelProvider>
+    </LabelProvider>
+  </PrintingProvider>
 </ThemeProvider>
 ```
 
-`StyleProvider` is documented on its own below; it must sit inside the other two. Do not skip `LabelProvider` — components with built-in labels (close buttons, pagination, etc.) rely on it.
+Do not skip `PrintingProvider`: `Collapse` and `SideNav` throw without it. Do not skip `LabelProvider`: components with built-in labels (close buttons, pagination, etc.) rely on it. `StyleProvider` (below) is optional.
 
 ## Theme Switching
 
@@ -157,7 +157,8 @@ Create a custom theme by defining token values under a theme class:
 
 ## StyleProvider
 
-The `StyleProvider` wraps components that need runtime style injection:
+`StyleProvider` is exported for compatibility but currently renders its children unchanged, so
+it is optional:
 
 ```tsx
 import { StyleProvider } from '@tedi-design-system/react/tedi';

@@ -25,9 +25,10 @@
     "start": "storybook dev -p 4400 -c .storybook",
     "build": "rm -rf dist && vite build --config vite.lib.config.ts && replace-in-file //fonts//g \"./fonts/\" dist/index.css dist/index-without-icons.css --isRegex",
     "build:sb": "storybook build -c .storybook -o dist/storybook-static --stats-json && replace-in-file //fonts//g \"../fonts/\" \"dist/storybook-static/assets/*.css\" --isRegex",
-    "lint": "npx stylelint \"src/**/*.scss\" --fix && eslint \"src/**/*.{ts,tsx}\" --no-ignore --fix",
-    "lint:ci": "npx stylelint \"src/**/*.scss\" --quiet && npx eslint . --quiet",
+    "lint": "npx stylelint \"src/**/*.scss\" --fix && eslint \"src/**/*.{ts,tsx}\" \"skills/**/*.mjs\" --no-ignore --fix",
+    "lint:ci": "npx stylelint \"src/**/*.scss\" --quiet && npx eslint . \"skills/**/*.mjs\" --quiet",
     "test": "jest --config ./jest.config.ts --passWithNoTests",
+    "test:skills": "node --test \"skills/__tests__/**/*.test.mjs\"",
     "test:coverage": "jest --config ./jest.config.ts --coverage",
     "test-storybook": "test-storybook",
     "test-storybook:ci": "concurrently -k -s first -n \"SB,A11Y\" -c \"magenta,blue\" \"http-server dist/storybook-static --port 6006 --silent\" \"wait-on tcp:127.0.0.1:6006 && test-storybook --index-json --url http://127.0.0.1:6006 --junit\"",
@@ -44,13 +45,14 @@
     "node": ">=24.0.0"
   },
   "dependencies": {
+    "@emotion/cache": "^11.4.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@floating-ui/react": "^0.27.19",
     "@mui/material": "^5.15.13",
     "@mui/x-date-pickers": "^5.0.20",
     "@tanstack/react-table": "^8.13.2",
-    "@tedi-design-system/core": "6.12.0",
+    "@tedi-design-system/core": "6.13.0",
     "classnames": "^2.5.1",
     "draft-js": "^0.11.7",
     "draftjs-md-converter": "^1.5.2",
@@ -82,7 +84,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@etchteam/storybook-addon-status": "^8.1.0",
     "@faker-js/faker": "^10.3.0",
-    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/npm": "^13.1.5",
@@ -102,7 +104,7 @@
     "@types/draft-js": "^0.11.20",
     "@types/jest": "29.5.14",
     "@types/lodash-es": "^4.17.12",
-    "@types/node": "20.11.28",
+    "@types/node": "26.6.6",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.0",
     "@types/showdown": "^2.0.6",
@@ -181,6 +183,10 @@
       "prettier --write"
     ],
     "src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "skills/**/*.mjs": [
       "eslint --fix",
       "prettier --write"
     ]

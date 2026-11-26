@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Label, LabelModifierProps } from '../../content/label/label';
 import { Col, Row } from '../../layout/grid';
@@ -16,6 +17,7 @@ const meta: Meta<typeof FormLabel> = {
     status: {
       type: 'internalComponent',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -126,4 +128,30 @@ const WrappingTemplate: StoryFn = () => {
 
 export const LabelWrapping = {
   render: WrappingTemplate,
+};
+
+/** Chromatic snapshot for FormLabel: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} component={FormLabel} props={{ id: 'input-id-vt-1' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Size</Text>
+        <VisualTestStory story={Size} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Structure</Text>
+        <VisualTestStory story={Structure} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Label wrapping</Text>
+        <VisualTestStory story={LabelWrapping} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

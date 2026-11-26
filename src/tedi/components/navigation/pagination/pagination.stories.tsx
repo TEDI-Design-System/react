@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { Text } from '../../base/typography/text/text';
+import { Card } from '../../content/card';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Pagination, PaginationProps } from './pagination';
 
 /**
@@ -24,6 +28,7 @@ const meta: Meta<typeof Pagination> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=8478-72385&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 export default meta;
@@ -104,7 +109,7 @@ export const WithoutDropdown: Story = {
  * Controlled mode — the consumer owns `page` state explicitly.
  */
 export const ControlledPage: Story = {
-  parameters: { chromatic: { disableSnapshot: true } },
+  parameters: { visualTest: false },
   render: function ControlledPage() {
     const [page, setPage] = useState(3);
     return <Pagination pageCount={10} page={page} onPageChange={setPage} />;
@@ -177,6 +182,43 @@ export const Transparent: Story = {
   ],
 };
 
+const TopBottomSplitTemplate = ({ ariaLabels }: { ariaLabels?: { top: string; bottom: string } }) => {
+  const [page, setPage] = useState(3);
+  const [pageSize, setPageSize] = useState(10);
+  const sharedProps = {
+    pageCount: Math.ceil(97 / pageSize),
+    page,
+    onPageChange: setPage,
+    totalItems: 97,
+    pageSize,
+    pageSizeOptions: [10, 25, 50, 100],
+    onPageSizeChange: (next: number) => {
+      setPageSize(next);
+      setPage(1);
+    },
+  };
+  return (
+    <>
+      <Pagination
+        {...sharedProps}
+        hidePager
+        borders="bottom"
+        labels={ariaLabels ? { ariaLabel: ariaLabels.top } : undefined}
+      />
+      <div style={{ padding: '1.5rem 0', color: 'var(--general-text-tertiary)', textAlign: 'center' }}>
+        — table content goes here —
+      </div>
+      <Pagination
+        {...sharedProps}
+        hideResults
+        hidePageSize
+        borders="top"
+        labels={ariaLabels ? { ariaLabel: ariaLabels.bottom } : undefined}
+      />
+    </>
+  );
+};
+
 /**
  * Use the per-slot hide toggles to render different parts of the pagination
  * above and below a table. Top row shows results + page-size; bottom row shows
@@ -184,31 +226,7 @@ export const Transparent: Story = {
  * pager stays visually anchored when content sits beneath it.
  */
 export const TopBottomSplit: Story = {
-  render: function TopBottomSplit() {
-    const [page, setPage] = useState(3);
-    const [pageSize, setPageSize] = useState(10);
-    const sharedProps = {
-      pageCount: Math.ceil(97 / pageSize),
-      page,
-      onPageChange: setPage,
-      totalItems: 97,
-      pageSize,
-      pageSizeOptions: [10, 25, 50, 100],
-      onPageSizeChange: (next: number) => {
-        setPageSize(next);
-        setPage(1);
-      },
-    };
-    return (
-      <>
-        <Pagination {...sharedProps} hidePager borders="bottom" />
-        <div style={{ padding: '1.5rem 0', color: 'var(--general-text-tertiary)', textAlign: 'center' }}>
-          — table content goes here —
-        </div>
-        <Pagination {...sharedProps} hideResults hidePageSize borders="top" />
-      </>
-    );
-  },
+  render: () => <TopBottomSplitTemplate />,
 };
 
 /**
@@ -307,7 +325,7 @@ export const Borders: Story = {
           totalItems={97}
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
-          labels={{ ariaLabel: 'Pagination (borders: top)' }}
+          labels={{ ariaLabel: 'Lehed: ülemine eraldusjoon' }}
         />
       </div>
       <div>
@@ -319,7 +337,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="bottom"
-          labels={{ ariaLabel: 'Pagination (borders: bottom)' }}
+          labels={{ ariaLabel: 'Lehed: alumine eraldusjoon' }}
         />
       </div>
       <div>
@@ -331,7 +349,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="both"
-          labels={{ ariaLabel: 'Pagination (borders: both)' }}
+          labels={{ ariaLabel: 'Lehed: mõlemad eraldusjooned' }}
         />
       </div>
       <div>
@@ -343,7 +361,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="none"
-          labels={{ ariaLabel: 'Pagination (borders: none)' }}
+          labels={{ ariaLabel: 'Lehed: eraldusjooneta' }}
         />
       </div>
     </div>
@@ -441,4 +459,142 @@ export const ShowAllPageSize: Story = {
       />
     );
   },
+};
+
+/** Chromatic snapshot for Pagination: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} component={Pagination} props={{ labels: { ariaLabel: 'Default' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">First</Text>
+        <VisualTestStory story={First} component={Pagination} props={{ labels: { ariaLabel: 'First' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Last</Text>
+        <VisualTestStory story={Last} component={Pagination} props={{ labels: { ariaLabel: 'Last' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">All properties shown</Text>
+        <VisualTestStory story={AllPropertiesShown} props={{ labels: { ariaLabel: 'All properties shown' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Without results number</Text>
+        <VisualTestStory story={WithoutResultsNumber} props={{ labels: { ariaLabel: 'Without results number' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Without dropdown</Text>
+        <VisualTestStory
+          story={WithoutDropdown}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Without dropdown' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Few pages</Text>
+        <VisualTestStory story={FewPages} component={Pagination} props={{ labels: { ariaLabel: 'Few pages' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Many pages ellipsis</Text>
+        <VisualTestStory
+          story={ManyPagesEllipsis}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Many pages ellipsis' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Huge page count</Text>
+        <VisualTestStory
+          story={HugePageCount}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Huge page count' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Wider siblings</Text>
+        <VisualTestStory
+          story={WiderSiblings}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Wider siblings' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Transparent</Text>
+        <Card borderless>
+          <Card.Content background="secondary">
+            <VisualTestStory
+              story={Transparent}
+              component={Pagination}
+              props={{ labels: { ariaLabel: 'Transparent' } }}
+            />
+          </Card.Content>
+        </Card>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Top bottom split</Text>
+        <TopBottomSplitTemplate ariaLabels={{ top: 'Top bottom split, top', bottom: 'Top bottom split, bottom' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Disabled boundary arrows</Text>
+        <VisualTestStory story={DisabledBoundaryArrows} props={{ labels: { ariaLabel: 'Disabled boundary arrows' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Arrows with labels</Text>
+        <VisualTestStory
+          story={ArrowsWithLabels}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Arrows with labels' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Custom arrow icons</Text>
+        <VisualTestStory
+          story={CustomArrowIcons}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Custom arrow icons' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Arrows primary variant</Text>
+        <VisualTestStory story={ArrowsPrimaryVariant} props={{ labels: { ariaLabel: 'Arrows primary variant' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Borders</Text>
+        <VisualTestStory story={Borders} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Custom labels</Text>
+        <VisualTestStory
+          story={CustomLabels}
+          component={Pagination}
+          props={{ labels: { ...CustomLabels.args?.labels, ariaLabel: 'Custom labels' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Show all page size</Text>
+        <VisualTestStory story={ShowAllPageSize} props={{ labels: { ariaLabel: 'Show all page size' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive visibility</Text>
+        <VisualTestStory
+          story={ResponsiveVisibility}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Responsive visibility' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Mobile picker</Text>
+        <VisualTestStory
+          story={MobilePicker}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Mobile picker' } }}
+        />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

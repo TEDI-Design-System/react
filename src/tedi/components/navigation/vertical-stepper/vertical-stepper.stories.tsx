@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -32,6 +33,7 @@ const meta: Meta<typeof VerticalStepper> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.54.75?node-id=4375-57530&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -116,16 +118,21 @@ export const WithStatusBadges: Story = {
   ),
 };
 
+/**
+ * `titleId` puts an id on the step title, so an action in `endSlot` can reference it with `aria-describedby`.
+ * Links also appear in a screen reader's links list, where descriptions are not read: give them the context in their text instead (see With Links).
+ */
 export const WithButton: Story = {
   render: () => (
     <Frame>
       <VerticalStepper aria-label="Andmete sisestus">
         <VerticalStepper.Item
           title="Isikuandmed"
+          titleId="step-personal-data-title"
           state="completed"
           href="#b1"
           endSlot={
-            <Button visualType="secondary" size="small" iconLeft="add">
+            <Button visualType="secondary" size="small" iconLeft="add" aria-describedby="step-personal-data-title">
               Lisa isik
             </Button>
           }
@@ -148,7 +155,7 @@ export const WithLinks: Story = {
           href="#l1"
           endSlot={
             <Link href="#read-1" iconRight="arrow_forward">
-              Loe rohkem
+              Loe rohkem<span className="visually-hidden">: Vaimne tervis</span>
             </Link>
           }
         />
@@ -158,7 +165,7 @@ export const WithLinks: Story = {
           href="#l2"
           endSlot={
             <Link href="#read-2" iconRight="arrow_forward">
-              Loe rohkem
+              Loe rohkem<span className="visually-hidden">: Füüsiline tervis</span>
             </Link>
           }
         />
@@ -169,24 +176,26 @@ export const WithLinks: Story = {
   ),
 };
 
+const CompactTemplate = ({ ariaLabel = 'Hindamise edenemine' }: { ariaLabel?: string }) => (
+  <Frame>
+    <VerticalStepper aria-label={ariaLabel} compact>
+      <VerticalStepper.Item title="Sotsiaalne võrgustik" current href="#c1" />
+      <VerticalStepper.Item title="Sotsiaalsed suhted" state="completed" defaultOpen>
+        <VerticalStepper.SubItem title="Sõbrad" state="completed" onClick={noop} />
+        <VerticalStepper.SubItem title="Pere" onClick={noop} />
+      </VerticalStepper.Item>
+      <VerticalStepper.Item title="Vaimne tervis" state="completed" href="#c3" />
+      <VerticalStepper.Item title="Füüsiline tervis" state="completed" href="#c4" />
+      <VerticalStepper.Item title="Elukeskkond" state="completed" href="#c5" />
+      <VerticalStepper.Item title="Hõivatus" state="error" href="#c6" />
+      <VerticalStepper.Item title="Vaba aeg ja huvitegevused" state="completed" href="#c7" />
+      <VerticalStepper.Item title="Igapäevaelu toimingud" href="#c8" />
+    </VerticalStepper>
+  </Frame>
+);
+
 export const Compact: Story = {
-  render: () => (
-    <Frame>
-      <VerticalStepper aria-label="Hindamise edenemine" compact>
-        <VerticalStepper.Item title="Sotsiaalne võrgustik" current href="#c1" />
-        <VerticalStepper.Item title="Sotsiaalsed suhted" state="completed" defaultOpen>
-          <VerticalStepper.SubItem title="Sõbrad" state="completed" onClick={noop} />
-          <VerticalStepper.SubItem title="Pere" onClick={noop} />
-        </VerticalStepper.Item>
-        <VerticalStepper.Item title="Vaimne tervis" state="completed" href="#c3" />
-        <VerticalStepper.Item title="Füüsiline tervis" state="completed" href="#c4" />
-        <VerticalStepper.Item title="Elukeskkond" state="completed" href="#c5" />
-        <VerticalStepper.Item title="Hõivatus" state="error" href="#c6" />
-        <VerticalStepper.Item title="Vaba aeg ja huvitegevused" state="completed" href="#c7" />
-        <VerticalStepper.Item title="Igapäevaelu toimingud" href="#c8" />
-      </VerticalStepper>
-    </Frame>
-  ),
+  render: () => <CompactTemplate />,
 };
 
 type StateDef<T> = { label: string; props: Partial<T>; noHover?: boolean };
@@ -358,4 +367,57 @@ export const Responsive: Story = {
       </>
     );
   },
+};
+
+/** Chromatic snapshot for VerticalStepper: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
+    pseudo: { hover: ['.vs-hover a', '.vs-hover button'] },
+    a11y: {
+      config: {
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'landmark-unique', enabled: false },
+        ],
+      },
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With descriptions</Text>
+        <VisualTestStory story={WithDescriptions} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With status badges</Text>
+        <VisualTestStory story={WithStatusBadges} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With button</Text>
+        <VisualTestStory story={WithButton} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With links</Text>
+        <VisualTestStory story={WithLinks} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Compact</Text>
+        <VisualTestStory story={Compact} props={{ ariaLabel: 'Hindamise edenemine, kompaktne' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <VisualTestStory story={States} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={Responsive} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

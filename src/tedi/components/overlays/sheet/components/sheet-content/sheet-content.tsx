@@ -1,8 +1,9 @@
-import { FloatingFocusManager, FloatingOverlay, FloatingPortal, useTransitionStatus } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingOverlay, useTransitionStatus } from '@floating-ui/react';
 import cn from 'classnames';
 import {
   ComponentProps,
   CSSProperties,
+  DragEvent as ReactDragEvent,
   PointerEvent as ReactPointerEvent,
   ReactNode,
   useCallback,
@@ -13,7 +14,9 @@ import {
 } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../../../helpers';
+import { useScrollContainerLock } from '../../../../../helpers/hooks/use-scroll-container-lock';
 import { useLabels } from '../../../../../providers/label-provider';
+import { StylePortal } from '../../../../../providers/style-provider/style-portal';
 import styles from '../../sheet.module.scss';
 import { useSheetContext } from '../../sheet-context';
 
@@ -79,7 +82,8 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
    */
   returnFocus?: boolean;
   /**
-   * Render the dimmed backdrop. `false` keeps portal + focus management but no overlay.
+   * Render the dimmed backdrop. `false` keeps portal + focus management but no overlay. Hidden while
+   * the sheet is collapsed.
    *
    * On its own this only removes the backdrop: scroll stays locked and a click on the page still
    * closes the sheet. For a non-modal sheet the page stays usable behind (docked peek), also set
@@ -193,6 +197,9 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   const { open, floating, getFloatingProps, context, labelId, onOpenChange, collapsed, onCollapsedChange } =
     useSheetContext();
   const { isMounted, status } = useTransitionStatus(context, { duration: { open: 350, close: 300 } });
+  const isScrollContainerLocked = useScrollContainerLock(lockScroll && isMounted);
+  // The page stays undimmed while the sheet is collapsed, so it can still be used.
+  const showBackdrop = showOverlay && !collapsed;
 
   const { snapPoints, defaultSnapPoint, onSnapPointChange } = props;
   const snaps = useMemo(() => (snapPoints ? [...snapPoints].sort((a, b) => a - b) : []), [snapPoints]);
@@ -217,11 +224,14 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   } | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
+  // From the press, not the drag threshold: the panel holds the pointer from then on, so its cursor shows.
+  const [grabbing, setGrabbing] = useState(false);
 
   const resetDrag = useCallback(() => {
     const drag = dragRef.current;
     if (!drag) return;
     dragRef.current = null;
+    setGrabbing(false);
     setDragging(false);
     setDragOffset(0);
     if (drag.target.hasPointerCapture(drag.pointerId)) {
@@ -254,6 +264,9 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
       target: currentTarget,
       started: false,
     };
+    setGrabbing(true);
+    // Captured from the press, so a quick flick that leaves the small collapsed header still reaches the panel.
+    currentTarget.setPointerCapture(event.pointerId);
   };
 
   const handleDragMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -276,7 +289,6 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
       }
       drag.started = true;
       setDragging(true);
-      drag.target.setPointerCapture(drag.pointerId);
     }
 
     setDragOffset(hasSnaps ? delta : Math.max(0, delta));
@@ -317,6 +329,11 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
     if (dragRef.current?.pointerId === event.pointerId) resetDrag();
   };
 
+  // A native drag, e.g. of selected text, sends `pointercancel`, which would end the sheet drag.
+  const handleNativeDragStart = (event: ReactDragEvent<HTMLDivElement>) => {
+    if (dragRef.current) event.preventDefault();
+  };
+
   if (!isMounted && !keepMounted) return null;
 
   const panelClassName = cn(
@@ -324,6 +341,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
     {
       [styles['tedi-sheet__panel--padding-small']]: padding === 'small',
       [styles['tedi-sheet__panel--draggable']]: showHandle,
+      [styles['tedi-sheet__panel--grabbing']]: grabbing,
     },
     className
   );
@@ -356,14 +374,16 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   }
 
   return (
-    <FloatingPortal>
+    <StylePortal>
       <FloatingOverlay
-        lockScroll={lockScroll && active}
+        lockScroll={lockScroll && active && !isScrollContainerLocked}
         // `FloatingOverlay` sets `overflow: auto` inline, so overriding it needs an inline style too.
         style={{ overflow: 'clip' }}
         data-status={status}
+        // Out of the Tab order, the accessibility tree and pointer input while it animates out.
+        {...(status === 'close' && { inert: '' })}
         className={cn(styles['tedi-sheet__overlay'], {
-          [styles['tedi-sheet__overlay--no-overlay']]: !showOverlay,
+          [styles['tedi-sheet__overlay--no-overlay']]: !showBackdrop,
           [styles['tedi-sheet__overlay--hidden']]: !active,
         })}
       >
@@ -390,6 +410,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
               onPointerUp: handleDragEnd,
               onPointerCancel: handleDragCancel,
               onLostPointerCapture: handleDragCancel,
+              onDragStart: handleNativeDragStart,
               onContextMenu: resetDrag,
             })}
             data-status={status}
@@ -403,7 +424,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
           </div>
         </FloatingFocusManager>
       </FloatingOverlay>
-    </FloatingPortal>
+    </StylePortal>
   );
 };
 

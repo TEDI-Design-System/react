@@ -6,6 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -30,6 +31,7 @@ const meta: Meta<typeof HorizontalStepper> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.51.75?node-id=11201-120696&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -83,7 +85,7 @@ const TYPE_COLS: { key: string; label: string; props: Partial<HorizontalStepperI
   { key: 'selected', label: 'Selected', props: { selected: true }, rows: ['default'] },
 ];
 
-const StatesMatrix = ({ compact }: { compact: boolean }) => {
+const StatesMatrix = ({ compact, labelPrefix = '' }: { compact: boolean; labelPrefix?: string }) => {
   const breakpoint = useBreakpoint();
   const isMobile = isBreakpointBelow(breakpoint, 'md');
 
@@ -107,7 +109,7 @@ const StatesMatrix = ({ compact }: { compact: boolean }) => {
                   </div>
                   <div style={{ width: 'fit-content', maxWidth: '100%' }}>
                     <HorizontalStepper
-                      aria-label={`${col.label} – ${row.label}`}
+                      aria-label={`${labelPrefix}${col.label} – ${row.label}`}
                       background="transparent"
                       compact={compact}
                     >
@@ -146,7 +148,7 @@ const StatesMatrix = ({ compact }: { compact: boolean }) => {
             col.rows.includes(row.key) ? (
               <div key={col.key} data-stepper-state={row.key}>
                 <HorizontalStepper
-                  aria-label={`${col.label} – ${row.label}`}
+                  aria-label={`${labelPrefix}${col.label} – ${row.label}`}
                   background="transparent"
                   compact={compact}
                 >
@@ -223,25 +225,25 @@ export const WithErrors: Story = {
 export const WithDescriptions: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <HorizontalStepper aria-label="Sammud kirjeldustega – Kutse aktiivne" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega (samm 1)" compact="lg">
         <HorizontalStepper.Item label="Kutse" selected />
         <HorizontalStepper.Item label="Tahteavaldus" />
         <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Sammud kirjeldustega – Tahteavaldus aktiivne" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega (samm 2)" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" selected />
         <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Sammud kirjeldustega – Geenianalüüs aktiivne" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega (samm 3)" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" completed />
         <HorizontalStepper.Item label="Geenianalüüs" selected description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Sammud kirjeldustega – Vastus aktiivne" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega (samm 4)" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" completed />
         <HorizontalStepper.Item label="Geenianalüüs" completed description="Ametnik täidab" />
@@ -302,6 +304,7 @@ export const Compact: Story = {
  * render as `completed`, future ones stay default.
  */
 export const ClickToNavigate: Story = {
+  parameters: { visualTest: false },
   render: () => {
     const Demo = () => {
       const [current, setCurrent] = useState(1);
@@ -323,49 +326,48 @@ export const ClickToNavigate: Story = {
   },
 };
 
+const ExternalNavigationTemplate = ({ ariaLabel = 'Protsessi sammud' }: { ariaLabel?: string }) => {
+  const [current, setCurrent] = useState(0);
+  return (
+    <VerticalSpacing size={1.5}>
+      <HorizontalStepper aria-label={ariaLabel} compact="lg">
+        {STEPS.map((label, index) => (
+          <HorizontalStepper.Item
+            key={label}
+            label={label}
+            completed={index < current}
+            selected={index === current}
+            disabled={index > current}
+            onSelect={() => setCurrent(index)}
+          />
+        ))}
+      </HorizontalStepper>
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <Button
+          visualType="secondary"
+          disabled={current === 0}
+          onClick={() => setCurrent((step) => Math.max(0, step - 1))}
+        >
+          Tagasi
+        </Button>
+        <Button
+          disabled={current === STEPS.length - 1}
+          onClick={() => setCurrent((step) => Math.min(STEPS.length - 1, step + 1))}
+        >
+          Edasi
+        </Button>
+      </div>
+    </VerticalSpacing>
+  );
+};
+
 /**
  * Step-by-step validation — the user advances with `Edasi` / `Tagasi`. Past steps
  * render as `completed` and stay clickable for back-navigation; future steps are
  * `disabled` so they can't be skipped from the header.
  */
 export const ExternalNavigation: Story = {
-  render: () => {
-    const Demo = () => {
-      const [current, setCurrent] = useState(0);
-      return (
-        <VerticalSpacing size={1.5}>
-          <HorizontalStepper aria-label="Protsessi sammud" compact="lg">
-            {STEPS.map((label, index) => (
-              <HorizontalStepper.Item
-                key={label}
-                label={label}
-                completed={index < current}
-                selected={index === current}
-                disabled={index > current}
-                onSelect={() => setCurrent(index)}
-              />
-            ))}
-          </HorizontalStepper>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Button
-              visualType="secondary"
-              disabled={current === 0}
-              onClick={() => setCurrent((step) => Math.max(0, step - 1))}
-            >
-              Tagasi
-            </Button>
-            <Button
-              disabled={current === STEPS.length - 1}
-              onClick={() => setCurrent((step) => Math.min(STEPS.length - 1, step + 1))}
-            >
-              Edasi
-            </Button>
-          </div>
-        </VerticalSpacing>
-      );
-    };
-    return <Demo />;
-  },
+  render: () => <ExternalNavigationTemplate />,
 };
 
 export const States: Story = {
@@ -376,4 +378,54 @@ export const States: Story = {
 export const CompactStates: Story = {
   parameters: statesPseudo,
   render: () => <StatesMatrix compact />,
+};
+
+/** Chromatic snapshot for HorizontalStepper: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS }, ...statesPseudo },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Second step</Text>
+        <VisualTestStory story={SecondStep} props={{ 'aria-label': 'Second step' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Third step</Text>
+        <VisualTestStory story={ThirdStep} props={{ 'aria-label': 'Third step' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With errors</Text>
+        <VisualTestStory story={WithErrors} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With descriptions</Text>
+        <VisualTestStory story={WithDescriptions} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Transparent background</Text>
+        <VisualTestStory story={TransparentBackground} props={{ 'aria-label': 'Transparent background' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Compact</Text>
+        <VisualTestStory story={Compact} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">External navigation</Text>
+        <ExternalNavigationTemplate ariaLabel="External navigation" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <VisualTestStory story={States} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Compact states</Text>
+        <VisualTestStory story={CompactStates} props={{ labelPrefix: 'Compact: ' }} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

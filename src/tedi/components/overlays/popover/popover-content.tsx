@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { CSSProperties, useContext } from 'react';
+import { CSSProperties, ReactNode, useContext } from 'react';
 import { useId } from 'react';
 
 import { Text, TextProps } from '../../base/typography/text/text';
@@ -27,7 +27,11 @@ const resolvePopoverPadding = (padding: CardContentPadding | undefined): CSSProp
   } as CSSProperties;
 };
 
-export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNames'> {
+export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNames' | 'children'> {
+  /**
+   * Popover body. Optional, so a popover can show only a `title`.
+   */
+  children?: ReactNode | ReactNode[];
   /**
    * Popover title.
    */
@@ -72,6 +76,7 @@ export const PopoverContent = (props: PopoverContentProps) => {
     close,
     closeProps = { size: 'default' },
     padding,
+    ariaLabel,
   } = props;
   const { onOpenChange } = useContext(OverlayContext);
   const { withBorder } = useContext(PopoverContext);
@@ -93,6 +98,7 @@ export const PopoverContent = (props: PopoverContentProps) => {
         arrow: cn(styles['tedi-popover__arrow'], { [styles['tedi-popover__arrow--border']]: withBorder }),
       }}
       labelledBy={title ? titleId : undefined}
+      ariaLabel={ariaLabel}
       describedBy={hasDescription ? descriptionId : undefined}
       contentStyle={resolvePopoverPadding(padding)}
     >

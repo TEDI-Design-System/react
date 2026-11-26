@@ -247,7 +247,12 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
     const element = headerRowRef.current;
     if (!collapsible || !element) return undefined;
     const onClick = (event: MouseEvent): void => {
-      if ((event.target as HTMLElement).closest('a, button, input, select, textarea, label')) return;
+      if (
+        (event.target as HTMLElement).closest(
+          'a, button, input, select, textarea, label, [role="button"], [role="combobox"], [role="link"]'
+        )
+      )
+        return;
       openChangeRef.current(!isOpenRef.current);
     };
     element.addEventListener('click', onClick);
@@ -354,6 +359,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
               <CollapseButton
                 hideText
                 arrowType={arrowType}
+                size={arrowType === 'secondary' ? 'default' : 'small'}
                 open={isOpen}
                 onOpenChange={handleOpenChange}
                 aria-controls={bodyId}

@@ -2,7 +2,7 @@ import { Controls, Description, Primary, Stories, Subtitle, Title } from '@story
 import { Preview, StoryContext } from '@storybook/react-vite';
 
 import { freezeDateInChromatic } from './fixed-date';
-import StorybookDecorator from './storybook-decorator';
+import StorybookDecorator, { hasOwnStorybookDecorator } from './storybook-decorator';
 
 import '../src/tedi/styles/index.scss';
 import '../src/community/styles/index.scss';
@@ -45,7 +45,7 @@ export const decorators: Preview['decorators'] = [
     return (
       <ThemeProvider theme={theme}>
         <PrintingProvider>
-          {context.componentId === 'components-labelprovider' ? (
+          {hasOwnStorybookDecorator(context.title) ? (
             <Story />
           ) : (
             <StorybookDecorator>
@@ -123,6 +123,12 @@ const preview: Preview = {
           color: '#fff',
           description:
             'This component lacks some TEDI-Ready functionality, e.g it may rely on another component that has not yet been developed',
+        },
+        deprecated: {
+          background: '#b00020',
+          color: '#fff',
+          description:
+            'This component is deprecated and will be removed in a future release. Migrate to its replacement.',
         },
         mobileViewDifference: {
           background: '#99BDDA',

@@ -1,27 +1,137 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 import { Heading } from '../../../../tedi/components/base/typography/heading/heading';
+import { Text } from '../../../../tedi/components/base/typography/text/text';
 import { Section } from '../../../../tedi/components/content/section/section';
+import { Col, Row } from '../../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../../tedi/components/layout/vertical-spacing';
+import Separator from '../../../../tedi/components/misc/separator/separator';
 import { StretchContent } from '../../../../tedi/components/misc/stretch-content/stretch-content';
 import useLayout from '../../../helpers/hooks/use-layout';
+import Anchor from '../../anchor/anchor';
 import Button from '../../button/button';
+import { Card, CardContent } from '../../card';
 import Breadcrumbs, { BreadcrumbsProps } from '../breadcrumbs/breadcrumbs';
 import { Default as BreadcrumbsDefault } from '../breadcrumbs/breadcrumbs.stories';
 import Footer, { FooterProps } from '../footer/footer';
 import { Default as FooterDefault } from '../footer/footer.stories';
-import { Header, HeaderProps } from '../header';
-import { Default as HeaderNotificationDefault } from '../header/components/header-notification/header-notification.stories';
-import {
-  BottomContent as HeaderBottomContent,
-  Default as HeaderDefault,
-  Public as HeaderPublic,
-  PublicWithCustomContent as HeaderPublicWithCustomContent,
-} from '../header/header.stories';
+import { HeaderContent, HeaderLanguage, HeaderProps, HeaderRole, HeaderSettings } from '../header';
 import SideNav, { SideNavProps } from '../sidenav/sidenav';
 import { Default as SidenavDefault, Public as SidenavPublic } from '../sidenav/sidenav.stories';
 import { Layout } from './layout';
+
+const SettingsLinks = ({ onToggle }: { onToggle: (open: boolean) => void }) => {
+  const isMobile = useLayout(['mobile']);
+  const labels = ['My data', 'Representation rights', 'Access to health data', 'Statements of intention', 'Contacts'];
+
+  return (
+    <VerticalSpacing>
+      {(isMobile ? ['Custom Content', ...labels] : labels).map((label, index) => (
+        <Fragment key={label}>
+          {index > 0 && <Separator isStretched />}
+          <Anchor href="#" onClick={() => onToggle(false)}>
+            {label}
+          </Anchor>
+        </Fragment>
+      ))}
+    </VerticalSpacing>
+  );
+};
+
+const SettingsContent = ({ onToggle }: { onToggle: (open: boolean) => void }) => {
+  const isMobileTablet = useLayout(['mobile', 'tablet']);
+
+  if (!isMobileTablet) {
+    return <SettingsLinks onToggle={onToggle} />;
+  }
+
+  return (
+    <>
+      <HeaderRole
+        primaryInfo="Ida-Tallinna Keskhaigla"
+        secondaryInfo="Family physician"
+        label="Kristo Käärmann:"
+        renderModal
+      >
+        Any content
+      </HeaderRole>
+      <Card border="top-info-main">
+        <CardContent>
+          <SettingsLinks onToggle={onToggle} />
+        </CardContent>
+      </Card>
+    </>
+  );
+};
+
+const settings = (
+  <HeaderSettings onActionClick={() => console.log('Logout')}>
+    {({ onToggle }) => <SettingsContent onToggle={onToggle} />}
+  </HeaderSettings>
+);
+
+const languages = (
+  <HeaderLanguage
+    languages={[
+      { label: 'EST', 'aria-label': 'Estonian', isSelected: true },
+      { label: 'ENG', 'aria-label': 'English', isSelected: false },
+      { label: 'RUS', 'aria-label': 'Russian', isSelected: false },
+    ].map((language) => ({
+      ...language,
+      onClick: ({ onToggle }) => {
+        console.log(`Selected ${language.label}`);
+        onToggle(false);
+      },
+    }))}
+  />
+);
+
+const customHeaderContent = (
+  <HeaderContent>
+    <StretchContent>
+      <Row justifyContent="center" alignItems="center">
+        <Col width="auto">Custom content</Col>
+      </Row>
+    </StretchContent>
+  </HeaderContent>
+);
+
+const publicHeader: HeaderProps<'a'> = {
+  logo: { imageUrl: 'logo.svg', anchorProps: { href: '#' } },
+  skipLinks: { links: [{ children: 'Skip to main content', href: '#main-content' }] },
+  minimalSettingsArea: ['mobile', 'tablet'],
+  children: (
+    <>
+      {settings}
+      {languages}
+    </>
+  ),
+};
+
+const defaultHeader: HeaderProps<'a'> = {
+  ...publicHeader,
+  children: (
+    <>
+      {settings}
+      {languages}
+      <HeaderRole primaryInfo="Kristo Käärmann">Any content</HeaderRole>
+      {customHeaderContent}
+      <Anchor href="#">Accessibilty</Anchor>
+    </>
+  ),
+};
+const publicHeaderWithCustomContent: HeaderProps<'a'> = {
+  ...publicHeader,
+  enablePublicCustomContent: true,
+  children: (
+    <>
+      {settings}
+      {languages}
+      {customHeaderContent}
+    </>
+  ),
+};
 
 const defaultContent = (
   <Section>
@@ -36,7 +146,6 @@ const meta: Meta<typeof Layout> = {
   component: Layout,
   title: 'Community/Layout',
   subcomponents: {
-    Header,
     SideNav,
     Footer,
     Breadcrumbs,
@@ -92,7 +201,7 @@ export const Default: Story = {
 
   args: {
     children: defaultContent,
-    header: HeaderDefault.args as HeaderProps<'a'>,
+    header: defaultHeader,
     sideNav: SidenavDefault.args as SideNavProps,
     footer: FooterDefault.args as FooterProps,
     breadcrumbsProps: BreadcrumbsDefault.args as BreadcrumbsProps,
@@ -115,7 +224,7 @@ export const Public: Story = {
 
   args: {
     ...Default.args,
-    header: HeaderPublic.args as HeaderProps<'a'>,
+    header: publicHeader,
     sideNav: SidenavPublic.args as SideNavProps,
     headerType: 'public',
     breadcrumbsProps: undefined,
@@ -132,7 +241,7 @@ export const PublicWithCustomContent: Story = {
   render: Template,
   args: {
     ...Public.args,
-    header: HeaderPublicWithCustomContent.args as HeaderProps<'a'>,
+    header: publicHeaderWithCustomContent,
   },
 };
 
@@ -145,9 +254,16 @@ export const WithNotification: Story = {
   args: {
     ...Default.args,
     header: {
-      ...(HeaderDefault.args as HeaderProps<'a'>),
+      ...defaultHeader,
       notification: {
-        ...HeaderNotificationDefault.args,
+        children: (
+          <>
+            <Text element="span" modifiers="bold">
+              Attention!
+            </Text>{' '}
+            There are issues with &quot;health&quot; menu links. We are aware and are already working the problem.
+          </>
+        ),
       },
     },
   },
@@ -162,7 +278,20 @@ export const WithNotice: Story = {
 
   args: {
     ...Default.args,
-    header: HeaderBottomContent.args as HeaderProps<'a'>,
+    header: {
+      ...defaultHeader,
+      bottomContent: {
+        children: (
+          <Text modifiers="center">
+            Viewer role: <b>Asta Sarapuu</b>
+          </Text>
+        ),
+        cardProps: {
+          border: 'top-warning-main',
+          background: 'warning-highlight',
+        },
+      },
+    },
   },
 };
 
@@ -196,11 +325,7 @@ export const WithCustomMenu: Story = {
   render: (args) => {
     const [isMenuShown, setIsMenuShown] = useState(false);
     return (
-      <Layout
-        {...args}
-        header={HeaderDefault.args as HeaderProps<'a'>}
-        onHeaderSidenavToggle={() => setIsMenuShown(!isMenuShown)}
-      >
+      <Layout {...args} header={defaultHeader} onHeaderSidenavToggle={() => setIsMenuShown(!isMenuShown)}>
         {/* NB! This is only an example. Custom menu implementation is not included. */}
         <div>Custom menu status: {isMenuShown ? 'Opened' : 'Closed'}</div>
       </Layout>

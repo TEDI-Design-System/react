@@ -437,6 +437,18 @@ describe('DateField component', () => {
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
+  it('hides the weekday header row and names days without the year', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} initialMonth={new Date(2025, 5, 1)} />);
+
+    await user.click(screen.getByRole('button'));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('grid', { name: 'juuni 2025' })).toBeInTheDocument();
+    expect(dialog.querySelector('thead')).toHaveAttribute('aria-hidden', 'true');
+    expect(within(dialog).queryAllByRole('columnheader')).toHaveLength(0);
+    expect(within(dialog).getByRole('gridcell', { name: 'esmaspäev, 16. juuni' })).toBeInTheDocument();
+  });
+
   describe('dayStatus (popover path)', () => {
     const markDay15 = (date: Date) =>
       date.getDate() === 15 ? ({ type: 'success', label: 'Kinnitatud vastuvõtt' } as const) : null;
@@ -457,7 +469,7 @@ describe('DateField component', () => {
       await user.click(screen.getByRole('button'));
       await screen.findByRole('dialog');
       expect(document.querySelector('.tedi-calendar__day-status')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Kinnitatud vastuvõtt/ })).toBeInTheDocument();
+      expect(screen.getByRole('gridcell', { name: /Kinnitatud vastuvõtt/ })).toBeInTheDocument();
     });
   });
 

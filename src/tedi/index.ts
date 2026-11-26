@@ -49,6 +49,7 @@ export * from './components/form/number-field/number-field';
 export * from './components/form/toggle/toggle';
 export * from './components/form/feedback-text/feedback-text';
 export * from './components/form/search';
+export * from './components/form/inline-edit/inline-edit';
 export * from './components/form/radio';
 export * from './components/form/choice-group';
 export * from './components/form/file-upload/file-upload';
@@ -78,11 +79,13 @@ export * from './components/misc/attachment';
 export * from './components/misc/ellipsis/ellipsis';
 export * from './components/misc/timeline';
 export * from './components/misc/option-content/option-content';
+export * from './components/form/rating/rating';
 export * from './components/layout/sidenav';
 export * from './components/layout/footer';
 export * from './components/layout/header';
 export * from './components/layout/show-at/show-at';
 export * from './components/layout/hide-at/hide-at';
+export * from './components/layout/skip-links/skip-links';
 
 export * from './helpers';
 

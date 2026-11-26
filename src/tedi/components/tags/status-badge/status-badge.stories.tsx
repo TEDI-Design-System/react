@@ -1,6 +1,11 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { Fragment } from 'react/jsx-runtime';
 
+import {
+  VISUAL_TEST_VIEWPORTS,
+  VisualTestStory,
+  type VisualTestStoryInput,
+} from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -26,6 +31,7 @@ const meta: Meta<typeof StatusBadge> = {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2385-24154&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -198,4 +204,28 @@ export const WithTooltip: StoryFn<StatusBadgeProps> = () => {
       </Tooltip.Content>
     </Tooltip>
   );
+};
+
+const visualTestStories: { label: string; story: VisualTestStoryInput }[] = [
+  { label: 'Default', story: Default },
+  { label: 'Sizes', story: Sizes },
+  { label: 'Colors', story: Colors },
+  { label: 'Status indicator', story: StatusIndicator },
+  { label: 'With tooltip', story: { render: WithTooltip } },
+];
+
+/** Chromatic snapshot for StatusBadge: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestStories.map(({ label, story }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          <VisualTestStory story={story} />
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
 };

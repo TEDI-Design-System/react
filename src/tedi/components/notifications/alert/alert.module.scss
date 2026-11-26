@@ -16,9 +16,12 @@
     var(--alert-default-text-info)
   );
 
+  &__main--centered {
+    align-self: center;
+  }
+
   &__content {
     display: flex;
-    align-self: center;
 
     .tedi-alert__icon {
       line-height: var(--body-regular-line-height);

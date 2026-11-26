@@ -1,5 +1,7 @@
-import { Slide, toast, ToastContainer, ToastOptions } from 'react-toastify';
+import { useEffect, useRef } from 'react';
+import { Slide, toast, ToastContainer as ToastifyContainer, ToastContainerProps, ToastOptions } from 'react-toastify';
 
+import { useLabels } from '../../../providers/label-provider';
 import { Alert, AlertProps } from '../alert/alert';
 import styles from './toast.module.scss';
 
@@ -16,6 +18,8 @@ const toastDefaultOptions: ToastOptions = {
   transition: Slide,
   rtl: false,
   closeButton: false,
+  // The Alert inside owns the live region, so the focusable toast wrapper must not be one.
+  role: 'group',
 };
 
 export const sendNotification = (props: AlertProps, toastOptions?: ToastOptions) => {
@@ -43,4 +47,19 @@ export const sendNotification = (props: AlertProps, toastOptions?: ToastOptions)
   );
 };
 
-export { ToastContainer };
+export const ToastContainer = (props: ToastContainerProps) => {
+  const { getLabel } = useLabels();
+  const ref = useRef<HTMLDivElement>(null);
+
+  // react-toastify hardcodes aria-live="polite" on its <section> with no prop to turn it off.
+  // Left on, every added toast is announced with its button names on top of the Alert's own live region.
+  useEffect(() => {
+    ref.current?.querySelector('section.Toastify')?.setAttribute('aria-live', 'off');
+  }, []);
+
+  return (
+    <div ref={ref} className={styles['tedi-toast-container']}>
+      <ToastifyContainer aria-label={getLabel('toast.region')} role="group" {...props} />
+    </div>
+  );
+};

@@ -27,7 +27,7 @@ import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/stat
 import { TableCard } from '../table-card/table-card';
 import { TextGroup } from '../text-group/text-group';
 import { Truncate } from '../truncate/truncate';
-import type { TableProps } from './table';
+import type { TableColumnMeta, TableProps } from './table';
 import { groupRowSpan, Table } from './table';
 
 /**
@@ -144,14 +144,14 @@ interface Booking {
   location: string;
 }
 
-const bookingDateRange: DateRange = {
-  from: new Date(2029, 2, 22),
-  to: new Date(2029, 2, 29),
-};
+const bookingDateRange = (index: number): DateRange => ({
+  from: new Date(2029, 2, 22 + index),
+  to: new Date(2029, 2, 29 + index),
+});
 
 const bookings: Booking[] = Array.from({ length: 28 }, (_, index) => ({
   id: String(index + 1),
-  dateRange: bookingDateRange,
+  dateRange: bookingDateRange(index),
   hour: '11:14',
   duration: '6 min',
   location: 'Harjumaa',
@@ -253,14 +253,14 @@ function useEditableRows<T extends { id: string }>(initial: T[]): EditableRows<T
   return { rows, editingId, draft, setDraft, beginEdit, cancelEdit, commitEdit };
 }
 
-function EditActionsCell<T extends { id: string }>({ row }: { row: T }) {
+function EditActionsCell<T extends { id: string }>({ row, rowLabel }: { row: T; rowLabel: string }) {
   const editor = useEditor<T>();
   if (row.id === editor.editingId) {
     return (
       <span style={editRowActionsStyle}>
-        <ClosingButton title="Tühista" onClick={editor.cancelEdit} />
+        <ClosingButton title={`Tühista ${rowLabel}`} onClick={editor.cancelEdit} />
         <Button visualType="primary" size="small" icon="check" onClick={editor.commitEdit}>
-          Kinnita
+          Kinnita<span className="sr-only"> {rowLabel}</span>
         </Button>
       </span>
     );
@@ -268,7 +268,7 @@ function EditActionsCell<T extends { id: string }>({ row }: { row: T }) {
   return (
     <span style={editRowActionsStyle}>
       <Button visualType="link" iconLeft="edit" onClick={() => editor.beginEdit(row)}>
-        Muuda
+        Muuda<span className="sr-only"> {rowLabel}</span>
       </Button>
     </span>
   );
@@ -362,6 +362,7 @@ function EditableDateRangeCell<T extends { id: string }>({
 const bookingShowcaseColumns: ColumnDef<Booking>[] = [
   {
     id: 'dateRange',
+    meta: { rowHeader: true },
     header: 'Kuupäev',
     accessorKey: 'dateRange',
     cell: ({ row }) => <EditableDateRangeCell row={row.original} field="dateRange" label="Kuupäev" />,
@@ -387,8 +388,9 @@ const bookingShowcaseColumns: ColumnDef<Booking>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
-    cell: ({ row }) => <EditActionsCell row={row.original} />,
+    cell: ({ row }) => <EditActionsCell row={row.original} rowLabel={formatDateRange(row.original.dateRange)} />,
   },
 ];
 
@@ -467,6 +469,7 @@ const simplePeopleColumns: ColumnDef<PersonRecord>[] = [
 const simpleDoctorColumns: ColumnDef<Doctor>[] = [
   {
     id: 'name',
+    meta: { rowHeader: true },
     header: 'Arst',
     cell: ({ row }) => (
       <div>
@@ -490,8 +493,9 @@ const simpleDoctorColumns: ColumnDef<Doctor>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
-    cell: ({ row }) => <EditActionsCell row={row.original} />,
+    cell: ({ row }) => <EditActionsCell row={row.original} rowLabel={row.original.name} />,
   },
 ];
 
@@ -550,6 +554,7 @@ const LONG_TEXT_MAX_LENGTH = 70;
 const baseDoctorWithDescriptionColumns: ColumnDef<Doctor>[] = [
   {
     id: 'name',
+    meta: { rowHeader: true },
     header: 'Arst',
     cell: ({ row }) => (
       <div>
@@ -567,8 +572,9 @@ const baseDoctorWithDescriptionColumns: ColumnDef<Doctor>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
-    cell: ({ row }) => <EditActionsCell row={row.original} />,
+    cell: ({ row }) => <EditActionsCell row={row.original} rowLabel={row.original.name} />,
   },
 ];
 
@@ -656,23 +662,10 @@ const initialsOf = (name: string) =>
 const mergedCellsColumns: ColumnDef<Booking>[] = [
   {
     id: 'dateRange',
+    meta: { rowHeader: true, sortable: true },
     accessorKey: 'dateRange',
     size: 240,
-    header: ({ column }) => {
-      const sorted = column.getIsSorted();
-      const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-      return (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          Kuupäev
-          <Table.HeaderButton
-            icon={iconName}
-            selected={!!sorted}
-            aria-label="Sort by Kuupäev"
-            onClick={column.getToggleSortingHandler()}
-          />
-        </span>
-      );
-    },
+    header: 'Kuupäev',
     cell: ({ row }) => <EditableDateRangeCell row={row.original} field="dateRange" label="Kuupäev" />,
   },
   {
@@ -702,8 +695,9 @@ const mergedCellsColumns: ColumnDef<Booking>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
-    cell: ({ row }) => <EditActionsCell row={row.original} />,
+    cell: ({ row }) => <EditActionsCell row={row.original} rowLabel={formatDateRange(row.original.dateRange)} />,
   },
 ];
 
@@ -828,21 +822,8 @@ export const VerticalBorders: Story = {
       {
         id: 'service',
         accessorKey: 'service',
-        header: ({ column }) => {
-          const sorted = column.getIsSorted();
-          const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-          return (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              Teenus
-              <Table.HeaderButton
-                icon={iconName}
-                selected={!!sorted}
-                aria-label="Sorteeri Teenus järgi"
-                onClick={column.getToggleSortingHandler()}
-              />
-            </span>
-          );
-        },
+        header: 'Teenus',
+        meta: { sortable: true },
       },
       {
         id: 'doctor',
@@ -917,42 +898,53 @@ export const EditableValues: Story = {
 };
 
 /**
- * Client-side sorting via `Table.HeaderButton` in the header renderer. The column label is
- * passed as the button's children, so the whole "text + icon" header is one clickable sort
- * target. Each click cycles `unfold_more → arrow_upward → arrow_downward → unfold_more`.
- * TanStack Table handles the sort state internally; no external state needed for client-side use.
+ * Client-side sorting with the `meta: { sortable: true }` shorthand. For a string header the
+ * whole title becomes the sort button; each click cycles ascending, descending and off, and
+ * `aria-sort` stays on the `<th>`. TanStack Table handles the sort state internally; no external
+ * state needed for client-side use. For a custom header (see the next story), the header renders
+ * unchanged and an icon-only sort button follows it. Without `sortable`, hand-built
+ * `Table.HeaderButton` headers keep working as before.
  */
 export const Sortable: Story = {
   render: function Sortable() {
     const columns = useMemo<ColumnDef<Person>[]>(
-      () =>
-        [
-          { id: 'name', header: 'Name', accessorKey: 'name' },
-          { id: 'role', header: 'Role', accessorKey: 'role' },
-          { id: 'location', header: 'Location', accessorKey: 'location' },
-          { id: 'salary', header: 'Salary', accessorKey: 'salary' },
-        ].map((col) => ({
-          ...col,
-          meta: { label: col.header },
-          header: ({ column }) => {
-            const sorted = column.getIsSorted();
-            const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-            return (
-              <Table.HeaderButton
-                icon={iconName}
-                selected={!!sorted}
-                aria-label={`Sort by ${col.header}`}
-                onClick={column.getToggleSortingHandler()}
-              >
-                {col.header}
-              </Table.HeaderButton>
-            );
-          },
-        })),
+      () => [
+        { id: 'name', header: 'Name', accessorKey: 'name', meta: { sortable: true } },
+        { id: 'role', header: 'Role', accessorKey: 'role', meta: { sortable: true } },
+        { id: 'location', header: 'Location', accessorKey: 'location', meta: { sortable: true } },
+        { id: 'salary', header: 'Salary', accessorKey: 'salary', meta: { sortable: true } },
+      ],
       []
     );
 
     return <Table<Person> id="tedi-table-sortable" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />;
+  },
+};
+
+/**
+ * `meta: { sortable: true }` with a custom header. The header renders unchanged and an icon-only
+ * sort button follows it, so the info button is never nested inside another button. The button's
+ * accessible name comes from `meta.label` (falling back to the column id).
+ */
+export const SortableCustomHeader: Story = {
+  render: function SortableCustomHeader() {
+    const columns = useMemo<ColumnDef<Person>[]>(
+      () => [
+        { id: 'name', header: 'Name', accessorKey: 'name', meta: { sortable: true } },
+        {
+          id: 'role',
+          accessorKey: 'role',
+          header: () => <HeaderWithInfo label="Role" info="The person's job title." />,
+          meta: { sortable: true, label: 'Role' },
+        },
+        { id: 'location', header: 'Location', accessorKey: 'location' },
+      ],
+      []
+    );
+
+    return (
+      <Table<Person> id="tedi-table-sortable-custom" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />
+    );
   },
 };
 
@@ -995,87 +987,6 @@ const filterablePeople: PersonRecord[] = Array.from({ length: 28 }, (_, index) =
   };
 });
 
-const SortLabel = ({
-  column,
-  children,
-  ariaLabel,
-}: {
-  column: {
-    getIsSorted: () => false | 'asc' | 'desc';
-    getToggleSortingHandler: () => ((e: unknown) => void) | undefined;
-  };
-  children: React.ReactNode;
-  ariaLabel: string;
-}) => {
-  const sorted = column.getIsSorted();
-  const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-  return (
-    <Table.HeaderButton
-      icon={iconName}
-      selected={!!sorted}
-      aria-label={ariaLabel}
-      onClick={column.getToggleSortingHandler()}
-    >
-      {children}
-    </Table.HeaderButton>
-  );
-};
-
-const TextFilterPopover = ({
-  value,
-  onApply,
-  label,
-}: {
-  value: string;
-  onApply: (next: string | undefined) => void;
-  label: string;
-}) => {
-  const [draft, setDraft] = useState(value);
-  const [open, setOpen] = useState(false);
-  return (
-    <Popover open={open} onToggle={setOpen}>
-      <PopoverTrigger>
-        <Table.HeaderButton icon="filter_alt" selected={!!value} filled={!!value} aria-label={`Filtreeri ${label}`} />
-      </PopoverTrigger>
-      <PopoverContent>
-        <VerticalSpacing size={0.5}>
-          <TextField
-            id={`filter-${label}`}
-            name={`filter-${label}`}
-            label={label}
-            hideLabel
-            value={draft}
-            onChange={setDraft}
-          />
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <Button
-              visualType="secondary"
-              size="small"
-              onClick={() => {
-                setDraft('');
-                onApply(undefined);
-                setOpen(false);
-              }}
-            >
-              Tühista
-            </Button>
-            <Button
-              visualType="primary"
-              size="small"
-              onClick={() => {
-                onApply(draft || undefined);
-                setOpen(false);
-              }}
-            >
-              Filtreeri
-            </Button>
-          </div>
-        </VerticalSpacing>
-      </PopoverContent>
-    </Popover>
-  );
-};
-
 type DateRangeValue = { from?: string; to?: string };
 
 const dateRangeStringToDate = (value?: string): Date | undefined => {
@@ -1093,129 +1004,6 @@ const dateToDateRangeString = (date?: Date): string | undefined => {
   return `${dd}.${mm}.${date.getFullYear()}`;
 };
 
-const DateRangeFilterPopover = ({
-  value,
-  onApply,
-  label,
-}: {
-  value: DateRangeValue | undefined;
-  onApply: (next: DateRangeValue | undefined) => void;
-  label: string;
-}) => {
-  const [range, setRange] = useState<DateRange | undefined>(() => {
-    const from = dateRangeStringToDate(value?.from);
-    const to = dateRangeStringToDate(value?.to);
-    return from || to ? { from, to } : undefined;
-  });
-  const [open, setOpen] = useState(false);
-  const active = Boolean(value?.from || value?.to);
-  return (
-    <Popover open={open} onToggle={setOpen}>
-      <PopoverTrigger>
-        <Table.HeaderButton icon="filter_alt" selected={active} filled={active} aria-label={`Filtreeri ${label}`} />
-      </PopoverTrigger>
-      <PopoverContent width="medium">
-        <VerticalSpacing size={0.5}>
-          <DateField
-            id="filter-date-range"
-            mode="range"
-            label={label}
-            selected={range}
-            placeholder="pp.kk.aaaa - pp.kk.aaaa"
-            onSelect={(next) => setRange(next as DateRange | undefined)}
-          />
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <Button
-              visualType="secondary"
-              size="small"
-              onClick={() => {
-                setRange(undefined);
-                onApply(undefined);
-                setOpen(false);
-              }}
-            >
-              Tühista
-            </Button>
-            <Button
-              visualType="primary"
-              size="small"
-              onClick={() => {
-                const fromStr = dateToDateRangeString(range?.from);
-                const toStr = dateToDateRangeString(range?.to);
-                onApply(fromStr || toStr ? { from: fromStr, to: toStr } : undefined);
-                setOpen(false);
-              }}
-            >
-              Filtreeri
-            </Button>
-          </div>
-        </VerticalSpacing>
-      </PopoverContent>
-    </Popover>
-  );
-};
-
-const MultiSelectFilterPopover = ({
-  value,
-  onApply,
-  label,
-}: {
-  value: CertStatus[] | undefined;
-  onApply: (next: CertStatus[] | undefined) => void;
-  label: string;
-}) => {
-  const [draft, setDraft] = useState<CertStatus[]>(value ?? []);
-  const [open, setOpen] = useState(false);
-  const active = (value?.length ?? 0) > 0;
-  return (
-    <Popover open={open} onToggle={setOpen}>
-      <PopoverTrigger>
-        <Table.HeaderButton icon="filter_alt" selected={active} filled={active} aria-label={`Filtreeri ${label}`} />
-      </PopoverTrigger>
-      <PopoverContent>
-        <VerticalSpacing size={0.5}>
-          {CERT_STATUSES.map((option) => (
-            <Checkbox
-              key={option}
-              id={`filter-status-${option}`}
-              name="filter-status"
-              value={option}
-              label={option}
-              checked={draft.includes(option)}
-              onChange={(_val, checked) =>
-                setDraft((prev) => (checked ? [...prev, option] : prev.filter((v) => v !== option)))
-              }
-            />
-          ))}
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <Button
-              visualType="secondary"
-              size="small"
-              onClick={() => {
-                setDraft([]);
-                onApply(undefined);
-                setOpen(false);
-              }}
-            >
-              Tühista
-            </Button>
-            <Button
-              visualType="primary"
-              size="small"
-              onClick={() => {
-                onApply(draft.length ? draft : undefined);
-                setOpen(false);
-              }}
-            >
-              Filtreeri
-            </Button>
-          </div>
-        </VerticalSpacing>
-      </PopoverContent>
-    </Popover>
-  );
-};
-
 const parseDate = (value: string): number | null => {
   const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value);
   if (!match) return null;
@@ -1224,9 +1012,7 @@ const parseDate = (value: string): number | null => {
 };
 
 /**
- * Column filter popovers via `Table.HeaderButton` + `Popover`. Each column provides a `filterFn`
- * and stores its filter value in TanStack Table's `columnFilters` state. Filter UI varies per column:
- * text input for names, date-range fields for dates, and a checkbox list for enum values.
+ * Edits stay in the popover until you select Apply. Clear removes the applied filter.
  */
 export const Filters: Story = {
   render: function Filters() {
@@ -1235,23 +1021,14 @@ export const Filters: Story = {
         {
           id: 'name',
           accessorKey: 'name',
+          header: 'Nimi',
           filterFn: 'includesString',
-          header: ({ column }) => (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <SortLabel column={column} ariaLabel="Sorteeri Nimi">
-                Nimi
-              </SortLabel>
-              <TextFilterPopover
-                value={(column.getFilterValue() as string | undefined) ?? ''}
-                onApply={(next) => column.setFilterValue(next)}
-                label="Nimi"
-              />
-            </span>
-          ),
+          meta: { sortable: true, filterable: true },
         },
         {
           id: 'jobStart',
           accessorKey: 'jobStart',
+          header: 'Töö algus',
           filterFn: (row, id, value: DateRangeValue) => {
             if (!value?.from && !value?.to) return true;
             const cell = parseDate(row.getValue(id) as string);
@@ -1262,56 +1039,66 @@ export const Filters: Story = {
             if (toTs !== null && cell > toTs) return false;
             return true;
           },
-          header: ({ column }) => (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <SortLabel column={column} ariaLabel="Sorteeri Töö algus">
-                Töö algus
-              </SortLabel>
-              <DateRangeFilterPopover
-                value={column.getFilterValue() as DateRangeValue | undefined}
-                onApply={(next) => column.setFilterValue(next)}
-                label="Töö algus"
-              />
-            </span>
-          ),
+          meta: {
+            sortable: true,
+            filterable: { popoverWidth: 'medium' },
+            filterContent: ({ value, setValue, label }) => {
+              const current = value as DateRangeValue | undefined;
+              const from = dateRangeStringToDate(current?.from);
+              const to = dateRangeStringToDate(current?.to);
+              return (
+                <DateField
+                  id="filter-date-range"
+                  mode="range"
+                  label={label}
+                  selected={from || to ? { from, to } : undefined}
+                  placeholder="pp.kk.aaaa - pp.kk.aaaa"
+                  onSelect={(next) => {
+                    const range = next as DateRange | undefined;
+                    const fromStr = dateToDateRangeString(range?.from);
+                    const toStr = dateToDateRangeString(range?.to);
+                    setValue(fromStr || toStr ? { from: fromStr, to: toStr } : undefined);
+                  }}
+                />
+              );
+            },
+          } satisfies TableColumnMeta<PersonRecord>,
         },
-        {
-          id: 'age',
-          accessorKey: 'age',
-          header: ({ column }) => (
-            <SortLabel column={column} ariaLabel="Sorteeri Vanus">
-              Vanus
-            </SortLabel>
-          ),
-        },
-        {
-          id: 'visits',
-          accessorKey: 'visits',
-          header: ({ column }) => (
-            <SortLabel column={column} ariaLabel="Sorteeri Külastuste arv">
-              Külastuste arv
-            </SortLabel>
-          ),
-        },
+        { id: 'age', accessorKey: 'age', header: 'Vanus', meta: { sortable: true } },
+        { id: 'visits', accessorKey: 'visits', header: 'Külastuste arv', meta: { sortable: true } },
         {
           id: 'status',
           accessorKey: 'status',
+          header: 'Tõendi staatus',
           filterFn: (row, id, value: CertStatus[]) => !value?.length || value.includes(row.getValue(id) as CertStatus),
-          header: ({ column }) => (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <SortLabel column={column} ariaLabel="Sorteeri Tõendi staatus">
-                Tõendi staatus
-              </SortLabel>
-              <MultiSelectFilterPopover
-                value={column.getFilterValue() as CertStatus[] | undefined}
-                onApply={(next) => column.setFilterValue(next)}
-                label="Tõendi staatus"
-              />
-            </span>
-          ),
           cell: ({ row }) => (
             <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
           ),
+          meta: {
+            sortable: true,
+            filterable: true,
+            filterContent: ({ value, setValue }) => {
+              const selected = (value as CertStatus[] | undefined) ?? [];
+              return (
+                <VerticalSpacing size={0.5}>
+                  {CERT_STATUSES.map((option) => (
+                    <Checkbox
+                      key={option}
+                      id={`filter-status-${option}`}
+                      name="filter-status"
+                      value={option}
+                      label={option}
+                      checked={selected.includes(option)}
+                      onChange={(_val, checked) => {
+                        const next = checked ? [...selected, option] : selected.filter((v) => v !== option);
+                        setValue(next.length ? next : undefined);
+                      }}
+                    />
+                  ))}
+                </VerticalSpacing>
+              );
+            },
+          } satisfies TableColumnMeta<PersonRecord>,
         },
       ],
       []
@@ -1322,6 +1109,65 @@ export const Filters: Story = {
         id="tedi-table-filters"
         data={filterablePeople}
         columns={columns}
+        pagination={DEFAULT_PAGINATION}
+      />
+    );
+  },
+};
+
+/**
+ * Name inherits the table's actions, and Age overrides their order. Status hides the footer and applies the filter when a status is chosen.
+ */
+export const FilterActions: Story = {
+  render: function FilterActions() {
+    const columns = useMemo<ColumnDef<PersonRecord>[]>(
+      () => [
+        { id: 'name', accessorKey: 'name', header: 'Nimi', filterFn: 'includesString', meta: { filterable: true } },
+        {
+          id: 'age',
+          accessorKey: 'age',
+          header: 'Vanus',
+          meta: { filterable: { actions: ['clear', 'cancel', 'apply'], popoverWidth: 'medium' } },
+        },
+        {
+          id: 'status',
+          accessorKey: 'status',
+          header: 'Tõendi staatus',
+          filterFn: 'equals',
+          meta: {
+            filterable: { actions: [] },
+            filterContent: ({ value, apply, setValue, clear }) => (
+              <VerticalSpacing size={0.5}>
+                {CERT_STATUSES.map((option) => (
+                  <Button
+                    key={option}
+                    size="small"
+                    visualType={value === option ? 'primary' : 'secondary'}
+                    onClick={() => {
+                      setValue(option);
+                      apply();
+                    }}
+                  >
+                    {option}
+                  </Button>
+                ))}
+                <Button size="small" visualType="secondary" onClick={clear}>
+                  Tühjenda
+                </Button>
+              </VerticalSpacing>
+            ),
+          } satisfies TableColumnMeta<PersonRecord>,
+        },
+      ],
+      []
+    );
+
+    return (
+      <Table<PersonRecord>
+        id="tedi-table-filter-actions"
+        data={filterablePeople}
+        columns={columns}
+        filterActions={['cancel', 'apply']}
         pagination={DEFAULT_PAGINATION}
       />
     );
@@ -1428,6 +1274,44 @@ export const CollapsibleRowsRowTrigger: Story = {
 };
 
 /**
+ * A `Table` rendered inside `renderSubComponent` follows only its own props. The outer table here is
+ * striped, small and has vertical borders; the nested tables keep the default look.
+ */
+export const NestedTable: Story = {
+  render: () => {
+    const columns: ColumnDef<CollapsibleRecord>[] = [
+      { id: 'name', header: 'Isik', accessorKey: 'name' },
+      { id: 'age', header: 'Vanus', accessorKey: 'age' },
+      { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
+    ];
+    const nestedColumns: ColumnDef<CollapsibleRecord>[] = [
+      { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
+      { id: 'status', header: 'Tõendi staatus', accessorKey: 'status' },
+    ];
+    return (
+      <Table<CollapsibleRecord>
+        id="tedi-table-nested"
+        data={collapsiblePeople}
+        columns={columns}
+        renderSubComponent={(row) => (
+          <Table<CollapsibleRecord>
+            id={`tedi-table-nested-${row.id}`}
+            data={row.original.subRows ?? []}
+            columns={nestedColumns}
+          />
+        )}
+        getRowCanExpand={(row) => !!row.original.subRows}
+        defaultState={{ expanded: { '0': true, '2': true } }}
+        striped
+        verticalBorders
+        size="small"
+        pagination={SHOWCASE_PAGINATION_4}
+      />
+    );
+  },
+};
+
+/**
  * Columns hidden on narrow viewports — the secondary columns whose `id` is in `RESPONSIVE_SECONDARY_COLUMNS`
  * are toggled off below `md` and re-surfaced inside the expandable detail row.
  */
@@ -1448,6 +1332,7 @@ export const SelectableRows: Story = {
       data={people}
       columns={personColumns}
       enableRowSelection
+      rowSelectionLabel={(row) => `Vali ${row.original.name}`}
       pagination={DEFAULT_PAGINATION}
     />
   ),
@@ -1552,6 +1437,7 @@ const stickyDoctors: StickyDoctor[] = Array.from({ length: 28 }, (_, index) => (
 const stickyDoctorColumns: ColumnDef<StickyDoctor>[] = [
   {
     id: 'name',
+    meta: { rowHeader: true },
     header: 'Arst',
     accessorKey: 'name',
     size: 280,
@@ -1568,11 +1454,12 @@ const stickyDoctorColumns: ColumnDef<StickyDoctor>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
-    cell: () => (
+    cell: ({ row }) => (
       <span style={rowActionsCellStyle}>
         <Button visualType="link" iconLeft="edit">
-          Muuda
+          Muuda<span className="sr-only"> {row.original.name}</span>
         </Button>
       </span>
     ),
@@ -1717,6 +1604,7 @@ export const Actions: Story = {
         {
           id: 'actions',
           header: '',
+          meta: { label: 'Tegevused' },
           size: 1,
           cell: ({ row }) => (
             <span style={rowActionsCellStyle}>
@@ -1774,6 +1662,7 @@ export const Custom: Story = {
         {
           id: 'note',
           header: '',
+          meta: { label: 'Märkus' },
           cell: ({ row }) =>
             row.original.note && row.original.noteColor ? (
               <Alert type={row.original.noteColor} size="small" role="status">
@@ -1785,6 +1674,7 @@ export const Custom: Story = {
         {
           id: 'actions',
           header: '',
+          meta: { label: 'Tegevused' },
           size: 1,
           cell: ({ row }) => (
             <span style={rowActionsCellStyle}>

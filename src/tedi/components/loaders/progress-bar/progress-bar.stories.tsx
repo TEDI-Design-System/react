@@ -1,8 +1,11 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
+import isChromatic from 'chromatic/isChromatic';
 import { useEffect, useState } from 'react';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { ProgressBar, ProgressBarProps } from './progress-bar';
 
 const HINT = { text: 'Üleslaadimine', type: 'hint' } as const;
@@ -26,6 +29,7 @@ const meta: Meta<typeof ProgressBar> = {
     controls: {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
+    chromatic: { disableSnapshot: true },
   },
   argTypes: {
     value: { control: { type: 'range', min: 0, max: 100, step: 1 } },
@@ -72,12 +76,12 @@ const MatrixTable = ({ rows }: { rows: MatrixRow[] }): JSX.Element => {
 };
 
 export const Default: Story = {
-  args: { value: 60, ariaLabel: 'Edenemisriba pealkiri' },
+  args: { value: 60, ariaLabel: 'Faili üleslaadimine' },
 };
 
 const sizeRows: MatrixRow[] = [
-  { lines: ['Default'], props: { value: 20, ariaLabel: 'Edenemisriba pealkiri', helper: HINT } },
-  { lines: ['Small'], props: { value: 20, small: true, ariaLabel: 'Edenemisriba pealkiri', helper: HINT } },
+  { lines: ['Default'], props: { value: 20, ariaLabel: 'Faili üleslaadimine', helper: HINT } },
+  { lines: ['Small'], props: { value: 20, small: true, ariaLabel: 'Faili üleslaadimine', helper: HINT } },
 ];
 
 export const Sizes: Story = {
@@ -85,8 +89,8 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<ProgressBar value={20} ariaLabel="Edenemisriba pealkiri" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
-<ProgressBar value={20} small ariaLabel="Edenemisriba pealkiri" helper={{ text: 'Üleslaadimine', type: 'hint' }} />`,
+        code: `<ProgressBar value={20} ariaLabel="Faili üleslaadimine" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
+<ProgressBar value={20} small ariaLabel="Faili üleslaadimine" helper={{ text: 'Üleslaadimine', type: 'hint' }} />`,
       },
     },
   },
@@ -97,7 +101,7 @@ const positionRows: MatrixRow[] = [
     lines: ['Top title', 'Horizontal value', 'Bottom hint'],
     props: {
       value: 20,
-      label: 'Edenemisriba pealkiri',
+      label: 'Faili üleslaadimine',
       required: true,
       labelPosition: 'top',
       valuePosition: 'horizontal',
@@ -108,7 +112,7 @@ const positionRows: MatrixRow[] = [
     lines: ['Top title', 'Bottom value', 'Bottom hint'],
     props: {
       value: 20,
-      label: 'Edenemisriba pealkiri',
+      label: 'Faili üleslaadimine',
       required: true,
       labelPosition: 'top',
       valuePosition: 'bottom',
@@ -119,7 +123,7 @@ const positionRows: MatrixRow[] = [
     lines: ['Horizontal title', 'Horizontal value', 'Bottom hint'],
     props: {
       value: 20,
-      label: 'Edenemisriba pealkiri',
+      label: 'Faili üleslaadimine',
       required: true,
       labelPosition: 'top',
       valuePosition: 'horizontal',
@@ -131,7 +135,7 @@ const positionRows: MatrixRow[] = [
     lines: ['Horizontal title', 'Bottom value', 'Bottom hint'],
     props: {
       value: 20,
-      label: 'Edenemisriba pealkiri',
+      label: 'Faili üleslaadimine',
       required: true,
       labelPosition: 'top',
       valuePosition: 'bottom',
@@ -146,10 +150,10 @@ export const Position: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
-<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
-<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} md={{ labelPosition: 'horizontal' }} />
-<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} md={{ labelPosition: 'horizontal' }} />`,
+        code: `<ProgressBar value={20} label="Faili üleslaadimine" required labelPosition="top" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
+<ProgressBar value={20} label="Faili üleslaadimine" required labelPosition="top" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
+<ProgressBar value={20} label="Faili üleslaadimine" required labelPosition="top" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} md={{ labelPosition: 'horizontal' }} />
+<ProgressBar value={20} label="Faili üleslaadimine" required labelPosition="top" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} md={{ labelPosition: 'horizontal' }} />`,
       },
     },
   },
@@ -186,17 +190,17 @@ export const WithLabel: Story = {
 export const Regular: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '720px' }}>
-      <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" />
-      <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valueLabel="1 / 5" />
-      <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valuePosition="bottom" />
+      <ProgressBar value={40} ariaLabel="Faili üleslaadimine" />
+      <ProgressBar value={40} ariaLabel="Faili üleslaadimine" valueLabel="1 / 5" />
+      <ProgressBar value={40} ariaLabel="Faili üleslaadimine" valuePosition="bottom" />
     </div>
   ),
   parameters: {
     docs: {
       source: {
-        code: `<ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" />
-<ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valueLabel="1 / 5" />
-<ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valuePosition="bottom" />`,
+        code: `<ProgressBar value={40} ariaLabel="Faili üleslaadimine" />
+<ProgressBar value={40} ariaLabel="Faili üleslaadimine" valueLabel="1 / 5" />
+<ProgressBar value={40} ariaLabel="Faili üleslaadimine" valuePosition="bottom" />`,
       },
     },
   },
@@ -205,7 +209,7 @@ export const Regular: Story = {
 export const WithHint: Story = {
   args: {
     value: 40,
-    ariaLabel: 'Edenemisriba pealkiri',
+    ariaLabel: 'Faili üleslaadimine',
     helper: HINT,
   },
 };
@@ -216,7 +220,7 @@ export const WithHint: Story = {
 export const WithError: Story = {
   args: {
     value: 40,
-    ariaLabel: 'Edenemisriba pealkiri',
+    ariaLabel: 'Faili üleslaadimine',
     helper: { text: 'Üleslaadimine ebaõnnestus, fail on liiga suur', type: 'error' },
   },
 };
@@ -224,7 +228,7 @@ export const WithError: Story = {
 export const ValueHidden: Story = {
   args: {
     value: 60,
-    ariaLabel: 'Edenemisriba pealkiri',
+    ariaLabel: 'Faili üleslaadimine',
     showValue: false,
   },
 };
@@ -232,7 +236,7 @@ export const ValueHidden: Story = {
 export const Responsive: Story = {
   args: {
     value: 40,
-    label: 'Edenemisriba pealkiri',
+    label: 'Faili üleslaadimine',
     labelPosition: 'top',
     valuePosition: 'bottom',
     helper: HINT,
@@ -247,8 +251,9 @@ export const Responsive: Story = {
  */
 export const Animated: Story = {
   render: function AnimatedStory() {
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(isChromatic() ? 40 : 0);
     useEffect(() => {
+      if (isChromatic()) return;
       const id = window.setInterval(() => {
         setValue((v) => (v >= 100 ? 0 : v + 5));
       }, 300);
@@ -256,4 +261,51 @@ export const Animated: Story = {
     }, []);
     return <ProgressBar value={value} label="Üleslaadimine..." />;
   },
+  parameters: { chromatic: { disableSnapshot: false } },
+};
+
+/** Chromatic snapshot for ProgressBar: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} component={ProgressBar} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <VisualTestStory story={Sizes} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Position</Text>
+        <VisualTestStory story={Position} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With label</Text>
+        <VisualTestStory story={WithLabel} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Regular</Text>
+        <VisualTestStory story={Regular} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With hint</Text>
+        <VisualTestStory story={WithHint} component={ProgressBar} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With error</Text>
+        <VisualTestStory story={WithError} component={ProgressBar} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Value hidden</Text>
+        <VisualTestStory story={ValueHidden} component={ProgressBar} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={Responsive} component={ProgressBar} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

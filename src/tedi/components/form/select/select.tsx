@@ -16,6 +16,7 @@ import AsyncSelect from 'react-select/async';
 import { FeedbackText, FeedbackTextProps } from '../../../../tedi/components/form/feedback-text/feedback-text';
 import { FormLabel, FormLabelProps } from '../../../../tedi/components/form/form-label/form-label';
 import { useLabels } from '../../../../tedi/providers/label-provider';
+import { usePortalRoot } from '../../../providers/style-provider/style-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { TextProps } from '../../base/typography/text/text';
 import { TagEllipsis } from '../../tags/tag/tag';
@@ -138,6 +139,12 @@ export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
    * valid visual state.
    */
   helper?: FeedbackTextProps;
+  /**
+   * Space-separated ids of elements rendered outside the select (for example the
+   * application's own error message) that describe the combobox. Listed before the
+   * helper id.
+   */
+  'aria-describedby'?: string;
   /**
    * Visual size variant.
    * - omit — default (40px tall).
@@ -453,6 +460,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       className,
       hideLabel = false,
       helper,
+      'aria-describedby': ariaDescribedBy,
       placeholder,
       invalid,
       valid,
@@ -505,13 +513,41 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     const containerId = shouldHideLabel ? `${resolvedId}-container` : resolvedId;
 
     const helperId = helper ? helper?.id ?? `${resolvedId}-helper` : undefined;
+    const describedBy =
+      [...new Set([...(ariaDescribedBy?.split(/\s+/) ?? []), helperId].filter(Boolean))].join(' ') || undefined;
     const element = React.useRef<SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>> | null>(null);
+    const portalRoot = usePortalRoot();
     const { getLabel } = useLabels();
 
     React.useImperativeHandle(
       ref,
       () => element.current as SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>>
     );
+
+    // Gives react-select's document `touchend` handler the control or menu from the composed path when the tap
+    // was inside one, so taps inside a shadow root (or a shadow root within an option) count as inside the select.
+    React.useEffect(() => {
+      const instance = element.current as {
+        onTouchEnd?: (event: TouchEvent) => void;
+        controlRef?: HTMLElement | null;
+        menuListRef?: HTMLElement | null;
+      } | null;
+      const originalTouchEnd = instance?.onTouchEnd;
+
+      if (!instance || !originalTouchEnd) return undefined;
+
+      const handleTouchEnd = (event: TouchEvent) => {
+        const path = event.composedPath?.() ?? [event.target];
+        const target = path.find((node) => node === instance.controlRef || node === instance.menuListRef) ?? path[0];
+
+        originalTouchEnd.call(instance, { target } as unknown as TouchEvent);
+      };
+
+      document.removeEventListener('touchend', originalTouchEnd, false);
+      document.addEventListener('touchend', handleTouchEnd, false);
+
+      return () => document.removeEventListener('touchend', handleTouchEnd, false);
+    }, [async]);
 
     // Touch-only keyboard deferral (see `openKeyboardOnTouch`). Tapping the field
     // to *open* it suppresses the soft keyboard (`inputMode="none"`); tapping the
@@ -749,7 +785,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           exitKeyboardMode={exitKeyboardMode}
           onKeyDown={handleSelectKeyDown}
           id={containerId}
-          aria-describedby={helperId}
+          aria-describedby={describedBy}
           autoFocus={autoFocus}
           ref={element}
           instanceId={resolvedId}
@@ -775,7 +811,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           components={customComponents}
           isDisabled={disabled}
           isSearchable={isSearchable}
-          menuIsOpen={menuIsOpen}
+          menuIsOpen={portalRoot === null ? false : menuIsOpen}
           openMenuOnFocus={openMenuOnFocus}
           openMenuOnClick={openMenuOnClick}
           tabSelectsValue={tabSelectsValue}
@@ -792,8 +828,8 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           menuPlacement="auto"
           inputIsHidden={inputIsHidden}
           required={required}
-          menuPortalTarget={document.body}
-          menuPosition="absolute"
+          menuPortalTarget={portalRoot === undefined ? document.body : portalRoot}
+          menuPosition={portalRoot ? 'fixed' : 'absolute'}
           classNames={(() => {
             const merged: Record<string, (state: UnknownType) => string> = {};
             if (classNames) {

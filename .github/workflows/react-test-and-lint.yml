@@ -64,6 +64,9 @@ jobs:
         run: |
           npm run test:coverage
 
+      - name: Run skill script tests
+        run: npm run test:skills
+
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v5
         with:

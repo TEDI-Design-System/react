@@ -35,7 +35,23 @@ npm run test:coverage  # Jest with coverage (80% threshold)
 npm run build          # library build into dist/
 ```
 
+On Windows, enable symlinks before cloning. `.claude/skills/` links to `.agents/skills/`, and
+without symlinks Claude Code doesn't find the repository's skills. Turn on Developer Mode, then:
+
+```bash
+git clone -c core.symlinks=true <repo-url>
+```
+
+In an existing clone, run `git config core.symlinks true`, delete the files under
+`.claude/skills/` and run `git checkout -- .claude/skills`.
+
 Components live in two tiers: `src/tedi/` (TEDI-READY, must meet the [Definition of Done](https://github.com/TEDI-Design-System/general/wiki/Definition-of-Done)) and `src/community/` (looser requirements).
+
+## Visual tests
+
+Chromatic snapshots each component through one hidden `VisualTest` story, at mobile and desktop width (`VISUAL_TEST_VIEWPORTS`). The docs stories themselves are not snapshotted. When you add a story to a component that has `VisualTest`, add a block for it there too. The block renders the docs story through `<VisualTestStory>` from `.storybook/visual-test-story`, so later changes to the story reach Chromatic. Don't copy the story's markup.
+
+`npm run test` fails when a docs story has no block. A story that only demonstrates behaviour (form integration, a controlled-state demo) opts out with `parameters: { visualTest: false }`. The full rules are in section 9 of [stories.md](.agents/skills/contributing/references/stories.md).
 
 ## Accessibility check
 

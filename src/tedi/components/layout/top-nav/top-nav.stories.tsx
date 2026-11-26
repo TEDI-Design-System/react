@@ -127,7 +127,7 @@ const reserveSubmenuSpace: Decorator = (Story) => <div style={{ minHeight: '24re
 export const Default: Story = {
   render: Template,
   args: {
-    ariaLabel: 'Primary navigation',
+    ariaLabel: 'Primary',
     children: (
       <>
         <TopNav.Item href="#">Avaleht</TopNav.Item>
@@ -146,7 +146,7 @@ export const Default: Story = {
 export const WithIcons: Story = {
   render: Template,
   args: {
-    ariaLabel: 'Primary navigation',
+    ariaLabel: 'Primary',
     children: (
       <>
         <TopNav.Item href="#" icon="home" isActive>
@@ -172,7 +172,7 @@ export const WithIcons: Story = {
 export const WithSeparator: Story = {
   render: Template,
   args: {
-    ariaLabel: 'Primary navigation',
+    ariaLabel: 'Primary',
     children: (
       <>
         <TopNav.Item href="#" isActive>
@@ -193,7 +193,7 @@ export const WithSeparator: Story = {
 export const CustomItemContent: Story = {
   render: Template,
   args: {
-    ariaLabel: 'Primary navigation',
+    ariaLabel: 'Primary',
     children: (
       <>
         <TopNav.Item href="#" isActive>
@@ -214,7 +214,7 @@ export const CustomItemContent: Story = {
 export const MenuOpen: Story = {
   render: Template,
   args: {
-    ariaLabel: 'Primary navigation',
+    ariaLabel: 'Primary',
     children: (
       <>
         <TopNav.Item href="#">Avaleht</TopNav.Item>
@@ -268,7 +268,7 @@ export const MenuOpen: Story = {
 export const ConstrainedInnerWidth: Story = {
   render: Template,
   args: {
-    ariaLabel: 'Primary navigation',
+    ariaLabel: 'Primary',
     maxWidth: 'lg',
     children: (
       <>
@@ -307,7 +307,7 @@ export const ContentWidthMegaMenu: Story = {
   render: Template,
   decorators: [reserveSubmenuSpace],
   args: {
-    ariaLabel: 'Primary navigation',
+    ariaLabel: 'Primary',
     submenuFit: 'content',
     children: (
       <>
@@ -348,7 +348,7 @@ export const SubmenuGroupWithoutTitle: Story = {
   render: Template,
   decorators: [reserveSubmenuSpace],
   args: {
-    ariaLabel: 'Primary navigation',
+    ariaLabel: 'Primary',
     submenuFit: 'content',
     children: (
       <>
@@ -526,7 +526,7 @@ export const ControlledMobile: Story = {
             <Header.Language languages={headerLanguages} currentLanguage="EST" />
           </Header.Actions>
         </Header>
-        <TopNav ariaLabel="Primary navigation" mobileBreakpoint="xxl" isMobileOpen={open} onMenuToggle={setOpen}>
+        <TopNav ariaLabel="Primary" mobileBreakpoint="xxl" isMobileOpen={open} onMenuToggle={setOpen}>
           <TopNav.Item href="#" isActive>
             Avaleht
           </TopNav.Item>
@@ -539,7 +539,7 @@ export const ControlledMobile: Story = {
 };
 
 const stickyDemoNav = (
-  <TopNav ariaLabel="Primary navigation">
+  <TopNav ariaLabel="Primary">
     <TopNav.Item href="#" isActive>
       Avaleht
     </TopNav.Item>

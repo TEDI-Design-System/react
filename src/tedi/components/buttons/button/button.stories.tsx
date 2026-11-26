@@ -1,7 +1,9 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { ElementType } from 'react';
 
+import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text, TextProps } from '../../base/typography/text/text';
+import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
@@ -16,6 +18,7 @@ const meta: Meta<typeof Button> = {
   component: Button,
   title: 'TEDI-Ready/Components/Buttons/Button',
   parameters: {
+    chromatic: { disableSnapshot: true },
     a11y: {
       config: {
         // TODO: [Button]: Review storybook a11y violations #843
@@ -56,13 +59,15 @@ export const Default: Story = {
   },
 };
 
-type TemplateMultipleProps<Type = typeof buttonStateArray> = ButtonProps<'button'> & {
+type TemplateMultipleProps<Type = typeof buttonStateArray> = Omit<ButtonProps<'button'>, 'children'> & {
   array: Type;
-  titleColor: TextProps['color'];
+  titleColor?: TextProps['color'];
+  idPrefix?: string;
 };
 
 const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
-  const { array, titleColor, ...buttonProps } = args;
+  const { array, titleColor, idPrefix, ...buttonProps } = args;
+  const getId = (value: string, index: number) => (idPrefix ? `${idPrefix}-${value}-${index}` : value);
 
   return (
     <>
@@ -88,11 +93,16 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
               </Text>
             </Col>
             <Col className="flex align-items-center gap-3">
-              <Button id={value} {...buttonProps} disabled={value === 'Disabled'} isLoading={value === 'Loading'}>
+              <Button
+                id={getId(value, 1)}
+                {...buttonProps}
+                disabled={value === 'Disabled'}
+                isLoading={value === 'Loading'}
+              >
                 Create
               </Button>
               <Button
-                id={value}
+                id={getId(value, 2)}
                 {...buttonProps}
                 iconRight="arrow_right_alt"
                 disabled={value === 'Disabled'}
@@ -101,7 +111,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 Continue
               </Button>
               <Button
-                id={value}
+                id={getId(value, 3)}
                 {...buttonProps}
                 iconLeft="edit"
                 disabled={value === 'Disabled'}
@@ -110,7 +120,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 Edit
               </Button>
               <Button
-                id={value}
+                id={getId(value, 4)}
                 {...buttonProps}
                 icon="arrow_right_alt"
                 disabled={value === 'Disabled'}
@@ -122,7 +132,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
             </Col>
             <Col className="flex align-items-center gap-3">
               <Button
-                id={value}
+                id={getId(value, 5)}
                 size="small"
                 {...buttonProps}
                 disabled={value === 'Disabled'}
@@ -131,7 +141,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 Create
               </Button>
               <Button
-                id={value}
+                id={getId(value, 6)}
                 size="small"
                 {...buttonProps}
                 iconRight="arrow_right_alt"
@@ -141,7 +151,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 Continue
               </Button>
               <Button
-                id={value}
+                id={getId(value, 7)}
                 size="small"
                 {...buttonProps}
                 iconLeft="edit"
@@ -151,7 +161,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 Edit
               </Button>
               <Button
-                id={value}
+                id={getId(value, 8)}
                 size="small"
                 {...buttonProps}
                 icon="arrow_right_alt"
@@ -314,6 +324,28 @@ export const DangerNeutral: StoryObj<TemplateMultipleProps> = {
   },
 };
 
+/**
+ * The extra small size is only available for icon-only buttons. It does not grow on mobile.
+ */
+export const ExtraSmallIconOnly: StoryObj<ButtonProps<ElementType>> = {
+  render: () => (
+    <div className="flex align-items-center gap-3">
+      <Button size="extra-small" icon="close" showTooltip>
+        Close
+      </Button>
+      <Button size="extra-small" icon="edit" visualType="secondary" showTooltip>
+        Edit
+      </Button>
+      <Button size="extra-small" icon="more_vert" visualType="neutral" showTooltip>
+        More
+      </Button>
+      <Button size="extra-small" icon="close" disabled showTooltip>
+        Close
+      </Button>
+    </div>
+  ),
+};
+
 export const NoStyleTemplate: StoryFn<ButtonProps> = (args) => {
   return (
     <Button {...args} noStyle={true}>
@@ -361,53 +393,134 @@ export const ResponsiveButton: Story = {
   },
 };
 
+const LongTextTemplate: StoryFn<ButtonProps> = (args) => (
+  <VerticalSpacing>
+    <Row>
+      <Col md={6}>
+        <Alert type="warning">Please avoid long text. This is fallback for emergencies — use only with caution.</Alert>
+      </Col>
+    </Row>
+    <Row>
+      <Col md={4} width={12}>
+        <Button>{args.children}</Button>
+      </Col>
+      <Col md={4} width={12}>
+        <Button iconLeft="edit">{args.children}</Button>
+      </Col>
+      <Col md={3} width={12}>
+        <Button>{args.children}</Button>
+      </Col>
+    </Row>
+  </VerticalSpacing>
+);
+
 export const LongTextButtonThatWrapsIntoMultipleLines: Story = {
   args: {
     children: 'This is a very long button text that should wrap into multiple lines',
   },
-
-  render: (args) => (
-    <VerticalSpacing>
-      <Row>
-        <Col md={6}>
-          <Alert type="warning">
-            Please avoid long text. This is fallback for emergencies — use only with caution.
-          </Alert>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={4} width={12}>
-          <Button>{args.children}</Button>
-        </Col>
-        <Col md={4} width={12}>
-          <Button iconLeft="edit">{args.children}</Button>
-        </Col>
-        <Col md={3} width={12}>
-          <Button>{args.children}</Button>
-        </Col>
-      </Row>
-    </VerticalSpacing>
-  ),
+  render: LongTextTemplate,
 };
 
+const VisualTypeLinkTemplate = () => (
+  <VerticalSpacing>
+    <Row gap={3}>
+      <Col width="auto">
+        <Button visualType="link">Add file</Button>
+      </Col>
+      <Col width="auto">
+        <Button visualType="link" iconLeft="add">
+          Add file
+        </Button>
+      </Col>
+      <Col width="auto">
+        <Button visualType="link" iconRight="add">
+          Add file
+        </Button>
+      </Col>
+    </Row>
+  </VerticalSpacing>
+);
+
 export const VisualTypeLink: StoryObj<TemplateMultipleProps> = {
+  render: VisualTypeLinkTemplate,
+};
+
+const visualTestVariants: {
+  label: string;
+  idPrefix: string;
+  inverted?: boolean;
+  story: StoryObj<TemplateMultipleProps>;
+}[] = [
+  { label: 'Primary', idPrefix: 'vt-primary', story: Primary },
+  { label: 'Primary inverted', idPrefix: 'vt-primary-inverted', inverted: true, story: PrimaryInverted },
+  { label: 'Secondary', idPrefix: 'vt-secondary', story: Secondary },
+  { label: 'Secondary inverted', idPrefix: 'vt-secondary-inverted', inverted: true, story: SecondaryInverted },
+  { label: 'Neutral', idPrefix: 'vt-neutral', story: Neutral },
+  { label: 'Neutral inverted', idPrefix: 'vt-neutral-inverted', inverted: true, story: NeutralInverted },
+  { label: 'Success', idPrefix: 'vt-success', story: Success },
+  { label: 'Danger', idPrefix: 'vt-danger', story: Danger },
+  { label: 'Danger neutral', idPrefix: 'vt-danger-neutral', story: DangerNeutral },
+];
+
+/** Chromatic snapshot for Button: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS },
+    pseudo: {
+      hover: '[id^="vt-"][id*="-Hover-"]',
+      active: '[id^="vt-"][id*="-Active-"]',
+    },
+  },
   render: () => (
-    <VerticalSpacing>
-      <Row gap={3}>
-        <Col width="auto">
-          <Button visualType="link">Add file</Button>
-        </Col>
-        <Col width="auto">
-          <Button visualType="link" iconLeft="add">
-            Add file
-          </Button>
-        </Col>
-        <Col width="auto">
-          <Button visualType="link" iconRight="add">
-            Add file
-          </Button>
-        </Col>
-      </Row>
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      {visualTestVariants.map(({ label, idPrefix, inverted, story }) =>
+        inverted ? (
+          <Card key={idPrefix} background="brand-primary" borderless>
+            <Card.Content>
+              <VerticalSpacing size={0.5}>
+                <Text modifiers="bold" color="white">
+                  {label}
+                </Text>
+                <VisualTestStory story={{ ...story, args: { ...story.args, idPrefix } }} />
+              </VerticalSpacing>
+            </Card.Content>
+          </Card>
+        ) : (
+          <VerticalSpacing key={idPrefix} size={0.5}>
+            <Text modifiers="bold">{label}</Text>
+            <VisualTestStory story={{ ...story, args: { ...story.args, idPrefix } }} />
+          </VerticalSpacing>
+        )
+      )}
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Extra small icon only</Text>
+        <VisualTestStory story={ExtraSmallIconOnly} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">No style</Text>
+        <VisualTestStory story={{ render: NoStyleTemplate }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Full width</Text>
+        <VisualTestStory story={FullWidth} component={Button} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Responsive</Text>
+        <VisualTestStory story={ResponsiveButton} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Long text</Text>
+        <VisualTestStory story={LongTextButtonThatWrapsIntoMultipleLines} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Visual type link</Text>
+        <VisualTestStory story={VisualTypeLink} />
+      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

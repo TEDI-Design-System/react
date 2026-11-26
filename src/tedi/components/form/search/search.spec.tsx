@@ -33,21 +33,34 @@ describe('Search component', () => {
     expect(input).toBeInTheDocument();
   });
 
-  it('does not name the search region with the placeholder (avoids double announcement)', () => {
+  it('leaves the search landmark unnamed by default', () => {
     render(<Search {...defaultProps} placeholder="Search by name or keyword" />);
-    const region = screen.getByRole('search');
-    expect(region).toHaveAttribute('aria-label', 'search');
-    expect(region.getAttribute('aria-label')).not.toBe('Search by name or keyword');
+    expect(screen.getByRole('search')).not.toHaveAttribute('aria-label');
   });
 
-  it('uses the provided ariaLabel as the search region name', () => {
+  it('names the search landmark with ariaLabel', () => {
     render(<Search {...defaultProps} ariaLabel="Search products" />);
     expect(screen.getByRole('search')).toHaveAttribute('aria-label', 'Search products');
   });
 
-  it('falls back to the generic label when ariaLabel is an empty string', () => {
+  it('leaves the search landmark unnamed when ariaLabel is an empty string', () => {
     render(<Search {...defaultProps} ariaLabel="" />);
-    expect(screen.getByRole('search')).toHaveAttribute('aria-label', 'search');
+    expect(screen.getByRole('search')).not.toHaveAttribute('aria-label');
+  });
+
+  it('keeps the field named by its label when ariaLabel is set', () => {
+    render(<Search {...defaultProps} ariaLabel="Search products" />);
+    expect(screen.getByRole('searchbox', { name: 'Search' })).toBeInTheDocument();
+  });
+
+  it('keeps the field named by a visually hidden label', () => {
+    render(<Search {...defaultProps} hideLabel ariaLabel="Search products" />);
+    expect(screen.getByRole('searchbox', { name: 'Search' })).toBeInTheDocument();
+  });
+
+  it('keeps the button name when ariaLabel is set', () => {
+    render(<Search {...defaultProps} ariaLabel="Search products" button={{}} />);
+    expect(screen.getByRole('button', { name: 'search' })).toBeInTheDocument();
   });
 
   it('renders the plain input as a searchbox', () => {
@@ -106,6 +119,56 @@ describe('Search component', () => {
     render(<Search {...defaultProps} disabled />);
     const input = screen.getByPlaceholderText('Search...');
     expect(input).toBeDisabled();
+  });
+});
+
+describe('Search button size', () => {
+  it('uses the large icon size on the button when the search is large', () => {
+    render(<Search id="search-large" label="Search" size="large" button={{ icon: 'search', 'aria-label': 'Otsi' }} />);
+    expect(screen.getByRole('button', { name: 'Otsi' }).querySelector('.tedi-icon--size-24')).toBeInTheDocument();
+  });
+
+  it('keeps an explicit icon size given as an object when the search is large', () => {
+    render(
+      <Search
+        id="search-large-object"
+        label="Search"
+        size="large"
+        button={{ iconLeft: { name: 'search', size: 18 }, children: 'Otsi' }}
+      />
+    );
+    const button = screen.getByRole('button', { name: 'Otsi' });
+    expect(button.querySelector('.tedi-icon--size-18')).toBeInTheDocument();
+    expect(button.querySelector('.tedi-icon--size-24')).not.toBeInTheDocument();
+  });
+
+  it('applies the large icon size to an icon and keeps its size when set in a breakpoint', () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = jest.fn().mockImplementation((query: string) => ({
+      matches: /min-width: (36|48)rem/.test(query),
+      media: query,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+    }));
+    render(
+      <Search
+        id="search-large-breakpoint"
+        label="Search"
+        size="large"
+        button={{ 'aria-label': 'Otsi', md: { icon: 'search', size: 'small' } } as SearchProps['button']}
+      />
+    );
+    window.matchMedia = originalMatchMedia;
+    const button = screen.getByRole('button', { name: 'Otsi' });
+    expect(button.querySelector('.tedi-icon--size-24')).toBeInTheDocument();
+    expect(button).not.toHaveClass('tedi-btn--small');
+  });
+
+  it('keeps the default icon size on the button when the search is not large', () => {
+    render(<Search id="search-default" label="Search" button={{ icon: 'search', 'aria-label': 'Otsi' }} />);
+    expect(screen.getByRole('button', { name: 'Otsi' }).querySelector('.tedi-icon--size-18')).toBeInTheDocument();
   });
 });
 

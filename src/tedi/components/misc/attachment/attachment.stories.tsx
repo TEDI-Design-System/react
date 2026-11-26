@@ -1,5 +1,11 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import {
+  VISUAL_TEST_VIEWPORTS,
+  VisualTestStory,
+  type VisualTestStoryInput,
+} from '../../../../../.storybook/visual-test-story';
+import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { HideAt } from '../../layout/hide-at/hide-at';
 import { ShowAt } from '../../layout/show-at/show-at';
@@ -26,6 +32,7 @@ const meta: Meta<AttachmentProps> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.59.78?node-id=30427-154342&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -246,3 +253,34 @@ export const LabeledActions: StoryFn<AttachmentProps> = () => (
     />
   </div>
 );
+
+const withMetaArgs = (story: Story): VisualTestStoryInput => ({ ...story, args: { ...meta.args, ...story.args } });
+
+const visualTestBlocks: { label: string; story: VisualTestStoryInput }[] = [
+  { label: 'Default', story: withMetaArgs(Default) },
+  { label: 'Read only', story: { render: ReadOnly } },
+  { label: 'With progress', story: { render: WithProgress } },
+  { label: 'With file size', story: withMetaArgs(WithFileSize) },
+  { label: 'With icon', story: { render: WithIcon } },
+  { label: 'Without delete button', story: { render: WithoutDeleteButton } },
+  { label: 'With different actions', story: { render: WithDifferentActions } },
+  { label: 'Vertical', story: { render: Vertical } },
+  { label: 'With error', story: { render: WithError } },
+  { label: 'Labeled actions', story: { render: LabeledActions } },
+];
+
+/** Chromatic snapshot for Attachment: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false, viewports: VISUAL_TEST_VIEWPORTS } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestBlocks.map(({ label, story }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          <VisualTestStory story={story} />
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
+};

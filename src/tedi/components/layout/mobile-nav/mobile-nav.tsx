@@ -1,7 +1,8 @@
-import { FloatingOverlay } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingOverlay, useDismiss, useFloating, useInteractions } from '@floating-ui/react';
 import classNames from 'classnames';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { getRootNode } from '../../../helpers/shadow-dom';
 import { warnDeprecated } from '../../../helpers/warn-deprecated/warn-deprecated';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
@@ -68,6 +69,16 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
   const [navigationStack, setNavigationStack] = useState<NavigationLevel<C>[]>([{ items: navItems }]);
   const overlayRef = useRef<HTMLDivElement>(null);
   const [overlayTop, setOverlayTop] = useState<string>('var(--layout-header-height)');
+  const trapsFocus = isOpen && showOverlay;
+
+  const { refs, context } = useFloating({
+    open: trapsFocus,
+    onOpenChange: (open) => {
+      if (!open) onClose();
+    },
+  });
+  const dismiss = useDismiss(context, { outsidePress: false });
+  const { getFloatingProps } = useInteractions([dismiss]);
 
   useEffect(() => {
     setNavigationStack([{ items: navItems }]);
@@ -77,7 +88,9 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
     if (!isOpen || !showOverlay || typeof document === 'undefined') return undefined;
 
     const block = findFixedContainingBlock(overlayRef.current);
-    const header = (block ?? document).querySelector('header') ?? document.querySelector('header');
+    const root = overlayRef.current ? getRootNode(overlayRef.current) : document;
+    const header =
+      (block ?? root).querySelector('header') ?? root.querySelector('header') ?? document.querySelector('header');
 
     if (!header) {
       setOverlayTop('var(--layout-header-height)');
@@ -228,6 +241,7 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
       className={classNames(styles['tedi-sidenav'], styles['tedi-sidenav--mobile'], className)}
       aria-label={ariaLabel}
       id={id}
+      {...(trapsFocus ? getFloatingProps({ ref: refs.setFloating }) : {})}
     >
       <div className={styles['tedi-sidenav__list']}>
         {!isRootLevel && (
@@ -292,7 +306,14 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
         }
       }}
     >
-      {content}
+      <FloatingFocusManager
+        context={context}
+        modal
+        closeOnFocusOut={false}
+        visuallyHiddenDismiss={getLabel('header.toggle', true)}
+      >
+        {content}
+      </FloatingFocusManager>
     </FloatingOverlay>
   ) : (
     content

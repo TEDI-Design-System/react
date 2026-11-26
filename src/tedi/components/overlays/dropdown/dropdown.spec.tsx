@@ -2,6 +2,7 @@ import * as FloatingUI from '@floating-ui/react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React, { ComponentProps } from 'react';
 
+import { StyleProvider } from '../../../providers/style-provider/style-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown, DropdownProps } from './dropdown';
 import styles from './dropdown.module.scss';
@@ -166,7 +167,7 @@ describe('Dropdown component', () => {
     expect(dropdownContainer).toHaveClass(styles['tedi-dropdown--tree']);
   });
 
-  it('sets aria-activedescendant when activeIndex is set', () => {
+  it('leaves aria-activedescendant off the menu, since focus moves onto the items', () => {
     renderDropdown(
       { children: <span>Trigger</span> },
       <>
@@ -177,7 +178,7 @@ describe('Dropdown component', () => {
     );
 
     fireEvent.click(screen.getByText('Trigger'));
-    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-0');
+    expect(screen.getByRole('menu')).not.toHaveAttribute('aria-activedescendant');
   });
 
   it('focuses the item at defaultActiveIndex on open', () => {
@@ -192,7 +193,8 @@ describe('Dropdown component', () => {
     );
 
     fireEvent.click(screen.getByText('Trigger'));
-    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-2');
+    expect(screen.getByRole('menuitem', { name: 'Third' })).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('menuitem', { name: 'First' })).toHaveAttribute('tabindex', '-1');
   });
 
   it('resets the active index when the dropdown closes', () => {
@@ -207,13 +209,14 @@ describe('Dropdown component', () => {
 
     // Open → close → reopen. Ensure the seeded index is reapplied cleanly.
     fireEvent.click(screen.getByText('Trigger'));
-    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-1');
+    expect(screen.getByRole('menuitem', { name: 'Second' })).toHaveAttribute('tabindex', '0');
 
     fireEvent.click(screen.getByText('Trigger'));
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Trigger'));
-    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-1');
+    expect(screen.getByRole('menuitem', { name: 'Second' })).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('menuitem', { name: 'First' })).toHaveAttribute('tabindex', '-1');
   });
 
   it('exposes asChild buttons as focusable menuitems with roving tabindex', () => {
@@ -242,7 +245,6 @@ describe('Dropdown component', () => {
     expect(actionA).toHaveAttribute('tabindex', '0');
     expect(actionB).toHaveAttribute('tabindex', '-1');
     expect(result).toHaveAttribute('tabindex', '-1');
-    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-1');
   });
 
   it('applies pixel width when width is a number', () => {
@@ -330,5 +332,36 @@ describe('Dropdown component', () => {
     });
     fireEvent.click(screen.getByText('Open menu'));
     expect(document.querySelector(`.${styles['tedi-dropdown__scroll']}`)).toHaveStyle({ maxHeight: '20rem' });
+  });
+});
+
+describe('Dropdown portal root', () => {
+  it('renders the content into the StyleProvider container element', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    render(
+      <StyleProvider containerElement={container}>
+        <Dropdown>
+          <Dropdown.Trigger>
+            <span>Open menu</span>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item index={0}>Item</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </StyleProvider>
+    );
+    fireEvent.click(screen.getByText('Open menu'));
+
+    expect(container).toContainElement(screen.getByText('Item'));
+    container.remove();
+  });
+
+  it('renders the content into document.body without a container element', () => {
+    renderDropdown({ children: <span>Open menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>);
+    fireEvent.click(screen.getByText('Open menu'));
+
+    expect(document.body).toContainElement(screen.getByText('Item'));
   });
 });
