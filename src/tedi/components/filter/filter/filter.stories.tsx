@@ -2,6 +2,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
@@ -974,23 +975,45 @@ export const Examples: Story = {
  * while the search input and "Clear selection" stay pinned to the top and bottom of the dropdown.
  */
 export const RestrictedHeight: Story = {
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          // `aria-hidden-focus`: @floating-ui/react wraps the open dropdown in `data-floating-ui-focus-guard`
+          // spans with tabindex="0" and aria-hidden="true" by its own design, as in the open Dropdown stories.
+          { id: 'aria-hidden-focus', enabled: false },
+        ],
+      },
+    },
+  },
+  // Opens the single-select filter, so Chromatic captures its option list stacked in a column.
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Raviasutus 4' }));
+    const body = within(canvasElement.ownerDocument.body);
+    await waitFor(() => expect(body.getByRole('menuitem', { name: 'Raviasutus 5' })).toBeVisible());
+  },
   render: () => {
     const manyOptions: FilterOption[] = Array.from({ length: 20 }, (_, i) => ({
       value: `${i + 1}`,
       label: `Raviasutus ${i + 1}`,
     }));
     return (
-      <div className="flex gap-2 flex-wrap">
-        <Filter
-          text="Raviasutus"
-          multiselect
-          options={manyOptions}
-          defaultSelectedValues={['4']}
-          searchable
-          showSelectAll
-          showClear
-          maxHeight={280}
-        />
+      // Tall enough for the open 280px list, which is outside the story root and would be cropped otherwise.
+      <div style={{ minHeight: 360 }}>
+        <div className="flex gap-2 flex-wrap">
+          <Filter
+            text="Raviasutus"
+            multiselect
+            options={manyOptions}
+            defaultSelectedValues={['4']}
+            searchable
+            showSelectAll
+            showClear
+            maxHeight={280}
+          />
+          <Filter text="Raviasutus (single)" options={manyOptions} defaultSelectedValue="4" maxHeight={280} />
+        </div>
       </div>
     );
   },

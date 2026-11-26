@@ -475,7 +475,10 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>((props, ref) =>
                 </>
               )}
               {resolvedMaxHeight !== undefined ? (
-                <div className={styles['tedi-filter-dropdown__options']} style={{ maxHeight: resolvedMaxHeight }}>
+                <div
+                  className={cn(styles['tedi-filter-dropdown__options'], styles['tedi-filter-dropdown__option-list'])}
+                  style={{ maxHeight: resolvedMaxHeight }}
+                >
                   {renderOptions()}
                 </div>
               ) : (

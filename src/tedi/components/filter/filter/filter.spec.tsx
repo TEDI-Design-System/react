@@ -471,6 +471,7 @@ describe('Filter — maxHeight', () => {
     const optionsBody = document.querySelector('[class*="tedi-filter-dropdown__options"]');
     expect(optionsBody).toBeInTheDocument();
     expect(optionsBody).toHaveStyle({ maxHeight: '200px' });
+    expect(optionsBody).toHaveClass('tedi-filter-dropdown__option-list');
 
     const search = document.querySelector('[class*="tedi-filter-dropdown__search"]');
     const clear = document.querySelector('[class*="tedi-filter-dropdown__clear"]');
