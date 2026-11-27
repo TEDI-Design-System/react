@@ -43,20 +43,29 @@ type ResizeListener = () => void;
 const resizeListeners = new Map<Element, ResizeListener>();
 let sharedResizeObserver: ResizeObserver | undefined;
 
+const notifyListeners = () => resizeListeners.forEach((listener) => listener());
+
 /**
- * Calls `listener` whenever the element is resized. All Ellipsis instances share one
- * `ResizeObserver`, so a page with many of them is notified in a single callback
- * instead of running a timer, a window listener and an observer per instance. The observer
- * is released again when the last observed element is gone.
+ * Calls `listener` whenever the element is resized or the window is resized. A window resize
+ * can change the text width without changing the element's own size (for example through a
+ * responsive font size), which a `ResizeObserver` does not report.
+ *
+ * All Ellipsis instances share one `ResizeObserver` and one window listener, so a page with
+ * many of them is notified in a single callback instead of running a timer, a window listener
+ * and an observer per instance. Both are released when the last observed element is gone.
  */
 const observeResize = (element: Element, listener: ResizeListener) => {
-  if (typeof ResizeObserver === 'undefined') return undefined;
-
-  sharedResizeObserver ??= new ResizeObserver((entries) => {
-    entries.forEach((entry) => resizeListeners.get(entry.target)?.());
-  });
+  if (resizeListeners.size === 0) {
+    window.addEventListener('resize', notifyListeners);
+  }
   resizeListeners.set(element, listener);
-  sharedResizeObserver.observe(element);
+
+  if (typeof ResizeObserver !== 'undefined') {
+    sharedResizeObserver ??= new ResizeObserver((entries) => {
+      entries.forEach((entry) => resizeListeners.get(entry.target)?.());
+    });
+    sharedResizeObserver.observe(element);
+  }
 
   return () => {
     resizeListeners.delete(element);
@@ -65,6 +74,7 @@ const observeResize = (element: Element, listener: ResizeListener) => {
     if (resizeListeners.size === 0) {
       sharedResizeObserver?.disconnect();
       sharedResizeObserver = undefined;
+      window.removeEventListener('resize', notifyListeners);
     }
   };
 };
