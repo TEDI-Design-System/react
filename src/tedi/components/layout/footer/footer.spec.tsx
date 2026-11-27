@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { Breakpoint } from '../../../helpers';
 import { Footer } from './footer';
@@ -289,5 +289,105 @@ describe('Footer', () => {
     const dots = bottom.querySelectorAll('.tedi-footer-bottom__dot');
     expect(dots).toHaveLength(2);
     dots.forEach((dot) => expect(dot).toHaveAttribute('aria-hidden', 'true'));
+  });
+
+  it('Footer.List renders a labelled list with one item per link', () => {
+    render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Links">
+            <Footer.List aria-label="Links">
+              <Footer.ListItem>
+                <a href="#">A</a>
+              </Footer.ListItem>
+              <Footer.ListItem>
+                <a href="#">B</a>
+              </Footer.ListItem>
+            </Footer.List>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const list = screen.getByRole('list', { name: 'Links' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  });
+
+  it('Footer.List with `navigationLabel` is wrapped in a labelled navigation landmark', () => {
+    render(
+      <Footer>
+        <Footer.Bottom>
+          <Footer.List navigationLabel="Legal">
+            <Footer.ListItem>
+              <a href="#">A</a>
+            </Footer.ListItem>
+          </Footer.List>
+        </Footer.Bottom>
+      </Footer>
+    );
+
+    const nav = screen.getByRole('navigation', { name: 'Legal' });
+    expect(within(nav).getByRole('list')).toBeInTheDocument();
+  });
+
+  it('Footer.List keeps its links in a list inside a collapsible section below the mobile breakpoint', () => {
+    mockUseBreakpoint.mockReturnValue('xs');
+    render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Links" collapsible defaultOpen>
+            <Footer.List>
+              <Footer.ListItem>
+                <a href="#">A</a>
+              </Footer.ListItem>
+            </Footer.List>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    expect(within(screen.getByRole('list')).getAllByRole('listitem')).toHaveLength(1);
+  });
+
+  it('Footer.List with `separator` shows a dot only after items followed by another item on the same line', () => {
+    let firstRowEndsAfter = 2;
+    const offsetTop = jest
+      .spyOn(HTMLElement.prototype, 'offsetTop', 'get')
+      .mockImplementation(function (this: HTMLElement) {
+        const index = Array.from(this.parentElement?.children ?? []).indexOf(this);
+        return index < firstRowEndsAfter ? 0 : 24;
+      });
+
+    const footer = (firstLabel: string) => (
+      <Footer>
+        <Footer.Bottom>
+          <Footer.List separator>
+            {[firstLabel, 'B', 'C'].map((label) => (
+              <Footer.ListItem key={label}>
+                <a href="#">{label}</a>
+              </Footer.ListItem>
+            ))}
+          </Footer.List>
+        </Footer.Bottom>
+      </Footer>
+    );
+
+    try {
+      const { container, rerender } = render(footer('A'));
+      const list = screen.getByRole('list');
+      const followedItems = () =>
+        Array.from(container.querySelectorAll('.tedi-footer-list__item--followed'), (item) => item.textContent);
+
+      expect(list.className).toMatch(/--separator/);
+      expect(list.children).toHaveLength(3);
+      expect(followedItems()).toEqual(['A']);
+
+      firstRowEndsAfter = 1;
+      rerender(footer('A much longer label'));
+      expect(followedItems()).toEqual(['B']);
+    } finally {
+      offsetTop.mockRestore();
+    }
   });
 });

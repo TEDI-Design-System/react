@@ -25,6 +25,8 @@ const meta: Meta<typeof Footer> = {
     'Footer.Body': Footer.Body,
     'Footer.Section': Footer.Section,
     'Footer.Bottom': Footer.Bottom,
+    'Footer.List': Footer.List,
+    'Footer.ListItem': Footer.ListItem,
   } as never,
   title: 'TEDI-Ready/Layout/Footer',
   parameters: {
@@ -81,17 +83,23 @@ const InstagramIcon = () => (
 );
 
 const ContactLinks = () => (
-  <>
-    <Link href="tel:+3725555555" color="inverted">
-      +372 555 5555
-    </Link>
-    <Link href="mailto:tedi@tehik.ee" color="inverted">
-      tedi@tehik.ee
-    </Link>
-    <Link href="#" color="inverted">
-      Pärnu mnt. 132, 11317 Tallinn
-    </Link>
-  </>
+  <Footer.List>
+    <Footer.ListItem>
+      <Link href="tel:+3725555555" color="inverted">
+        +372 555 5555
+      </Link>
+    </Footer.ListItem>
+    <Footer.ListItem>
+      <Link href="mailto:tedi@tehik.ee" color="inverted">
+        tedi@tehik.ee
+      </Link>
+    </Footer.ListItem>
+    <Footer.ListItem>
+      <Link href="#" color="inverted">
+        Pärnu mnt. 132, 11317 Tallinn
+      </Link>
+    </Footer.ListItem>
+  </Footer.List>
 );
 
 type SectionOverrides = Partial<
@@ -111,32 +119,52 @@ const StandardSections = ({
       defaultOpen={firstOpen}
       {...sectionProps}
     >
-      <Link href="#" color="inverted">
-        Privaatsuspoliitika
-      </Link>
-      <Link href="#" color="inverted">
-        Küpsised
-      </Link>
-      <Link href="#" color="inverted">
-        Korduma kippuvad küsimused
-      </Link>
-      <Link href="#" color="inverted">
-        Karjäärivõimalused
-      </Link>
+      <Footer.List>
+        <Footer.ListItem>
+          <Link href="#" color="inverted">
+            Privaatsuspoliitika
+          </Link>
+        </Footer.ListItem>
+        <Footer.ListItem>
+          <Link href="#" color="inverted">
+            Küpsised
+          </Link>
+        </Footer.ListItem>
+        <Footer.ListItem>
+          <Link href="#" color="inverted">
+            Korduma kippuvad küsimused
+          </Link>
+        </Footer.ListItem>
+        <Footer.ListItem>
+          <Link href="#" color="inverted">
+            Karjäärivõimalused
+          </Link>
+        </Footer.ListItem>
+      </Footer.List>
     </Footer.Section>
     <Footer.Section icon={showIcons ? 'share' : undefined} heading="Sotsiaalmeedia ja uuendused" {...sectionProps}>
-      <Link href="#" color="inverted">
-        Uudiskirja tellimine
-      </Link>
-      <Link href="https://x.com" color="inverted">
-        Jälgi meid Twitteris
-      </Link>
-      <Link href="https://www.facebook.com/TEHIK" color="inverted">
-        Jälgi meid Facebookis
-      </Link>
-      <Link href="#" color="inverted">
-        Liitu meie kogukonnaga
-      </Link>
+      <Footer.List>
+        <Footer.ListItem>
+          <Link href="#" color="inverted">
+            Uudiskirja tellimine
+          </Link>
+        </Footer.ListItem>
+        <Footer.ListItem>
+          <Link href="https://x.com" color="inverted">
+            Jälgi meid Twitteris
+          </Link>
+        </Footer.ListItem>
+        <Footer.ListItem>
+          <Link href="https://www.facebook.com/TEHIK" color="inverted">
+            Jälgi meid Facebookis
+          </Link>
+        </Footer.ListItem>
+        <Footer.ListItem>
+          <Link href="#" color="inverted">
+            Liitu meie kogukonnaga
+          </Link>
+        </Footer.ListItem>
+      </Footer.List>
     </Footer.Section>
     <Footer.Section icon={showIcons ? contactIcon : undefined} heading="Kontakt" {...sectionProps}>
       <ContactLinks />
@@ -149,9 +177,11 @@ const bottomLinks = [
   ['Instagram', 'https://www.instagram.com/nahtamatudkangelased/'],
   ['LinkedIn', 'https://www.linkedin.com/showcase/tedi-disain/'],
 ].map(([label, href]) => (
-  <Link key={label} href={href} color="inverted" underline={false}>
-    {label}
-  </Link>
+  <Footer.ListItem key={label}>
+    <Link href={href} color="inverted" underline={false}>
+      {label}
+    </Link>
+  </Footer.ListItem>
 ));
 
 const DeviceFrame = ({
@@ -375,18 +405,28 @@ export const LogoPosition: Story = {
 const BottomSections = () => (
   <>
     <Footer.Section icon="info" heading="Uuri lähemalt">
-      <Link href="#" color="inverted">
-        Privaatsuspoliitika
-      </Link>
-      <Link href="#" color="inverted">
-        Küpsised
-      </Link>
-      <Link href="#" color="inverted">
-        Korduma kippuvad küsimused
-      </Link>
-      <Link href="#" color="inverted">
-        Karjäärivõimalused
-      </Link>
+      <Footer.List>
+        <Footer.ListItem>
+          <Link href="#" color="inverted">
+            Privaatsuspoliitika
+          </Link>
+        </Footer.ListItem>
+        <Footer.ListItem>
+          <Link href="#" color="inverted">
+            Küpsised
+          </Link>
+        </Footer.ListItem>
+        <Footer.ListItem>
+          <Link href="#" color="inverted">
+            Korduma kippuvad küsimused
+          </Link>
+        </Footer.ListItem>
+        <Footer.ListItem>
+          <Link href="#" color="inverted">
+            Karjäärivõimalused
+          </Link>
+        </Footer.ListItem>
+      </Footer.List>
     </Footer.Section>
     <Footer.Section icon="location_on" heading="Kontakt">
       <ContactLinks />
@@ -406,7 +446,9 @@ export const WithBottomSection: Story = {
           <Footer.Side placement="end">
             <LogoPlaceholder />
           </Footer.Side>
-          <Footer.Bottom>{bottomLinks}</Footer.Bottom>
+          <Footer.Bottom>
+            <Footer.List>{bottomLinks}</Footer.List>
+          </Footer.Bottom>
         </Footer>
         <Footer>
           <Footer.Body>
@@ -415,7 +457,9 @@ export const WithBottomSection: Story = {
           <Footer.Side placement="end">
             <LogoPlaceholder />
           </Footer.Side>
-          <Footer.Bottom separator>{bottomLinks}</Footer.Bottom>
+          <Footer.Bottom>
+            <Footer.List separator>{bottomLinks}</Footer.List>
+          </Footer.Bottom>
         </Footer>
         <DeviceFrame
           storyId="tedi-ready-layout-footer--device-frame-source-bottom-section"
@@ -439,12 +483,16 @@ export const DeviceFrameSourceBottomSection: Story = {
       <Footer.Side placement="end">
         <LogoPlaceholder />
       </Footer.Side>
-      <Footer.Bottom separator>
-        {[1, 2, 3, 4, 5, 6].map((id) => (
-          <Link key={id} href="#" color="inverted" underline={false}>
-            Link
-          </Link>
-        ))}
+      <Footer.Bottom>
+        <Footer.List separator>
+          {[1, 2, 3, 4, 5, 6].map((id) => (
+            <Footer.ListItem key={id}>
+              <Link href="#" color="inverted" underline={false}>
+                Link
+              </Link>
+            </Footer.ListItem>
+          ))}
+        </Footer.List>
       </Footer.Bottom>
     </Footer>
   ),
@@ -506,31 +554,51 @@ export const CustomContent: Story = {
         <Footer>
           <Footer.Body columns={4}>
             <Footer.Section heading="Uuri lähemalt">
-              <Link href="#" color="inverted">
-                Privaatsuspoliitika
-              </Link>
-              <Link href="#" color="inverted">
-                Küpsised
-              </Link>
-              <Link href="#" color="inverted">
-                Korduma kippuvad küsimused
-              </Link>
+              <Footer.List>
+                <Footer.ListItem>
+                  <Link href="#" color="inverted">
+                    Privaatsuspoliitika
+                  </Link>
+                </Footer.ListItem>
+                <Footer.ListItem>
+                  <Link href="#" color="inverted">
+                    Küpsised
+                  </Link>
+                </Footer.ListItem>
+                <Footer.ListItem>
+                  <Link href="#" color="inverted">
+                    Korduma kippuvad küsimused
+                  </Link>
+                </Footer.ListItem>
+              </Footer.List>
             </Footer.Section>
             <Footer.Section heading="Sotsiaalmeedia">
-              <Link href="https://x.com" color="inverted">
-                Jälgi meid Twitteris
-              </Link>
-              <Link href="https://www.facebook.com/TEHIK" color="inverted">
-                Jälgi meid Facebookis
-              </Link>
-              <Link href="#" color="inverted">
-                Liitu meie kogukonnaga
-              </Link>
+              <Footer.List>
+                <Footer.ListItem>
+                  <Link href="https://x.com" color="inverted">
+                    Jälgi meid Twitteris
+                  </Link>
+                </Footer.ListItem>
+                <Footer.ListItem>
+                  <Link href="https://www.facebook.com/TEHIK" color="inverted">
+                    Jälgi meid Facebookis
+                  </Link>
+                </Footer.ListItem>
+                <Footer.ListItem>
+                  <Link href="#" color="inverted">
+                    Liitu meie kogukonnaga
+                  </Link>
+                </Footer.ListItem>
+              </Footer.List>
             </Footer.Section>
             <Footer.Section heading="Uudised">
-              <Link href="#" color="inverted">
-                Uudiskirja tellimine
-              </Link>
+              <Footer.List>
+                <Footer.ListItem>
+                  <Link href="#" color="inverted">
+                    Uudiskirja tellimine
+                  </Link>
+                </Footer.ListItem>
+              </Footer.List>
             </Footer.Section>
             <Footer.Section icon="call" heading="Kontakt">
               <ContactLinks />
@@ -593,24 +661,38 @@ export const MaxWidthAndColumns: Story = {
       <Footer.Body columns={2} lg={{ columns: 4 }}>
         <StandardSections />
         <Footer.Section icon="local_library" heading="Uudised">
-          <Link href="#" color="inverted">
-            Pressiteated
-          </Link>
-          <Link href="#" color="inverted">
-            Blogi
-          </Link>
+          <Footer.List>
+            <Footer.ListItem>
+              <Link href="#" color="inverted">
+                Pressiteated
+              </Link>
+            </Footer.ListItem>
+            <Footer.ListItem>
+              <Link href="#" color="inverted">
+                Blogi
+              </Link>
+            </Footer.ListItem>
+          </Footer.List>
         </Footer.Section>
       </Footer.Body>
-      <Footer.Bottom separator>
-        <Link href="#" color="inverted" underline={false}>
-          Privaatsuspoliitika
-        </Link>
-        <Link href="#" color="inverted" underline={false}>
-          Küpsised
-        </Link>
-        <Link href="#" color="inverted" underline={false}>
-          Ligipääsetavus
-        </Link>
+      <Footer.Bottom>
+        <Footer.List separator>
+          <Footer.ListItem>
+            <Link href="#" color="inverted" underline={false}>
+              Privaatsuspoliitika
+            </Link>
+          </Footer.ListItem>
+          <Footer.ListItem>
+            <Link href="#" color="inverted" underline={false}>
+              Küpsised
+            </Link>
+          </Footer.ListItem>
+          <Footer.ListItem>
+            <Link href="#" color="inverted" underline={false}>
+              Ligipääsetavus
+            </Link>
+          </Footer.ListItem>
+        </Footer.List>
       </Footer.Bottom>
     </Footer>
   ),
