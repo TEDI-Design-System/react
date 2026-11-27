@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import React from 'react';
 
-import { useElementSize } from '../../../helpers';
 import Popover from '../../overlays/popover/popover';
 import styles from './ellipsis.module.scss';
 
@@ -39,24 +38,59 @@ export interface EllipsisProps {
   className?: string;
 }
 
+type ResizeListener = () => void;
+
+const resizeListeners = new Map<Element, ResizeListener>();
+let sharedResizeObserver: ResizeObserver | undefined;
+
+/**
+ * Calls `listener` whenever the element is resized. All Ellipsis instances share one
+ * `ResizeObserver`, so a page with many of them is notified in a single callback
+ * instead of running a timer, a window listener and an observer per instance. The observer
+ * is released again when the last observed element is gone.
+ */
+const observeResize = (element: Element, listener: ResizeListener) => {
+  if (typeof ResizeObserver === 'undefined') return undefined;
+
+  sharedResizeObserver ??= new ResizeObserver((entries) => {
+    entries.forEach((entry) => resizeListeners.get(entry.target)?.());
+  });
+  resizeListeners.set(element, listener);
+  sharedResizeObserver.observe(element);
+
+  return () => {
+    resizeListeners.delete(element);
+    sharedResizeObserver?.unobserve(element);
+
+    if (resizeListeners.size === 0) {
+      sharedResizeObserver?.disconnect();
+      sharedResizeObserver = undefined;
+    }
+  };
+};
+
 export const Ellipsis = (props: EllipsisProps): JSX.Element => {
   const { children, lineClamp = 2, position = 'end', popover = true, className, ...rest } = props;
   const elementRef = React.useRef<HTMLDivElement>(null);
   const [isEllipsed, setIsEllipsed] = React.useState(false);
-  const elementSize = useElementSize(elementRef);
+  const showPopover = isEllipsed && popover;
 
+  // The element is re-created when the popover wrapper is added or removed, so
+  // measuring and observing starts over whenever `showPopover` changes.
   React.useEffect(() => {
     const element = elementRef.current;
-    if (!element) return;
+    if (!element) return undefined;
 
     // `start` truncates on a single line (horizontal overflow); `end` clamps
     // multiple lines (vertical overflow).
-    setIsEllipsed(
-      position === 'start' ? element.scrollWidth > element.clientWidth : element.scrollHeight > element.clientHeight
-    );
-  }, [elementSize, position, lineClamp]);
+    const measure = () =>
+      setIsEllipsed(
+        position === 'start' ? element.scrollWidth > element.clientWidth : element.scrollHeight > element.clientHeight
+      );
 
-  const showPopover = isEllipsed && popover;
+    measure();
+    return observeResize(element, measure);
+  }, [position, lineClamp, showPopover]);
 
   const ellipsis = (
     <div

@@ -92,4 +92,51 @@ describe('Ellipsis Component', () => {
 
     expect(screen.getByText('Ellipsis content')).toBeInTheDocument();
   });
+
+  describe('resize observing', () => {
+    const originalResizeObserver = global.ResizeObserver;
+    const observe = jest.fn();
+    const unobserve = jest.fn();
+    let observerCallback: ResizeObserverCallback;
+
+    beforeEach(() => {
+      jest.restoreAllMocks();
+      observe.mockClear();
+      unobserve.mockClear();
+      global.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
+        observerCallback = callback;
+        return { observe, unobserve, disconnect: jest.fn() };
+      }) as unknown as typeof ResizeObserver;
+    });
+
+    afterEach(() => {
+      global.ResizeObserver = originalResizeObserver;
+    });
+
+    it('re-measures when the element is resized', () => {
+      const scrollHeight = jest.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(50);
+      jest.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(50);
+      render(<Ellipsis>Ellipsis content</Ellipsis>);
+      const element = screen.getByText('Ellipsis content').closest('[data-name="ellipsis"]') as HTMLElement;
+      expect(element).not.toHaveAttribute('tabindex');
+
+      scrollHeight.mockReturnValue(100);
+      act(() => {
+        observerCallback([{ target: element } as ResizeObserverEntry], {} as ResizeObserver);
+      });
+
+      expect(screen.getByText('Ellipsis content').closest('[data-name="ellipsis"]')).toHaveAttribute('tabindex', '0');
+    });
+
+    it('stops observing the element on unmount', () => {
+      jest.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(50);
+      jest.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(50);
+      const { unmount } = render(<Ellipsis>Ellipsis content</Ellipsis>);
+      expect(observe).toHaveBeenCalledTimes(1);
+
+      unmount();
+
+      expect(unobserve).toHaveBeenCalledTimes(1);
+    });
+  });
 });
