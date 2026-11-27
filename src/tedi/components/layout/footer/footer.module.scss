@@ -116,6 +116,72 @@
   @include footer-links;
 }
 
+.tedi-footer-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  @include footer-links;
+}
+
+.tedi-footer-list__item {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.tedi-footer-bottom__inner > .tedi-footer-list,
+.tedi-footer-bottom__inner > nav > .tedi-footer-list {
+  flex-flow: row wrap;
+  gap: var(--_footer-bottom-gap);
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin footer-list-separator-gap {
+  // Reserve room for dots only where flexbox places a gap between items.
+  // Items stretch to the row height so items on one row share the same top edge.
+  column-gap: calc(2 * var(--_footer-list-gap) + var(--separator-dot-size-sm));
+  align-items: stretch;
+}
+
+.tedi-footer-list--separator {
+  --_footer-list-gap: var(--layout-grid-gutters-24);
+
+  @include footer-list-separator-gap;
+}
+
+.tedi-footer-bottom__inner > .tedi-footer-list--separator,
+.tedi-footer-bottom__inner > nav > .tedi-footer-list--separator {
+  --_footer-list-gap: var(--_footer-bottom-gap);
+
+  @include footer-list-separator-gap;
+}
+
+.tedi-footer-list--separator > .tedi-footer-list__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+
+  &::after {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: calc(100% + var(--_footer-list-gap));
+    visibility: hidden;
+    width: var(--separator-dot-size-sm);
+    height: var(--separator-dot-size-sm);
+    content: '';
+    background-color: var(--general-border-secondary);
+    border-radius: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.tedi-footer-list--separator > .tedi-footer-list__item--followed::after {
+  visibility: visible;
+}
+
 .tedi-footer-section__heading {
   margin: 0;
   font-size: inherit;

@@ -6,6 +6,8 @@ import styles from './footer.module.scss';
 import { FooterBody } from './footer-body/footer-body';
 import { FooterBottom } from './footer-bottom/footer-bottom';
 import { FooterContext, FooterContextValue } from './footer-context';
+import { FooterList } from './footer-list/footer-list';
+import { FooterListItem } from './footer-list/footer-list-item';
 import { FooterSection } from './footer-section/footer-section';
 import { FooterSide, FooterSideBaseProps, FooterSideProps } from './footer-side/footer-side';
 
@@ -112,6 +114,8 @@ Footer.Side = FooterSide;
 Footer.Body = FooterBody;
 Footer.Section = FooterSection;
 Footer.Bottom = FooterBottom;
+Footer.List = FooterList;
+Footer.ListItem = FooterListItem;
 
 Footer.displayName = 'Footer';
 

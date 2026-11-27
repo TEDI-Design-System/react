@@ -49,7 +49,8 @@ export interface FooterSectionProps {
    */
   iconBreakpoint?: Breakpoint;
   /**
-   * Section content — typically a sequence of `<Link>` elements.
+   * Section content. Wrap links in `<Footer.List>` with one `<Footer.ListItem>` per link so assistive
+   * technology announces them as a list. Other content (text, icons) is rendered as given.
    */
   children: ReactNode;
   /**

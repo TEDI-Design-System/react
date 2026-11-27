@@ -7,13 +7,14 @@ import { FooterContext } from '../footer-context';
 
 export interface FooterBottomProps {
   /**
-   * Bottom-row content — typically a sequence of `<Link>` elements. On mobile the gap shrinks
-   * and items wrap to multiple lines.
+   * Bottom-row content. Wrap links in `<Footer.List>` with one `<Footer.ListItem>` per link so assistive
+   * technology announces them as a list. On mobile the gap shrinks and items wrap to multiple lines.
    */
   children: ReactNode;
   /**
    * Insert a small dot between items (matches the Figma "with separator" bottom variant). When
-   * `false`, items are spaced only by the flex `gap`.
+   * `false`, items are spaced only by the flex `gap`. Does not reach inside `<Footer.List>`; set
+   * `separator` on the list instead.
    * @default false
    */
   separator?: boolean;
