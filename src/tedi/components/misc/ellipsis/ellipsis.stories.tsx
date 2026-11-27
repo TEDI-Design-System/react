@@ -3,7 +3,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { VISUAL_TEST_VIEWPORTS, VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import Popover from '../../overlays/popover/popover';
+import Tooltip from '../../overlays/tooltip/tooltip';
 import Ellipsis, { EllipsisProps } from './ellipsis';
 
 /**
@@ -44,7 +44,7 @@ export const Default: Story = {
 };
 
 /**
- * Resize the window to see that the ellipsis and popover appear only when content doesn't fit
+ * Resize the window to see that the ellipsis and tooltip appear only when content doesn't fit
  */
 export const ResponsiveExample: Story = {
   args: {
@@ -72,23 +72,23 @@ export const LeadingStart: Story = {
 };
 
 /**
- * Example when popover is shown even when text doesn't ellipse.
- * Use this when you want to show popover always or with custom content
+ * Example when tooltip is shown even when text doesn't ellipse.
+ * Use this when you want to show tooltip always or with custom content
  */
 export const ResponsiveWithCustomPopover: Story = {
   args: {
     lineClamp: 1,
     popover: false,
     children: (
-      <Popover openWith="hover" focusManager={{ modal: false }}>
-        <Popover.Trigger>
-          <span role="button">
+      <Tooltip>
+        <Tooltip.Trigger>
+          <span>
             Any inline <b>content (even bold)</b>, that is too long for the wrapper
             <span className="text-small"> and dont fit in x number of rows</span>
           </span>
-        </Popover.Trigger>
-        <Popover.Content>Custom popover content, shown also when text doesn&apos;t Ellipse</Popover.Content>
-      </Popover>
+        </Tooltip.Trigger>
+        <Tooltip.Content>Custom tooltip content, shown also when text doesn&apos;t Ellipse</Tooltip.Content>
+      </Tooltip>
     ),
   },
 };
@@ -112,7 +112,7 @@ export const VisualTest: Story = {
         <VisualTestStory story={ResponsiveExample} component={Ellipsis} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Responsive with custom popover</Text>
+        <Text modifiers="bold">Responsive with custom tooltip</Text>
         <VisualTestStory story={ResponsiveWithCustomPopover} component={Ellipsis} />
       </VerticalSpacing>
     </VerticalSpacing>

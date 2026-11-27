@@ -1,11 +1,21 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { act } from 'react';
 
+import * as helpers from '../../../helpers';
 import Ellipsis, { EllipsisProps } from './ellipsis';
 
 import '@testing-library/jest-dom';
 
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
+  useIsTouchDevice: jest.fn(),
+}));
+
 describe('Ellipsis Component', () => {
+  beforeEach(() => {
+    (helpers.useIsTouchDevice as jest.Mock).mockReturnValue(false);
+  });
+
   const renderEllipsis = (props: Partial<EllipsisProps> = {}) => {
     return render(
       <Ellipsis {...props}>
@@ -31,13 +41,13 @@ describe('Ellipsis Component', () => {
     expect(ellipsisElement).toHaveStyle({ 'line-clamp': '3' });
   });
 
-  it('renders with popover when content overflows', () => {
+  it('renders the trigger when content overflows', () => {
     const { container } = renderEllipsis({ popover: true });
     const popoverTrigger = container.querySelector('[data-name="ellipsis"]');
     expect(popoverTrigger).toBeInTheDocument();
   });
 
-  it('does not render popover when popover is false', () => {
+  it('does not render a tooltip when popover is false', () => {
     const { container } = renderEllipsis({ popover: false });
     expect(container.querySelector('Popover')).not.toBeInTheDocument();
   });
@@ -59,10 +69,27 @@ describe('Ellipsis Component', () => {
       </Ellipsis>
     );
 
-    expect(screen.getByRole('button')).toHaveTextContent('Ellipsis content');
+    const trigger = screen.getByText('Ellipsis content').closest('[data-name="ellipsis"]');
+    expect(trigger).toHaveAttribute('tabindex', '0');
+    expect(trigger).not.toHaveAttribute('role', 'button');
   });
 
-  it('does not show popover when content fits within container', () => {
+  it('shows the full content in a tooltip when the text is truncated', async () => {
+    jest.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(100);
+    jest.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(50);
+
+    render(
+      <Ellipsis>
+        <p>Ellipsis content</p>
+      </Ellipsis>
+    );
+
+    fireEvent.mouseEnter(screen.getByText('Ellipsis content').closest('[data-name="ellipsis"]') as HTMLElement);
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Ellipsis content');
+  });
+
+  it('does not show tooltip when content fits within container', () => {
     jest.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(50);
     jest.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(50);
 
@@ -73,7 +100,8 @@ describe('Ellipsis Component', () => {
     );
 
     expect(screen.getByText('Ellipsis content')).toBeInTheDocument();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    const element = screen.getByText('Ellipsis content').closest('[data-name="ellipsis"]');
+    expect(element).not.toHaveAttribute('tabindex');
   });
 
   it('does not apply a lineClamp style for the start position', () => {
