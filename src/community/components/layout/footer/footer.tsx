@@ -82,11 +82,11 @@ const FooterCategory = (props: FooterCategory): JSX.Element => {
   const { heading, icon, elements } = props;
 
   const getIcon = (icon: string | IconProps) => {
-    const defaultIconProps: Partial<IconProps> = { size: 16, color: 'inherit', background: undefined };
+    const defaultIconProps: Partial<IconProps> = { size: 16, color: 'inherit', backgroundColor: undefined };
     const iconProps: IconProps =
       typeof icon === 'string'
-        ? { ...defaultIconProps, name: icon, background: undefined }
-        : { ...defaultIconProps, ...icon, background: undefined };
+        ? { ...defaultIconProps, name: icon, backgroundColor: undefined }
+        : { ...defaultIconProps, ...icon, backgroundColor: undefined };
 
     return <Icon {...iconProps} />;
   };

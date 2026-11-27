@@ -24,14 +24,14 @@ export interface CardContentProps extends BreakpointSupport<SharedCardProps> {
 }
 
 export const CardContent = (props: CardContentProps): JSX.Element => {
-  const { padding: rootPadding, background: rootBackground } = React.useContext(CardContext);
+  const { padding: rootPadding, backgroundColor: rootBackgroundColor } = React.useContext(CardContext);
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
 
   const {
     children,
     className,
     padding,
-    background = 'primary',
+    backgroundColor = 'primary',
     backgroundImage,
     backgroundPosition,
     backgroundSize,
@@ -42,10 +42,10 @@ export const CardContent = (props: CardContentProps): JSX.Element => {
     ...rest
   } = getCurrentBreakpointProps<CardContentProps>(props, {
     padding: rootPadding,
-    background: rootBackground,
+    backgroundColor: rootBackgroundColor,
   });
 
-  const backgroundClass = background ? styles[`tedi-card--background--${background}`] : '';
+  const backgroundClass = backgroundColor ? styles[`tedi-card--background--${backgroundColor}`] : '';
   const backgroundStyle: React.CSSProperties = {
     backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
     backgroundPosition,

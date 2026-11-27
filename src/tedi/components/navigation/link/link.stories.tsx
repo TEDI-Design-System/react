@@ -401,7 +401,7 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       {visualTestVariants.map(({ label, inverted, story }) =>
         inverted ? (
-          <Card key={label} background="brand-primary" borderless>
+          <Card key={label} backgroundColor="brand-primary" borderless>
             <Card.Content>
               <VerticalSpacing size={0.5}>
                 <Text modifiers="bold" color="white">

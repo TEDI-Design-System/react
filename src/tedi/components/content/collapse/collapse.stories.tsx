@@ -153,7 +153,7 @@ export const VisualTest: Story = {
         <Text modifiers="bold">Full row toggle</Text>
         <VisualTestStory story={FullRowToggle} component={Collapse} />
       </VerticalSpacing>
-      <Card background="brand-primary" borderless>
+      <Card backgroundColor="brand-primary" borderless>
         <Card.Content>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold" color="white">

@@ -42,7 +42,7 @@ export interface SharedCardProps {
    * Background color.
    * @default primary
    */
-  background?: CardBackground;
+  backgroundColor?: CardBackground;
   /**
    * Background image.
    */
@@ -96,7 +96,7 @@ type CardBreakpointProps = {
    * Adds a colored accent border to the top or left of the card (e.g. `top-success-primary`, `left-danger-primary`).
    */
   border?: CardBorderType;
-} & Pick<CardContentProps, 'padding' | 'background'>;
+} & Pick<CardContentProps, 'padding' | 'backgroundColor'>;
 
 export interface CardProps extends BreakpointSupport<CardBreakpointProps> {
   children?: React.ReactNode;
@@ -108,7 +108,7 @@ export interface CardProps extends BreakpointSupport<CardBreakpointProps> {
 
 const CardComponent = forwardRef<HTMLDivElement, CardProps>((props, ref): JSX.Element => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  const { children, className, padding, background, borderRadius, borderless, border, ...rest } =
+  const { children, className, padding, backgroundColor, borderRadius, borderless, border, ...rest } =
     getCurrentBreakpointProps<CardProps>(props, { padding: 1 });
 
   const [borderPlacement, borderColor] = getCardBorderPlacementColor(border);
@@ -131,7 +131,7 @@ const CardComponent = forwardRef<HTMLDivElement, CardProps>((props, ref): JSX.El
   );
 
   return (
-    <CardContext.Provider value={{ padding, background }}>
+    <CardContext.Provider value={{ padding, backgroundColor }}>
       <div data-name="card" data-testid="tedi-card" {...rest} className={cardBEM} ref={ref}>
         {children}
       </div>

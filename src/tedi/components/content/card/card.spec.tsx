@@ -42,11 +42,11 @@ describe('Card Component', () => {
 
   it('provides context values to child components', () => {
     render(
-      <Card padding={2} background="primary">
+      <Card padding={2} backgroundColor="primary">
         <CardContext.Consumer>
           {(value) => (
             <div>
-              Padding: {value.padding as number}, Background: {value.background}
+              Padding: {value.padding as number}, Background: {value.backgroundColor}
             </div>
           )}
         </CardContext.Consumer>
@@ -55,6 +55,18 @@ describe('Card Component', () => {
 
     const contextInfo = screen.getByText('Padding: 2, Background: primary');
     expect(contextInfo).toBeInTheDocument();
+  });
+
+  it('applies the Card backgroundColor to CardContent', () => {
+    render(
+      <Card backgroundColor="secondary">
+        <CardContent>Content</CardContent>
+      </Card>
+    );
+
+    const content = screen.getByText('Content');
+    expect(content).toHaveClass('tedi-card--background--secondary');
+    expect(content).not.toHaveClass('tedi-card--background--primary');
   });
 
   it('applies border styles correctly', () => {

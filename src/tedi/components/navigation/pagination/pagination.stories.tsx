@@ -161,7 +161,7 @@ export const WiderSiblings: Story = {
 };
 
 /**
- * `background="transparent"` removes the surface fill and top border. Use it
+ * `backgroundColor="transparent"` removes the surface fill and top border. Use it
  * when pagination sits on a non-white container.
  */
 export const Transparent: Story = {
@@ -171,7 +171,7 @@ export const Transparent: Story = {
     totalItems: 97,
     pageSize: 10,
     pageSizeOptions: [10, 25, 50, 100],
-    background: 'transparent',
+    backgroundColor: 'transparent',
   },
   decorators: [
     (StoryEl) => (
@@ -526,7 +526,7 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Transparent</Text>
         <Card borderless>
-          <Card.Content background="secondary">
+          <Card.Content backgroundColor="secondary">
             <VisualTestStory
               story={Transparent}
               component={Pagination}

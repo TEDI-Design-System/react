@@ -48,7 +48,7 @@ const colorArray: IconProps['color'][] = [
   'white',
 ];
 
-type IconPropsType = IconProps['size'] | IconProps['color'] | IconProps['type'] | IconProps['background'];
+type IconPropsType = IconProps['size'] | IconProps['color'] | IconProps['type'] | IconProps['backgroundColor'];
 
 interface MultipleProps<Type = IconPropsType> {
   array: Type[];
@@ -57,7 +57,7 @@ interface MultipleProps<Type = IconPropsType> {
     name: string;
     property: string;
     color: IconProps['color'];
-    background: IconProps['background'];
+    backgroundColor: IconProps['backgroundColor'];
     size: IconProps['size'];
   }[];
 }
@@ -134,10 +134,10 @@ const TemplateColumnWithMultipleVariants: StoryFn<TemplateMultipleProps> = (args
             {item.size === 24 && <small className="example-text--secondary">default</small>}
           </Col>
           <Col className="flex">
-            <Icon {...{ size: item.size, background: item.background, name: item.name, color: item.color }} />
+            <Icon {...{ size: item.size, backgroundColor: item.backgroundColor, name: item.name, color: item.color }} />
             &nbsp;
             <Icon
-              {...{ size: item.size, background: item.background, name: item.name, color: item.color }}
+              {...{ size: item.size, backgroundColor: item.backgroundColor, name: item.name, color: item.color }}
               filled={true}
             />
           </Col>
@@ -153,32 +153,32 @@ const TemplateColumnWithBackgroundCircleVarians: StoryFn<TemplateMultipleProps> 
       <Col width="auto">
         <Row alignItems="center">
           <Col width="auto">
-            <Icon name="Vaccines" background="brand-primary" color="white" />
+            <Icon name="Vaccines" backgroundColor="brand-primary" color="white" />
           </Col>
           <Col width="auto">
-            <Icon name="Info" background="brand-primary" color="white" size={16} />
+            <Icon name="Info" backgroundColor="brand-primary" color="white" size={16} />
           </Col>
           <Col width="auto">
-            <Icon name="Vaccines" background="brand-secondary" color="brand" />
+            <Icon name="Vaccines" backgroundColor="brand-secondary" color="brand" />
           </Col>
           <Col width="auto">
-            <Icon name="Info" background="brand-secondary" color="brand" size={16} />
+            <Icon name="Info" backgroundColor="brand-secondary" color="brand" size={16} />
           </Col>
         </Row>
       </Col>
       <Col width="auto">
         <Row alignItems="center" className="bg bg-primary">
           <Col width="auto">
-            <Icon name="Vaccines" background="primary" color="brand" />
+            <Icon name="Vaccines" backgroundColor="primary" color="brand" />
           </Col>
           <Col width="auto">
-            <Icon name="Info" background="primary" color="brand" size={16} />
+            <Icon name="Info" backgroundColor="primary" color="brand" size={16} />
           </Col>
           <Col width="auto">
-            <Icon name="Vaccines" background="secondary" color="white" />
+            <Icon name="Vaccines" backgroundColor="secondary" color="white" />
           </Col>
           <Col width="auto">
-            <Icon name="Info" background="secondary" color="white" size={16} />
+            <Icon name="Info" backgroundColor="secondary" color="white" size={16} />
           </Col>
         </Row>
       </Col>
@@ -217,14 +217,14 @@ export const SizesWithBackground: Story = {
         name: 'info',
         property: 'size',
         color: 'brand',
-        background: 'brand-secondary',
+        backgroundColor: 'brand-secondary',
         size: 16,
       },
       {
         name: 'vaccines',
         property: 'size',
         color: 'brand',
-        background: 'brand-secondary',
+        backgroundColor: 'brand-secondary',
         size: 24,
       },
     ],

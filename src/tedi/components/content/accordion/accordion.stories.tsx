@@ -266,7 +266,7 @@ export const Variants: StoryObj = {
           <Accordion.Item>
             <Accordion.Item.Header
               title="Pealkiri"
-              beforeTitle={<Icon name="account_circle" color="brand" background="brand-secondary" size={16} />}
+              beforeTitle={<Icon name="account_circle" color="brand" backgroundColor="brand-secondary" size={16} />}
             />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
           </Accordion.Item>
@@ -709,7 +709,7 @@ export const Customized: StoryObj = {
               <Accordion.Item.Header
                 title="Pealkiri"
                 titleLayout="fill"
-                beforeTitle={<Icon name="account_circle" color="brand" background="brand-secondary" size={16} />}
+                beforeTitle={<Icon name="account_circle" color="brand" backgroundColor="brand-secondary" size={16} />}
                 afterTitle={<StatusBadge color="neutral">Uus</StatusBadge>}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>

@@ -190,7 +190,7 @@ export const VisualTest: StoryObj<StatesArgs> = {
           story={{ ...SecondaryButton, args: { ...metaArgs, ...SecondaryButton.args, idPrefix: 'vt-secondary-' } }}
         />
       </VerticalSpacing>
-      <Card background="brand-primary" borderless>
+      <Card backgroundColor="brand-primary" borderless>
         <Card.Content>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold" color="white">
@@ -202,7 +202,7 @@ export const VisualTest: StoryObj<StatesArgs> = {
           </VerticalSpacing>
         </Card.Content>
       </Card>
-      <Card background="brand-primary" borderless>
+      <Card backgroundColor="brand-primary" borderless>
         <Card.Content>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold" color="white">

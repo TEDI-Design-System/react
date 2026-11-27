@@ -145,7 +145,7 @@ const InternalButtonContent = forwardRef(
               ...defaultIconProps,
               ...icon,
               color: 'inherit',
-              background: undefined,
+              backgroundColor: undefined,
               className: cn(defaultIconProps.className, icon?.className),
             };
 

@@ -27,8 +27,8 @@ export interface IconSharedProps {
   name: string;
   /**
    * Additional classes to style the icon or its wrapper.
-   * - If `background` is provided, the `className` will be applied to the wrapper element.
-   * - If `background` is not provided, the `className` will be applied directly to the icon element.
+   * - If `backgroundColor` is provided, the `className` will be applied to the wrapper element.
+   * - If `backgroundColor` is not provided, the `className` will be applied directly to the icon element.
    */
   className?: string;
   /**
@@ -65,12 +65,12 @@ export interface IconWithBackgroundProps extends IconSharedProps {
   /**
    * Add round background
    */
-  background: IconBackgroundColor;
+  backgroundColor: IconBackgroundColor;
   display?: 'block';
 }
 
 export interface IconWithoutBackgroundProps extends IconSharedProps {
-  background?: undefined;
+  backgroundColor?: undefined;
   /**
    * Type of display
    * @default block
@@ -89,7 +89,7 @@ export const Icon = forwardRef<HTMLDivElement, IconProps>((props: IconProps, ref
     filled,
     display = 'block',
     color = 'primary',
-    background,
+    backgroundColor,
     label,
     ...rest
   } = props;
@@ -97,12 +97,12 @@ export const Icon = forwardRef<HTMLDivElement, IconProps>((props: IconProps, ref
   const wrapperBEM = cn(
     styles['tedi-icon__wrapper'],
     {
-      [styles['tedi-icon__wrapper--bg']]: background,
-      [styles[`tedi-icon__wrapper--bg-${background}`]]: background,
+      [styles['tedi-icon__wrapper--bg']]: backgroundColor,
+      [styles[`tedi-icon__wrapper--bg-${backgroundColor}`]]: backgroundColor,
       [styles[`tedi-icon__wrapper--size-${size}`]]: size,
-      [styles['tedi-icon__wrapper--block']]: background,
+      [styles['tedi-icon__wrapper--block']]: backgroundColor,
     },
-    background && className
+    backgroundColor && className
   );
 
   const iconBEM = cn(
@@ -114,12 +114,12 @@ export const Icon = forwardRef<HTMLDivElement, IconProps>((props: IconProps, ref
     size && styles[`tedi-icon--size-${size}`],
     display && styles[`tedi-icon--${display}`],
     filled && styles['tedi-icon--filled'],
-    !background && className
+    !backgroundColor && className
   );
 
   const iconElement = (
     <span
-      ref={!background ? ref : null}
+      ref={!backgroundColor ? ref : null}
       className={iconBEM}
       data-name="icon"
       role="img"
@@ -131,7 +131,7 @@ export const Icon = forwardRef<HTMLDivElement, IconProps>((props: IconProps, ref
     </span>
   );
 
-  if (background) {
+  if (backgroundColor) {
     return (
       <div className={wrapperBEM} ref={ref}>
         {iconElement}

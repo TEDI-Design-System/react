@@ -44,7 +44,7 @@ type Story = StoryObj<HorizontalStepperProps>;
  * `disabled`, `description`, …) — flattened into namespaced controls via the shared
  * `subcomponentArgTypes` helper — drive the **first** step (current by default) so their
  * effect is visible next to the unchanged later steps. The ungrouped controls are
- * `HorizontalStepper`'s own props (`background`, `compact`, …); `label` is excluded since
+ * `HorizontalStepper`'s own props (`backgroundColor`, `compact`, …); `label` is excluded since
  * each step sets its own.
  */
 export const Default: StoryObj = {
@@ -57,7 +57,7 @@ export const Default: StoryObj = {
   },
   args: {
     'aria-label': 'Form progress',
-    background: 'default',
+    backgroundColor: 'default',
     compact: 'sm',
     item__selected: true,
   },
@@ -110,7 +110,7 @@ const StatesMatrix = ({ compact, labelPrefix = '' }: { compact: boolean; labelPr
                   <div style={{ width: 'fit-content', maxWidth: '100%' }}>
                     <HorizontalStepper
                       aria-label={`${labelPrefix}${col.label} – ${row.label}`}
-                      background="transparent"
+                      backgroundColor="transparent"
                       compact={compact}
                     >
                       <HorizontalStepper.Item label="Step" {...col.props} />
@@ -149,7 +149,7 @@ const StatesMatrix = ({ compact, labelPrefix = '' }: { compact: boolean; labelPr
               <div key={col.key} data-stepper-state={row.key}>
                 <HorizontalStepper
                   aria-label={`${labelPrefix}${col.label} – ${row.label}`}
-                  background="transparent"
+                  backgroundColor="transparent"
                   compact={compact}
                 >
                   <HorizontalStepper.Item label="Step" {...col.props} />
@@ -254,12 +254,12 @@ export const WithDescriptions: Story = {
 };
 
 /**
- * `background="transparent"` drops the track surface so the stepper blends into
+ * `backgroundColor="transparent"` drops the track surface so the stepper blends into
  * a coloured or patterned page background.
  */
 export const TransparentBackground: Story = {
   render: () => (
-    <HorizontalStepper aria-label="Protsessi sammud" background="transparent" compact="lg">
+    <HorizontalStepper aria-label="Protsessi sammud" backgroundColor="transparent" compact="lg">
       <HorizontalStepper.Item label="Kutse" completed />
       <HorizontalStepper.Item label="Tahteavaldus" selected />
       <HorizontalStepper.Item label="Geenianalüüs" />

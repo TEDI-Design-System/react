@@ -102,7 +102,7 @@ type PaginationBreakpointProps = {
    * separately via `borders`.
    * @default white
    */
-  background?: PaginationBackground;
+  backgroundColor?: PaginationBackground;
   /**
    * Where the separator border is drawn around the pagination strip:
    * - `'top'` (default) — separator above only (typical "table then pager"
@@ -113,7 +113,7 @@ type PaginationBreakpointProps = {
    * - `'none'` — borderless, for embedded contexts where the outer container
    *   already provides framing.
    *
-   * Ignored when `background='transparent'` — that variant is always borderless.
+   * Ignored when `backgroundColor='transparent'` — that variant is always borderless.
    * @default top
    */
   borders?: PaginationBorders;
@@ -257,7 +257,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
   const {
     boundaryCount = 1,
     siblingCount = 1,
-    background = 'white',
+    backgroundColor = 'white',
     borders = 'top',
     showPrevNextButtons = false,
     showEdgeNavLabels = false,
@@ -382,8 +382,8 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
 
   const rootClassName = cn(
     styles['tedi-pagination'],
-    styles[`tedi-pagination--bg-${background}`],
-    background !== 'transparent' && styles[`tedi-pagination--borders-${borders}`],
+    styles[`tedi-pagination--bg-${backgroundColor}`],
+    backgroundColor !== 'transparent' && styles[`tedi-pagination--borders-${borders}`],
     {
       [styles['tedi-pagination--no-pager']]: !showPager,
       [styles['tedi-pagination--no-results']]: !showResults,

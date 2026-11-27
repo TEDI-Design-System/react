@@ -529,7 +529,7 @@ export const HasChildrenRows: StoryFn = () => {
         actions={editButton}
       >
         {certificates.map((name) => (
-          <Card.Content key={name} padding={1} background="tertiary" hasSeparator>
+          <Card.Content key={name} padding={1} backgroundColor="tertiary" hasSeparator>
             <VerticalSpacing size={0.5}>
               <TextGroup.List
                 type="horizontal"
@@ -565,7 +565,7 @@ export const HasChildrenRows: StoryFn = () => {
         actions={editButton}
       >
         {certificates.map((name) => (
-          <Card.Content key={name} padding={1} background="tertiary" hasSeparator>
+          <Card.Content key={name} padding={1} backgroundColor="tertiary" hasSeparator>
             <TextGroup.List
               type="horizontal"
               labelAlign="left"
@@ -592,7 +592,7 @@ export const HasChildrenRows: StoryFn = () => {
         actions={editButton}
       >
         {certificates.map((name) => (
-          <Card.Content key={name} padding={1} background="tertiary" hasSeparator>
+          <Card.Content key={name} padding={1} backgroundColor="tertiary" hasSeparator>
             <TextGroup.List
               type="vertical"
               columns={2}

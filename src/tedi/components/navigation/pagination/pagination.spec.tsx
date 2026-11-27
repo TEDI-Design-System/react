@@ -418,7 +418,7 @@ describe('Pagination component', () => {
   });
 
   it('applies the transparent background modifier class', () => {
-    const { container } = render(<Pagination pageCount={5} defaultPage={1} background="transparent" />);
+    const { container } = render(<Pagination pageCount={5} defaultPage={1} backgroundColor="transparent" />);
     const root = container.querySelector('[data-name="tedi-pagination"]');
     expect(root?.className).toMatch(/tedi-pagination--bg-transparent/);
   });
@@ -443,8 +443,10 @@ describe('Pagination component', () => {
     expect(root?.className).not.toMatch(/tedi-pagination--borders-both/);
   });
 
-  it('skips the border modifier entirely when background="transparent"', () => {
-    const { container } = render(<Pagination pageCount={5} defaultPage={1} background="transparent" borders="both" />);
+  it('skips the border modifier entirely when backgroundColor="transparent"', () => {
+    const { container } = render(
+      <Pagination pageCount={5} defaultPage={1} backgroundColor="transparent" borders="both" />
+    );
     const root = container.querySelector('[data-name="tedi-pagination"]');
     expect(root?.className).not.toMatch(/tedi-pagination--borders-/);
   });
