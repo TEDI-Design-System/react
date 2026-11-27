@@ -101,19 +101,23 @@ export const FooterSection = ({
         {applyCollapse ? (
           <Collapse
             id={`tedi-footer-section-${collapseId}`}
-            title={
-              <Heading element={headingLevel} modifiers="h6" color="white">
-                {heading}
-              </Heading>
-            }
             size="small"
             inverted
-            hideCollapseText
-            fullRowToggle
             defaultOpen={defaultOpen}
-            toggleLabel={typeof heading === 'string' ? heading : undefined}
             className={styles['tedi-footer-section__collapse']}
-            titleRowProps={{ gutter: 0 }}
+            {...(typeof heading === 'string'
+              ? // The toggle button sits inside the heading, so the section has one control named once.
+                { headingLevel, openText: heading, closeText: heading, underline: false }
+              : {
+                  title: (
+                    <Heading element={headingLevel} modifiers="h6" color="white">
+                      {heading}
+                    </Heading>
+                  ),
+                  hideCollapseText: true,
+                  fullRowToggle: true,
+                  titleRowProps: { gutter: 0 },
+                })}
           >
             <div className={styles['tedi-footer-section__content-inner']}>{children}</div>
           </Collapse>

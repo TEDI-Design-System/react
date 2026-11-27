@@ -11,3 +11,17 @@
   display: flex;
   align-items: center;
 }
+
+.tedi-collapse__heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+.tedi-collapse__heading > .tedi-collapse__heading-button {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  text-align: start;
+}

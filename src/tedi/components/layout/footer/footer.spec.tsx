@@ -91,6 +91,39 @@ describe('Footer', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
   });
 
+  it('collapsible section puts the toggle inside the heading, so the name is announced once', () => {
+    mockUseBreakpoint.mockReturnValue('xs');
+    render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Heading" headingLevel="h3" collapsible>
+            <a href="#">Link</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const heading = screen.getByRole('heading', { level: 3 });
+    expect(heading).toContainElement(screen.getByRole('button', { name: 'Heading' }));
+    expect(screen.getAllByText('Heading')).toHaveLength(1);
+  });
+
+  it('collapsible section with a non-string heading keeps its heading content', () => {
+    mockUseBreakpoint.mockReturnValue('xs');
+    render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading={<em>Rich heading</em>} collapsible>
+            <a href="#">Link</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    expect(screen.getByText('Rich heading')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('non-collapsible section uses a heading element, not a button', () => {
     render(
       <Footer>
