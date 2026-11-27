@@ -3,6 +3,7 @@ import React from 'react';
 import AnimateHeight from 'react-animate-height';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import { useLabels } from '../../../providers/label-provider';
 import { usePrint } from '../../../providers/printing-provider/printing-provider';
 import { CollapseButton } from '../../buttons/collapse-button/collapse-button';
 import { Col, Row, RowProps } from '../../layout/grid';
@@ -178,6 +179,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
 
   const [isOpenState, setIsOpen] = React.useState(() => defaultOpen ?? false);
   const isPrint = usePrint();
+  const { getLabel } = useLabels();
   const isOpen = isPrint || (open !== undefined ? open : isOpenState);
 
   const isIconOnly = iconOnly === true && !title;
@@ -227,9 +229,10 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
         })}
       >
         {HeadingTag ? (
-          <HeadingTag className={styles['tedi-collapse__heading']}>
+          // Printing drops the toggle, so the heading takes its id to keep the content region labelled.
+          <HeadingTag id={isPrint ? triggerId : undefined} className={styles['tedi-collapse__heading']}>
             {isPrint ? (
-              closeText ?? openText
+              closeText ?? getLabel('close')
             ) : (
               <CollapseButton
                 id={triggerId}

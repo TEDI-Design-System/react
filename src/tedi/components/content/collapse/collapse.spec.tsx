@@ -184,5 +184,24 @@ describe('Collapse', () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
       (usePrint as jest.Mock).mockReturnValue(false);
     });
+
+    it('prints the default close label when no label is given, like the toggle does', () => {
+      (usePrint as jest.Mock).mockReturnValue(true);
+      renderHeading({ openText: undefined, closeText: undefined });
+
+      const heading = screen.getByRole('heading', { level: 3 });
+      expect(heading.textContent?.trim()).not.toBe('');
+      (usePrint as jest.Mock).mockReturnValue(false);
+    });
+
+    it('keeps the content region labelled when printing', () => {
+      (usePrint as jest.Mock).mockReturnValue(true);
+      renderHeading();
+
+      const heading = screen.getByRole('heading', { level: 3 });
+      expect(heading).toHaveAttribute('id', 'collapse-1__trigger');
+      expect(screen.getByRole('region', { name: 'Section' })).toBeInTheDocument();
+      (usePrint as jest.Mock).mockReturnValue(false);
+    });
   });
 });

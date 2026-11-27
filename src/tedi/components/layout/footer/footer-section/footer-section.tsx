@@ -12,8 +12,10 @@ export type FooterSectionHeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
 export interface FooterSectionProps {
   /**
-   * Section heading text. Rendered as `<strong>` on desktop or as the trigger label of a
-   * `<Collapse>` on mobile (when `collapsible` is true).
+   * Section heading, rendered as the heading element at `headingLevel`. In a `collapsible` section on
+   * mobile, a plain-text heading becomes the label of the accordion toggle, which sits inside the
+   * heading. Other content (for example an element) stays beside an icon-only toggle, because the
+   * toggle label has to be text.
    */
   heading: ReactNode;
   /**
