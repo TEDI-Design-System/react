@@ -39,6 +39,7 @@ export const FooterList = ({
   className,
 }: FooterListProps): JSX.Element => {
   const listRef = useRef<HTMLUListElement>(null);
+  const hasNavigation = !!navigationLabel;
 
   useLayoutEffect(() => {
     const list = listRef.current;
@@ -63,7 +64,7 @@ export const FooterList = ({
     Array.from(list.children).forEach((item) => observer.observe(item));
 
     return () => observer.disconnect();
-  }, [children, separator]);
+  }, [children, separator, hasNavigation]);
 
   const list = (
     // `role="list"` keeps list semantics in Safari/VoiceOver, which drops them when `list-style` is `none`.

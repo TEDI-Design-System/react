@@ -138,17 +138,30 @@
   justify-content: center;
 }
 
-.tedi-footer-list--separator,
+@mixin footer-list-separator-gap {
+  // Reserve room for dots only where flexbox places a gap between items.
+  // Items stretch to the row height so items on one row share the same top edge.
+  column-gap: calc(2 * var(--_footer-list-gap) + var(--separator-dot-size-sm));
+  align-items: stretch;
+}
+
+.tedi-footer-list--separator {
+  --_footer-list-gap: var(--layout-grid-gutters-24);
+
+  @include footer-list-separator-gap;
+}
+
 .tedi-footer-bottom__inner > .tedi-footer-list--separator,
 .tedi-footer-bottom__inner > nav > .tedi-footer-list--separator {
-  // Reserve room for dots only where flexbox places a gap between items.
-  --_footer-list-gap: var(--_footer-bottom-gap, var(--layout-grid-gutters-24));
+  --_footer-list-gap: var(--_footer-bottom-gap);
 
-  column-gap: calc(2 * var(--_footer-list-gap) + var(--separator-dot-size-sm));
+  @include footer-list-separator-gap;
 }
 
 .tedi-footer-list--separator > .tedi-footer-list__item {
   position: relative;
+  display: flex;
+  align-items: center;
   max-width: 100%;
 
   &::after {

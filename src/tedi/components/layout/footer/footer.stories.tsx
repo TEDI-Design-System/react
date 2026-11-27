@@ -12,6 +12,7 @@ import Link from '../../navigation/link/link';
 import { VerticalSpacing } from '../vertical-spacing';
 import { Footer, FooterProps } from './footer';
 import { FooterContext } from './footer-context';
+import { FooterListProps } from './footer-list/footer-list';
 import { FooterSectionProps } from './footer-section/footer-section';
 
 /**
@@ -110,8 +111,14 @@ const StandardSections = ({
   contactIcon = 'call',
   firstOpen = false,
   showIcons = true,
+  firstListProps,
   ...sectionProps
-}: SectionOverrides & { contactIcon?: string; firstOpen?: boolean; showIcons?: boolean }) => (
+}: SectionOverrides & {
+  contactIcon?: string;
+  firstOpen?: boolean;
+  showIcons?: boolean;
+  firstListProps?: Pick<FooterListProps, 'navigationLabel'>;
+}) => (
   <>
     <Footer.Section
       icon={showIcons ? 'info' : undefined}
@@ -119,7 +126,7 @@ const StandardSections = ({
       defaultOpen={firstOpen}
       {...sectionProps}
     >
-      <Footer.List>
+      <Footer.List {...firstListProps}>
         <Footer.ListItem>
           <Link href="#" color="inverted">
             Privaatsuspoliitika
@@ -274,6 +281,11 @@ export const Default: StoryObj = {
       prefix: 'section',
       include: ['collapsible', 'defaultOpen', 'headingLevel', 'iconBreakpoint'],
     }),
+    ...subcomponentArgTypes(Footer.List, {
+      category: 'Footer.List',
+      prefix: 'list',
+      include: ['navigationLabel'],
+    }),
     ...subcomponentArgTypes(Footer.Side, {
       category: 'Footer.Side',
       prefix: 'side',
@@ -286,7 +298,10 @@ export const Default: StoryObj = {
   render: (args: Record<string, unknown>) => (
     <Footer {...getPrimaryComponentProps<FooterProps>(args)}>
       <Footer.Body {...getSubcomponentProps(args, 'body')}>
-        <StandardSections {...getSubcomponentProps<SectionOverrides>(args, 'section')} />
+        <StandardSections
+          {...getSubcomponentProps<SectionOverrides>(args, 'section')}
+          firstListProps={getSubcomponentProps<Pick<FooterListProps, 'navigationLabel'>>(args, 'list')}
+        />
       </Footer.Body>
       <Footer.Side {...getSubcomponentProps(args, 'side')}>
         <LogoPlaceholder />
