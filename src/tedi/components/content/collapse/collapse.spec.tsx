@@ -194,6 +194,22 @@ describe('Collapse', () => {
       (usePrint as jest.Mock).mockReturnValue(false);
     });
 
+    it('uses a single label for both states, on screen and in print', () => {
+      renderHeading({ openText: 'Section', closeText: undefined });
+
+      const button = screen.getByRole('button', { name: 'Section' });
+      fireEvent.click(button);
+      expect(screen.getByRole('button', { name: 'Section' })).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('prints the single label when only openText is given', () => {
+      (usePrint as jest.Mock).mockReturnValue(true);
+      renderHeading({ openText: 'Section', closeText: undefined });
+
+      expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent('Section');
+      (usePrint as jest.Mock).mockReturnValue(false);
+    });
+
     it('keeps the content region labelled when printing', () => {
       (usePrint as jest.Mock).mockReturnValue(true);
       renderHeading();

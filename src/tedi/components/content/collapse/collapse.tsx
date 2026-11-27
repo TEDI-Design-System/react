@@ -138,8 +138,9 @@ export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps
   /**
    * Renders the toggle button inside a heading of this level, following the WAI-ARIA accordion
    * pattern: one control, named once by its visible text, that is also a heading. Pass the label as
-   * `openText` / `closeText`. In this mode `title` is not rendered (it would repeat the button's
-   * name), and the whole row is the button. Leave unset to keep the title next to the toggle.
+   * `openText` / `closeText`; a single one is used for both states. In this mode `title` is not
+   * rendered (it would repeat the button's name), and the whole row is the button. Leave unset to keep
+   * the title next to the toggle.
    */
   headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
@@ -180,6 +181,9 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
   const [isOpenState, setIsOpen] = React.useState(() => defaultOpen ?? false);
   const isPrint = usePrint();
   const { getLabel } = useLabels();
+  // A heading keeps its text in both states (`aria-expanded` carries the state), so one label serves both.
+  const headingOpenText = openText ?? closeText;
+  const headingCloseText = closeText ?? openText;
   const isOpen = isPrint || (open !== undefined ? open : isOpenState);
 
   const isIconOnly = iconOnly === true && !title;
@@ -232,15 +236,15 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
           // Printing drops the toggle, so the heading takes its id to keep the content region labelled.
           <HeadingTag id={isPrint ? triggerId : undefined} className={styles['tedi-collapse__heading']}>
             {isPrint ? (
-              closeText ?? getLabel('close')
+              headingCloseText ?? getLabel('close')
             ) : (
               <CollapseButton
                 id={triggerId}
                 className={styles['tedi-collapse__heading-button']}
                 open={isOpen}
                 onOpenChange={handleToggle}
-                openText={openText}
-                closeText={closeText}
+                openText={headingOpenText}
+                closeText={headingCloseText}
                 size={size}
                 inverted={inverted}
                 underline={underline}
