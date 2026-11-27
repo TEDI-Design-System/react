@@ -12,8 +12,10 @@ export type FooterSectionHeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
 export interface FooterSectionProps {
   /**
-   * Section heading text. Rendered as `<strong>` on desktop or as the trigger label of a
-   * `<Collapse>` on mobile (when `collapsible` is true).
+   * Section heading, rendered as the heading element at `headingLevel`. In a `collapsible` section on
+   * mobile, a plain-text heading becomes the label of the accordion toggle, which sits inside the
+   * heading. Other content (for example an element) stays beside an icon-only toggle, because the
+   * toggle label has to be text.
    */
   heading: ReactNode;
   /**
@@ -101,19 +103,23 @@ export const FooterSection = ({
         {applyCollapse ? (
           <Collapse
             id={`tedi-footer-section-${collapseId}`}
-            title={
-              <Heading element={headingLevel} modifiers="h6" color="white">
-                {heading}
-              </Heading>
-            }
             size="small"
             inverted
-            hideCollapseText
-            fullRowToggle
             defaultOpen={defaultOpen}
-            toggleLabel={typeof heading === 'string' ? heading : undefined}
             className={styles['tedi-footer-section__collapse']}
-            titleRowProps={{ gutter: 0 }}
+            {...(typeof heading === 'string'
+              ? // The toggle button sits inside the heading, so the section has one control named once.
+                { headingLevel, openText: heading, closeText: heading, underline: false }
+              : {
+                  title: (
+                    <Heading element={headingLevel} modifiers="h6" color="white">
+                      {heading}
+                    </Heading>
+                  ),
+                  hideCollapseText: true,
+                  fullRowToggle: true,
+                  titleRowProps: { gutter: 0 },
+                })}
           >
             <div className={styles['tedi-footer-section__content-inner']}>{children}</div>
           </Collapse>

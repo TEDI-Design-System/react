@@ -126,6 +126,11 @@
 
 .tedi-footer-section__collapse {
   width: 100%;
+
+  // The toggle is the section heading, so it matches the desktop heading.
+  button[aria-expanded] {
+    font-weight: var(--body-bold-weight);
+  }
 }
 
 .tedi-footer-side {

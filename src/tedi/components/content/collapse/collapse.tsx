@@ -3,6 +3,7 @@ import React from 'react';
 import AnimateHeight from 'react-animate-height';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import { useLabels } from '../../../providers/label-provider';
 import { usePrint } from '../../../providers/printing-provider/printing-provider';
 import { CollapseButton } from '../../buttons/collapse-button/collapse-button';
 import { Col, Row, RowProps } from '../../layout/grid';
@@ -134,6 +135,14 @@ export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps
    * @default true
    */
   contentAsRegion?: boolean;
+  /**
+   * Renders the toggle button inside a heading of this level, following the WAI-ARIA accordion
+   * pattern: one control, named once by its visible text, that is also a heading. Pass the label as
+   * `openText` / `closeText`; a single one is used for both states. In this mode `title` is not
+   * rendered (it would repeat the button's name), and the whole row is the button. Leave unset to keep
+   * the title next to the toggle.
+   */
+  headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
 
 export const Collapse = (props: CollapseProps): JSX.Element => {
@@ -159,6 +168,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     inverted = false,
     fullRowToggle = false,
     contentAsRegion = true,
+    headingLevel,
     ...rest
   } = getCurrentBreakpointProps<CollapseProps>(props);
 
@@ -170,9 +180,14 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
 
   const [isOpenState, setIsOpen] = React.useState(() => defaultOpen ?? false);
   const isPrint = usePrint();
+  const { getLabel } = useLabels();
+  // A heading keeps its text in both states (`aria-expanded` carries the state), so one label serves both.
+  const headingOpenText = openText ?? closeText;
+  const headingCloseText = closeText ?? openText;
   const isOpen = isPrint || (open !== undefined ? open : isOpenState);
 
   const isIconOnly = iconOnly === true && !title;
+  const HeadingTag = headingLevel;
 
   const headerRef = React.useRef<HTMLDivElement>(null);
 
@@ -217,27 +232,50 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
           [styles['tedi-collapse__header--clickable']]: fullRowToggle,
         })}
       >
-        <Row justifyContent="between" alignItems="center" wrap="nowrap" {...titleRowProps}>
-          {title && <Col>{title}</Col>}
-          <Col width="auto">
-            <Print visibility="hide">
+        {HeadingTag ? (
+          // Printing drops the toggle, so the heading takes its id to keep the content region labelled.
+          <HeadingTag id={isPrint ? triggerId : undefined} className={styles['tedi-collapse__heading']}>
+            {isPrint ? (
+              headingCloseText ?? getLabel('close')
+            ) : (
               <CollapseButton
                 id={triggerId}
+                className={styles['tedi-collapse__heading-button']}
                 open={isOpen}
                 onOpenChange={handleToggle}
-                openText={openText}
-                closeText={closeText}
-                hideText={hideCollapseText || isIconOnly}
-                arrowType={arrowType}
+                openText={headingOpenText}
+                closeText={headingCloseText}
                 size={size}
                 inverted={inverted}
                 underline={underline}
                 aria-controls={isExternallyControlled ? controlsId : contentId}
                 {...(toggleLabel ? { 'aria-label': toggleLabel } : {})}
               />
-            </Print>
-          </Col>
-        </Row>
+            )}
+          </HeadingTag>
+        ) : (
+          <Row justifyContent="between" alignItems="center" wrap="nowrap" {...titleRowProps}>
+            {title && <Col>{title}</Col>}
+            <Col width="auto">
+              <Print visibility="hide">
+                <CollapseButton
+                  id={triggerId}
+                  open={isOpen}
+                  onOpenChange={handleToggle}
+                  openText={openText}
+                  closeText={closeText}
+                  hideText={hideCollapseText || isIconOnly}
+                  arrowType={arrowType}
+                  size={size}
+                  inverted={inverted}
+                  underline={underline}
+                  aria-controls={isExternallyControlled ? controlsId : contentId}
+                  {...(toggleLabel ? { 'aria-label': toggleLabel } : {})}
+                />
+              </Print>
+            </Col>
+          </Row>
+        )}
       </div>
 
       {!isExternallyControlled &&

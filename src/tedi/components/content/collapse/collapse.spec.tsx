@@ -139,4 +139,85 @@ describe('Collapse', () => {
     expect(screen.queryByTestId('collapse-inner')).not.toBeInTheDocument();
     expect(screen.queryByText('Should not render here')).not.toBeInTheDocument();
   });
+
+  describe('headingLevel', () => {
+    const renderHeading = (props?: Partial<CollapseProps>) =>
+      getComponent({ title: undefined, openText: 'Section', closeText: 'Section', headingLevel: 'h3', ...props });
+
+    it('puts the toggle button inside a heading of that level', () => {
+      renderHeading();
+
+      const heading = screen.getByRole('heading', { level: 3 });
+      expect(heading).toContainElement(screen.getByRole('button', { name: 'Section' }));
+    });
+
+    it('names the section once: the heading is the button, with no separate title', () => {
+      renderHeading({ title: <Heading>Section</Heading> });
+
+      expect(screen.getAllByText('Section')).toHaveLength(1);
+      expect(screen.getAllByRole('heading')).toHaveLength(1);
+      expect(screen.getByRole('button', { name: 'Section' })).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('toggles and labels the content region by the button', () => {
+      renderHeading();
+
+      const button = screen.getByRole('button', { name: 'Section' });
+      fireEvent.click(button);
+
+      expect(button).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByRole('region', { name: 'Section' })).toHaveTextContent('Collapse content');
+    });
+
+    it('keeps the title next to an icon-only toggle when headingLevel is not set', () => {
+      getComponent();
+
+      expect(screen.getByText('Heading')).toBeInTheDocument();
+      expect(screen.getByRole('button').closest('h1, h2, h3, h4, h5, h6')).toBeNull();
+    });
+
+    it('prints the label as plain text under the print provider', () => {
+      (usePrint as jest.Mock).mockReturnValue(true);
+      renderHeading();
+
+      expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent('Section');
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      (usePrint as jest.Mock).mockReturnValue(false);
+    });
+
+    it('prints the default close label when no label is given, like the toggle does', () => {
+      (usePrint as jest.Mock).mockReturnValue(true);
+      renderHeading({ openText: undefined, closeText: undefined });
+
+      const heading = screen.getByRole('heading', { level: 3 });
+      expect(heading.textContent?.trim()).not.toBe('');
+      (usePrint as jest.Mock).mockReturnValue(false);
+    });
+
+    it('uses a single label for both states, on screen and in print', () => {
+      renderHeading({ openText: 'Section', closeText: undefined });
+
+      const button = screen.getByRole('button', { name: 'Section' });
+      fireEvent.click(button);
+      expect(screen.getByRole('button', { name: 'Section' })).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('prints the single label when only openText is given', () => {
+      (usePrint as jest.Mock).mockReturnValue(true);
+      renderHeading({ openText: 'Section', closeText: undefined });
+
+      expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent('Section');
+      (usePrint as jest.Mock).mockReturnValue(false);
+    });
+
+    it('keeps the content region labelled when printing', () => {
+      (usePrint as jest.Mock).mockReturnValue(true);
+      renderHeading();
+
+      const heading = screen.getByRole('heading', { level: 3 });
+      expect(heading).toHaveAttribute('id', 'collapse-1__trigger');
+      expect(screen.getByRole('region', { name: 'Section' })).toBeInTheDocument();
+      (usePrint as jest.Mock).mockReturnValue(false);
+    });
+  });
 });
