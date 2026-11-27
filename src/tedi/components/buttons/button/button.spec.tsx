@@ -84,6 +84,14 @@ describe('Button component', () => {
     expect(button).toHaveClass('tedi-btn--extra-small', 'tedi-btn--icon-only');
   });
 
+  it('keeps the button focusable and its name unchanged while loading', () => {
+    render(<Button {...defaultProps} isLoading />);
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).not.toBeDisabled();
+    expect(button).toHaveAccessibleName('Click Me');
+  });
+
   it('is hidden when printing', () => {
     render(<Button>Save</Button>);
     expect(screen.getByRole('button', { name: 'Save' })).toHaveClass('no-print');

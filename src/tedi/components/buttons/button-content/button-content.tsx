@@ -1,7 +1,10 @@
+import { useMergeRefs } from '@floating-ui/react';
 import cn from 'classnames';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useContext, useEffect, useId, useRef } from 'react';
 
 import { AllowedHTMLTags, PolymorphicComponentPropWithRef, PolymorphicRef } from '../../../helpers/polymorphic/types';
+import { AccessibilityContext } from '../../../providers/accessibility-provider/accessibility-provider';
+import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Spinner } from '../../loaders/spinner/spinner';
@@ -67,11 +70,18 @@ export type ButtonContentProps<
      */
     isActive?: boolean;
     /**
-     * If button is in loading state and should show spinner.
-     * When isLoading is true, button does not trigger onClick event.
+     * Shows a spinner and blocks activation: `onClick` is not called, forms don't submit and links
+     * don't navigate. The button stays focusable. Screen readers hear the loading label when the
+     * focused button switches into this state (needs `AccessibilityProvider`,
+     * built into `Layout`), and as the button's description when it is focused while loading.
      * @default false
      */
     isLoading?: boolean;
+    /**
+     * What screen readers hear while `isLoading`. Say what is happening, e.g. "Saving".
+     * @default the `button.loading` label
+     */
+    loadingLabel?: string;
     /**
      * Skip applying button/link styles
      * Useful when you just want to use Button or Link logic without the styles
@@ -111,6 +121,7 @@ const InternalButtonContent = forwardRef(
       isHovered,
       isActive,
       isLoading = false,
+      loadingLabel,
       noStyle,
       _renderWrapperElement,
       fullWidth,
@@ -120,7 +131,33 @@ const InternalButtonContent = forwardRef(
     }: ButtonContentProps<C, P, A>,
     ref?: PolymorphicRef<C>
   ) => {
+    const { getLabel } = useLabels();
     const Component = as || 'button';
+
+    const accessibility = useContext(AccessibilityContext);
+    const loaderId = useId();
+    // `removeLoader` changes identity on every update, so the cleanup reads the latest one.
+    const removeLoaderRef = useRef(accessibility?.removeLoader);
+    removeLoaderRef.current = accessibility?.removeLoader;
+    const wasLoadingRef = useRef(isLoading);
+    const elementRef = useRef<HTMLElement>(null);
+    const mergedRef = useMergeRefs([elementRef, ref]);
+
+    useEffect(() => {
+      // Only a switch into loading is announced, not a button that renders loading.
+      const isSwitch = isLoading && !wasLoadingRef.current;
+      wasLoadingRef.current = isLoading;
+      // Focus-only, so buttons loading elsewhere don't interrupt with an assertive message.
+      if (!isSwitch || !accessibility || elementRef.current !== document.activeElement) return;
+
+      accessibility.addLoader({
+        id: loaderId,
+        mountLabel: loadingLabel || getLabel('button.loading'),
+        politeness: 'assertive',
+      });
+      return () => removeLoaderRef.current?.(loaderId);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoading]);
     const hasIcon = icon || iconLeft || iconRight;
 
     const BEM = !noStyle
@@ -183,7 +220,20 @@ const InternalButtonContent = forwardRef(
     };
 
     const onClickHandler = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-      if (onClick && !isLoading) onClick(event);
+      if (isLoading) {
+        event.preventDefault();
+        return;
+      }
+      onClick?.(event);
+    };
+
+    // A middle-click opens a link without firing `click`.
+    const onAuxClickHandler = (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {
+      if (isLoading) {
+        event.preventDefault();
+        return;
+      }
+      rest.onAuxClick?.(event);
     };
 
     const isIconOnly = Boolean(icon);
@@ -199,17 +249,25 @@ const InternalButtonContent = forwardRef(
     };
 
     const buttonText = getButtonText(children);
+    const loadingDescriptionId = `${loaderId}-loading`;
     const buttonElement = (
       <Component
         data-name="button-content"
         {...rest}
         aria-disabled={isLoading || rest['aria-disabled']}
-        aria-busy={isLoading || undefined}
+        aria-describedby={cn(rest['aria-describedby'], isLoading && loadingDescriptionId) || undefined}
         onClick={onClickHandler}
-        ref={ref}
+        onAuxClick={onAuxClickHandler}
+        ref={mergedRef}
         className={BEM}
       >
         {!noStyle ? renderContent() : children}
+        {isLoading && (
+          // aria-hidden keeps it out of the name and browse mode; aria-describedby still reads it.
+          <span id={loadingDescriptionId} aria-hidden="true" className={styles['tedi-btn__loading-description']}>
+            {loadingLabel || getLabel('button.loading')}
+          </span>
+        )}
       </Component>
     );
 

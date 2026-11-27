@@ -38,7 +38,7 @@ describe('MapButton', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
-  it('blocks onClick and marks busy while loading', () => {
+  it('blocks onClick and exposes the loading state while loading', () => {
     const onClick = jest.fn();
     render(
       <MapButton isLoading onClick={onClick}>
@@ -46,7 +46,7 @@ describe('MapButton', () => {
       </MapButton>
     );
     const btn = screen.getByRole('button');
-    expect(btn).toHaveAttribute('aria-busy', 'true');
+    expect(btn).toHaveAttribute('aria-disabled', 'true');
     fireEvent.click(btn);
     expect(onClick).not.toHaveBeenCalled();
   });
